@@ -274,6 +274,18 @@ export class View {
     this.sparks = this.pool(40, () => new THREE.Sprite(new THREE.SpriteMaterial({ map: this.glowTex, color: 0xffaa22, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })));
     this.debris = [];
     this.splats = [];
+    const ringGeo = new THREE.RingGeometry(0.2, 0.27, 28).rotateX(-Math.PI / 2);
+    this.ripples = [];
+    for (let i = 0; i < 4; i++) {
+      const m = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, fog: false }));
+      m.visible = false;
+      m.userData = { life: 1 };
+      this.ripples.push(m);
+    }
+    this.pulse = new THREE.Mesh(new THREE.RingGeometry(R_OUT + 0.1, R_OUT + 0.32, 64).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, fog: false }));
+    this.pulse.visible = false;
+    this.pulse.userData = { life: 1 };
+    this.scene.add(this.pulse);
 
     // polvo de fondo (da sensación de velocidad al caer)
     const N = 90;
@@ -318,7 +330,7 @@ export class View {
     this.camera.aspect = aspect;
     // que entre el anillo entero a lo ancho y unos tres anillos a lo alto
     const tv = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
-    const needW = (R_OUT * 1.32) / (tv * aspect);
+    const needW = (R_OUT * (aspect < 0.75 ? 1.45 : 1.32)) / (tv * aspect);
     const needH = 6.4 / tv;
     this.dist = Math.max(needW, needH, 9.5);
     this.camera.far = this.dist + 60;
@@ -516,6 +528,24 @@ export class View {
     }
   }
 
+  /** Onda blanca que se abre donde rebotó (pegada al anillo, gira con él). */
+  ripple(i, phi) {
+    const r = this.rings[i];
+    if (!r || this.reduced) return;
+    const m = this.ripples.find((x) => !x.visible) || this.ripples[0];
+    r.group.add(m);
+    m.position.set(Math.cos(phi) * ORBIT, 0.012, Math.sin(phi) * ORBIT);
+    m.visible = true;
+    m.userData.life = 0;
+  }
+
+  /** Pulso alrededor del anillo meta. */
+  goalPulse(y) {
+    this.pulse.position.y = y + 0.02;
+    this.pulse.visible = true;
+    this.pulse.userData.life = 0;
+  }
+
   burstDrops(y, n = 10, speed = 3.4) {
     if (this.reduced) n = Math.ceil(n / 3);
     const bx = this.ball.position.x, bz = this.ball.position.z;
@@ -700,6 +730,25 @@ export class View {
       m.rotation.z += u.ry * dt;
       const k = u.life / u.max;
       m.scale.setScalar(k > 0.55 ? Math.max(0.01, (1 - k) / 0.45) : 1);
+    }
+
+    for (const m of this.ripples) {
+      if (!m.visible) continue;
+      const u = m.userData;
+      u.life += dt / 0.38;
+      if (u.life >= 1) {
+        m.visible = false;
+        continue;
+      }
+      m.scale.setScalar(1 + u.life * 2.6);
+      m.material.opacity = 0.75 * (1 - u.life);
+    }
+    if (this.pulse.visible) {
+      const u = this.pulse.userData;
+      u.life += dt / 0.9;
+      if (u.life >= 1) this.pulse.visible = false;
+      this.pulse.scale.setScalar(1 + u.life * 0.9);
+      this.pulse.material.opacity = 0.9 * (1 - u.life);
     }
 
     // polvo del fondo: se envuelve alrededor de la cámara

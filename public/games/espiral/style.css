@@ -150,9 +150,9 @@ button {
 .bar em b {
   position: absolute;
   top: 50%;
-  width: 14px;
-  height: 14px;
-  margin: -7px 0 0 -7px;
+  width: 17px;
+  height: 17px;
+  margin: -8.5px 0 0 -8.5px;
   border-radius: 50%;
   border: 2px solid #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
@@ -252,7 +252,7 @@ button {
   position: fixed;
   z-index: 5;
   left: 50%;
-  top: 38%;
+  top: 30%;
   transform: translate(-50%, -50%);
   font-size: clamp(30px, 8vw, 54px);
   font-weight: 900;
@@ -537,9 +537,10 @@ h2 {
   gap: 8px;
 }
 .keys {
-  font-size: 13px;
-  color: var(--mute);
-  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  opacity: 0.82;
+  font-weight: 700;
 }
 .link {
   color: var(--mute);

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Cruce · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div id="stage"></div>
+
+    <!-- HUD -->
+    <div class="hud" id="hud" hidden>
+      <div class="hud-l">
+        <div class="score" id="score">0</div>
+        <div class="best" id="best"></div>
+      </div>
+      <div class="hud-c" id="hud-race" hidden>
+        <div class="timer" id="timer">0:00.0</div>
+        <div class="prog"><i id="bar"></i><em id="marks"></em></div>
+      </div>
+      <div class="coins" id="coins"><span class="coin"></span><b id="coin-n">0</b></div>
+    </div>
+    <div class="labels" id="labels"></div>
+    <div class="toast" id="toast"></div>
+    <div class="count" id="count"></div>
+    <div class="race" id="race" hidden></div>
+    <div class="swipe" id="swipe-hint" hidden><span></span><b data-t="swipeHint"></b></div>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="card home">
+        <h1><span>C</span><span>r</span><span>u</span><span>c</span><span>e</span></h1>
+        <p class="sub" data-t="tagline"></p>
+        <div class="picker">
+          <button class="arrow" id="ch-prev" aria-label="anterior">‹</button>
+          <div class="ch">
+            <b id="ch-name"></b>
+            <small id="ch-info"></small>
+          </div>
+          <button class="arrow" id="ch-next" aria-label="siguiente">›</button>
+        </div>
+        <button class="btn main" id="b-play"><span id="b-play-txt" data-t="play"></span></button>
+        <div class="row2">
+          <button class="btn yellow" id="b-daily"><span data-t="daily"></span><small id="b-daily-sub"></small></button>
+          <button class="btn blue" id="b-online"><span data-t="online"></span><small data-t="onlineSub"></small></button>
+        </div>
+        <p class="keys" id="keys"></p>
+      </div>
+    </section>
+
+    <!-- perdiste -->
+    <section class="screen" id="s-dead">
+      <div class="card">
+        <h2 id="dead-title"></h2>
+        <div class="big" id="dead-score">0</div>
+        <p class="sub" id="dead-best"></p>
+        <div class="stats" id="dead-stats"></div>
+        <button class="btn main" id="b-retry"><span data-t="again"></span></button>
+        <button class="btn yellow" id="b-revive" hidden></button>
+        <p class="sub small" id="dead-daily" hidden></p>
+        <button class="link" id="b-dead-menu" data-t="menu"></button>
+      </div>
+    </section>
+
+    <!-- online: entrar -->
+    <section class="screen" id="s-online">
+      <div class="card">
+        <h2 data-t="online"></h2>
+        <p class="sub" data-t="onlineLong"></p>
+        <label class="lbl" for="on-name" data-t="yourName"></label>
+        <input class="field" id="on-name" maxlength="16" autocomplete="off" spellcheck="false" />
+        <button class="btn main" id="on-quick"><span data-t="quick"></span><small data-t="quickSub"></small></button>
+        <button class="btn blue" id="on-create"><span data-t="create"></span><small data-t="createSub"></small></button>
+        <div class="join">
+          <input class="field code" id="on-code" maxlength="5" autocomplete="off" spellcheck="false" placeholder="ABCDE" aria-label="código" />
+          <button class="btn yellow" id="on-join"><span data-t="join"></span></button>
+        </div>
+        <p class="status" id="on-status"></p>
+        <button class="link" data-go="home" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- online: sala -->
+    <section class="screen" id="s-lobby">
+      <div class="card">
+        <p class="kicker" data-t="room"></p>
+        <button class="code-big" id="lobby-code">-----</button>
+        <p class="hint2" data-t="tapToCopy"></p>
+        <ul class="plist" id="lobby-players"></ul>
+        <div class="opt">
+          <span class="lbl" data-t="length"></span>
+          <div class="seg" id="seg-length">
+            <button data-v="short" data-t="lenShort"></button><button data-v="medium" data-t="lenMedium"></button><button data-v="long" data-t="lenLong"></button>
+          </div>
+        </div>
+        <button class="btn main" id="lobby-start"><span data-t="start"></span></button>
+        <p class="status" id="lobby-status"></p>
+        <button class="link" id="lobby-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <!-- online: resultados -->
+    <section class="screen" id="s-results">
+      <div class="card">
+        <h2 id="res-title"></h2>
+        <ol class="rank" id="res-rank"></ol>
+        <button class="btn main" id="res-again"><span></span></button>
+        <button class="link" id="res-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

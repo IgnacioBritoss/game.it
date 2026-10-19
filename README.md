@@ -33,7 +33,7 @@ Hay una plantilla lista en [`templates/juego-base/`](templates/juego-base/) y `n
 
 **Publicado en Render** (cada push a `main` se despliega solo):
 - Web: https://game-it-63r9.onrender.com (sitio estático: `npm ci && npm run build` → `dist/`)
-- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos y Espiral): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
+- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral y Cruce): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
   Variables: `ALLOWED_ORIGINS` (orígenes permitidos, separados por coma). La IP de cada cliente (para los límites por IP) se detecta sola cuando hay un proxy delante (solo se confía en los encabezados si quien se conecta por TCP es una dirección interna); se puede fijar con `CLIENT_IP_HEADER` (p. ej. `cf-connecting-ip`) o `TRUST_PROXY_HOPS` (cuántos proxies agregan una entrada a `X-Forwarded-For`, contando desde la derecha). `MAX_RT_ROOMS` (4 por defecto) es el tope de salas en tiempo real a la vez (Ameba, Serpentina, Clashball, Pádel y las arenas nuevas): el servidor gratis de Render tiene 0,1 CPU; al llegar al tope, crear otra devuelve `server_full_rt`. `/health` informa `rt: { rooms, max, avgTickMs }`. Límites ajustables en `server/index.js` (`CFG`).
 - En desarrollo: `npm run server` levanta el servidor local en `ws://localhost:8787`, que los juegos online usan automáticamente.
 
@@ -414,6 +414,22 @@ anillos en pedazos y cambia de paleta por sección. Modos: **Niveles** (el nivel
 devuelve al comienzo de la sección) y **Carrera online** de hasta 8 (`server/games/espiral.js` sobre `_race.js`: salas
 públicas para "Partida rápida" o privadas con código; cada uno manda su avance y se ven como fantasmas; el servidor rechaza
 tiempos menores que caer toda la torre a la velocidad máxima y ordena a los que no llegaron por cuánto bajaron).
+
+### Cruce (cruzar sin que te agarren)
+
+Saltás de a una casilla (flechas/WASD, tocar = adelante, deslizar = costados, mando) por un camino infinito de pasto,
+calles, vías y ríos (troncos que te llevan y camalotes quietos). El mundo (`public/games/cruce/shared/world.js`) se genera
+con semilla y **todo lo que se mueve es una función del tiempo** desde la largada (autos, camiones y troncos dan la vuelta
+a un circuito de 30 casillas; cada vía tiene su período con aviso de 1,7 s), así que con la misma semilla y el mismo
+instante todos ven el mismo tráfico. Un "camino libre" que solo se corre en el pasto garantiza que siempre se puede pasar
+(probado con BFS sobre muchas semillas) y el reparto en el circuito nunca deja dos autos o troncos pisándose. El saltador
+(`Hopper`, misma lógica en las pruebas) guarda una orden en el aire, frena con árboles y muere atropellado, en el agua, si
+el tronco lo saca de la zona o si se queda atrás (en solo la cámara avanza sola y baja el águila). La vista (`view.js`,
+three.js con cámara ortográfica en diagonal) arma cada fila en una sola malla de cajas con colores por vértice y pone lo que
+se mueve cada cuadro. Modos: **infinito** (récord, monedas y 6 personajes que se desbloquean con monedas, en
+`gameit:cruce:*`; revivir con anuncio opcional), **Camino del día** (mismo mundo para todos ese día) y **Carrera online**
+de hasta 8 (`server/games/cruce.js` sobre `_race.js`, con el flujo compartido de `public/shared/race-lobby.js`): meta a
+60, 100 o 150 filas, puntos de control cada 25, fantasmas con nombre y tiempos imposibles rechazados.
 
 ## Juegos diarios
 

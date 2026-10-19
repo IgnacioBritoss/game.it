@@ -1,0 +1,19 @@
+{
+  "id": "cruce",
+  "title": { "es": "Cruce", "en": "Crossing" },
+  "description": {
+    "es": "Saltá de a una casilla cruzando calles, vías y ríos sin que te pisen ni te agarre el águila. Personajes para desbloquear, camino del día y carrera online.",
+    "en": "Hop one tile at a time across roads, rails and rivers without getting run over or caught by the eagle. Unlockable characters, a daily path and online races."
+  },
+  "categories": ["arcade", "casual", "online", "multijugador"],
+  "tags": ["crossy", "cruzar", "cross", "calle", "road", "rio", "river", "saltar", "hop", "voxel", "3d", "carrera", "race", "infinito", "endless"],
+  "thumbnail": "thumb.svg",
+  "entry": "index.html",
+  "tech": "three",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "portrait",
+  "input": ["keyboard", "touch", "gamepad"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 8, "story": false },
+  "order": 39
+}

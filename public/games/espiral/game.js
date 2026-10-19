@@ -8,7 +8,7 @@
 import { View, PALETTES } from './scene.js';
 import { makeLevel, makeRace, Run, seedOf, ringTop, SPACING, BALL_A, ORBIT, wrap, RACE, START_SEG } from './shared/tower.js';
 import { tone, noise, notes } from '/shared/sfx.js';
-import { OnlineRoom, netText, defaultName, share, roomFromUrl } from '/shared/online.js';
+import { RaceLobby } from '/shared/race-lobby.js';
 import { today, dayNumber } from '/shared/daily.js';
 
 const G = window.GameIt;
@@ -65,25 +65,20 @@ const TXT = {
   join: { es: 'Unirse', en: 'Join' },
   room: { es: 'Sala', en: 'Room' },
   tapToCopy: { es: 'tocá el código para copiar el link', en: 'tap the code to copy the link' },
-  copiedLink: { es: '¡Link copiado!', en: 'Link copied!' },
   length: { es: 'Largo de la torre', en: 'Tower length' },
   lenShort: { es: 'Corta', en: 'Short' },
   lenMedium: { es: 'Media', en: 'Medium' },
   lenLong: { es: 'Larga', en: 'Long' },
   start: { es: '¡Largar!', en: 'Start!' },
-  waitingHost: { es: 'Esperando que el anfitrión largue…', en: 'Waiting for the host to start…' },
   leave: { es: '← salir de la sala', en: '← leave room' },
   you: { es: 'vos', en: 'you' },
-  host: { es: 'anfitrión', en: 'host' },
   rematch: { es: 'Revancha', en: 'Rematch' },
-  waitRematch: { es: 'Esperando la revancha…', en: 'Waiting for a rematch…' },
   waitOthers: { es: 'Esperando a los demás…', en: 'Waiting for the others…' },
   win: { es: '¡Ganaste!', en: 'You won!' },
   place: { es: 'Llegaste {n}°', en: 'You finished #{n}' },
   raceOver: { es: 'Fin de la carrera', en: 'Race over' },
   dnf: { es: 'no llegó · {p}%', en: 'DNF · {p}%' },
   finishedPop: { es: '{n} llegó {p}°', en: '{n} finished #{p}' },
-  searching: { es: 'Buscando una sala…', en: 'Looking for a room…' },
   go: { es: '¡YA!', en: 'GO!' },
 };
 const t = (k, v) => {
@@ -231,7 +226,7 @@ const sectionOf = (tower, i) => {
 };
 
 function toMenu() {
-  if (S.mode === 'race') online?.leave();
+  if (S.mode === 'race') lobby.leave();
   S.mode = 'menu';
   S.phase = 'menu';
   view.dropGhosts();
@@ -248,6 +243,7 @@ function handle(ev) {
   for (const e of ev) {
     if (e.t === 'bounce') {
       view.splat(e.ring, e.phi);
+      view.ripple(e.ring, e.phi);
       view.squash = 1;
       view.burstDrops(run.y, 7, 2.6);
       sfx('bounce');
@@ -322,6 +318,8 @@ function onDie() {
 
 function onGoal() {
   view.confettiBurst(S.run.y);
+  view.goalPulse(ringTop(S.tower.goal));
+  view.squash = 1;
   sfx('goal');
   if (S.mode === 'classic') {
     S.phase = 'clear';
@@ -563,11 +561,7 @@ function showDaily(ms, isBest, n, rec) {
 
 $('b-play').onclick = () => playClassic();
 $('b-daily').onclick = () => playDaily();
-$('b-online').onclick = () => {
-  $('on-name').value ||= defaultName();
-  $('on-status').textContent = '';
-  show('online');
-};
+$('b-online').onclick = () => lobby.open();
 $('b-retry').onclick = () => {
   G.commercialBreak('reintentar').then(() => {
     startLevel(S.level, 0);
@@ -688,35 +682,36 @@ function padInput(dt) {
 }
 
 // ---------------------------------------------------------------- online
-let online = null;
-let raceKey = null;
 let lastSent = 0;
-let wantQuick = false;
 const others = new Map(); // id → { name, color, depth, done, time, place }
 
-function ensureOnline() {
-  if (online) return online;
-  online = new OnlineRoom(ID, {
-    onStatus: (st) => {
-      const txt = { connecting: netText('connecting'), reconnecting: netText('reconnecting'), netError: netText('netError'), wakeup: netText('wakeup'), rate: netText('rate'), open: '' }[st];
-      if (txt !== undefined && !(st === 'open' && wantQuick)) $('on-status').textContent = txt;
-    },
-    onRoom: applyRoom,
-    onMessage: onNet,
-  });
-  return online;
-}
+const lobby = new RaceLobby({
+  game: ID,
+  settings: ['length'],
+  defaults: { length: 'medium' },
+  show: (id) => {
+    S.mode = 'race';
+    S.phase = 'menu';
+    show(id);
+  },
+  onRace: beginRace,
+  onLobby: () => {
+    S.results = null;
+    view.dropGhosts();
+    $('labels').innerHTML = '';
+    $('race').hidden = true;
+    $('hud').hidden = true;
+  },
+  onMessage: onNet,
+  onRoom: (room) => room.state === 'finished' && document.querySelector('#s-results.on') && showResults(),
+  onClosed: () => {
+    toMenu();
+    show('online');
+  },
+});
+const online = lobby.net;
 
 function onNet(m) {
-  if (m.t === 'list') {
-    if (!wantQuick) return;
-    wantQuick = false;
-    const room = (m.rooms || []).filter((r) => r.state === 'lobby' && r.n < r.max).sort((a, b) => b.n - a.n)[0];
-    const name = playerName();
-    if (room) online.join(room.code, name);
-    else online.create(name, { public: true, length: 'medium' });
-    return;
-  }
   if (m.t === 'state') {
     const g = view.ghosts.get(m.id);
     const o = others.get(m.id);
@@ -756,90 +751,15 @@ function onNet(m) {
       }
       showResults();
     }
-    return;
-  }
-  if (m.t === 'error') {
-    const txt = netText(m.code);
-    $('on-status').textContent = txt;
-    $('lobby-status').textContent = txt;
-    return;
-  }
-  if (m.t === 'closed' || m.t === 'kicked') {
-    const txt = netText(m.t === 'kicked' ? 'kicked' : `closed_${m.reason}`);
-    S.mode = 'menu';
-    toMenu();
-    $('on-status').textContent = txt;
-    show('online');
   }
 }
 
-const playerName = () => ($('on-name').value.trim() || defaultName()).slice(0, 16);
-
-$('on-quick').onclick = () => {
-  wantQuick = true;
-  $('on-status').textContent = t('searching');
-  ensureOnline().send({ t: 'list', game: ID });
-};
-$('on-create').onclick = () => ensureOnline().create(playerName(), { public: false, length: 'medium' });
-$('on-join').onclick = () => {
-  const code = $('on-code').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-  if (code.length === 5) ensureOnline().join(code, playerName());
-};
-$('on-code').addEventListener('input', (e) => (e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5)));
-$('on-code').addEventListener('keydown', (e) => e.key === 'Enter' && $('on-join').click());
-$('on-name').addEventListener('keydown', (e) => e.key === 'Enter' && $('on-quick').click());
-$('lobby-start').onclick = () => online.send({ t: 'start' });
-$('lobby-leave').onclick = () => {
-  online.leave();
-  S.mode = 'menu';
-  show('online');
-};
 $('res-leave').onclick = () => toMenu();
-$('res-again').onclick = () => online.isHost && online.send({ t: 'rematch' });
-$('lobby-code').onclick = async () => {
-  const r = await share(ID, online.room.code);
-  $('lobby-status').textContent = r === 'copied' ? t('copiedLink') : '';
-};
-$('seg-length').onclick = (e) => {
-  const b = e.target.closest('button');
-  if (!b || !online?.isHost) return;
-  online.send({ t: 'settings', settings: { length: b.dataset.v } });
-};
-
-function applyRoom(room) {
-  if (room.state === 'lobby' || !room.race) {
-    raceKey = null;
-    S.results = null;
-    if (S.mode === 'race' && S.phase !== 'menu') {
-      view.dropGhosts();
-      $('labels').innerHTML = '';
-      $('race').hidden = true;
-      $('hud').hidden = true;
-    }
-    S.mode = 'race';
-    S.phase = 'menu';
-    $('lobby-code').textContent = room.code;
-    $('lobby-players').innerHTML = room.players
-      .map((p) => `<li><i style="background:${p.color}"></i><span>${esc(p.name)}</span><small>${[p.id === online.myId ? t('you') : '', p.id === room.host ? t('host') : ''].filter(Boolean).join(' · ')}</small></li>`)
-      .join('');
-    $('lobby-start').hidden = !online.isHost;
-    $('lobby-status').textContent = online.isHost ? '' : t('waitingHost');
-    $('seg-length').classList.toggle('ro', !online.isHost);
-    $$('#seg-length button').forEach((b) => b.classList.toggle('on', b.dataset.v === room.settings.length));
-    if (!document.querySelector('#s-lobby.on')) show('lobby');
-    return;
-  }
-  const key = `${room.race.seed}:${room.race.startAt}`;
-  if (key !== raceKey && room.state === 'playing') {
-    raceKey = key;
-    beginRace(room);
-  }
-  if (room.state === 'finished' && document.querySelector('#s-results.on')) showResults();
-}
 
 function beginRace(room) {
   S.mode = 'race';
   S.results = null;
+  S.cheered = false;
   const tower = makeRace(room.race.seed, room.race.length);
   setTower(tower, (i) => PALETTES[(sectionOf(tower, i) * 3 + (room.race.seed % 8)) % PALETTES.length]);
   S.deaths = 0;
@@ -868,7 +788,7 @@ function beginRace(room) {
 }
 
 function sendState(now) {
-  if (now - lastSent < 90 || !S.run || !online) return;
+  if (now - lastSent < 90 || !S.run) return;
   if (S.phase !== 'play' && S.phase !== 'respawn' && S.phase !== 'countdown') return;
   lastSent = now;
   const r = S.run;
@@ -915,21 +835,24 @@ function showResults() {
   if (final) {
     rows = final.map((r) => ({ id: r.id, name: r.name, color: r.color, val: r.dnf ? t('dnf', { p: Math.round(((r.depth || 0) / (S.tower?.goal || 1)) * 100) }) : fmt(r.time) }));
   } else {
-    const mine = { id: online?.myId, name: `${playerName()}`, color: '#fff', done: true, time: S.finishMs, place: 0 };
+    const mine = { id: online.myId, name: lobby.name, color: '#fff', done: true, time: S.finishMs, place: 0 };
     const all = [mine, ...[...others.entries()].map(([id, o]) => ({ id, ...o }))];
     all.sort((a, b) => (a.done ? 0 : 1) - (b.done ? 0 : 1) || (a.done ? a.time - b.time : b.depth - a.depth));
     rows = all.map((r) => ({ id: r.id, name: r.name, color: r.color, val: r.done ? fmt(r.time) : `${Math.round((r.depth / (S.tower?.goal || 1)) * 100)}% …` }));
   }
-  const me = online?.myId;
+  const me = online.myId;
   const place = rows.findIndex((r) => r.id === me) + 1;
   $('res-title').textContent = !final ? t('waitOthers') : place === 1 && S.finishMs ? t('win') : S.finishMs ? t('place', { n: place }) : t('raceOver');
   $('res-rank').innerHTML = rows
     .map((r, i) => `<li class="${r.id === me ? 'me' : ''}"><span>${i + 1}.</span><i style="background:${r.color}"></i><span>${esc(r.name)}${r.id === me ? ` (${t('you')})` : ''}</span><b>${esc(r.val)}</b></li>`)
     .join('');
-  const host = online?.isHost && online.room?.state === 'finished';
-  $('res-again').disabled = !host;
-  $('res-again').querySelector('span').textContent = host ? t('rematch') : final ? t('waitRematch') : t('waitOthers');
-  if (final && place === 1 && S.finishMs) sfx('goal');
+  const again = lobby.againState(!!final);
+  $('res-again').disabled = !again.enabled;
+  $('res-again').querySelector('span').textContent = again.text;
+  if (final && place === 1 && S.finishMs && !S.cheered) {
+    S.cheered = true;
+    sfx('goal');
+  }
   show('results');
 }
 
@@ -969,12 +892,9 @@ startLevel(S.level, 0);
 applyPalette(levelPal(S.level), true);
 requestAnimationFrame(frame);
 
-const code = roomFromUrl();
-if (code) {
-  $('on-code').value = code;
-  $('on-name').value = defaultName();
+if (lobby.pending) {
+  S.mode = 'race';
   show('online');
-} else if (ensureOnline().resume()) show('online');
-else show('home');
+} else show('home');
 if (/[?&]debug\b/.test(location.search)) window.__espiral = { S, view, playClassic, playDaily };
 G.ready();

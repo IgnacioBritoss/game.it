@@ -489,6 +489,17 @@ Viento del día (3 saltos con el mismo viento para todos) y **competencia online
 mismos vientos por ronda, cada uno salta cuando quiere y ve a los demás como fantasmas; el servidor valida distancias y
 estilos y suma los puntos.
 
+### Solcito (gatos y cajas)
+
+Rompecabezas de empujar cajas (sokoban) con gatos que quieren echarse la siesta al sol: hay que llevar cada caja de cartón
+a un rayito de sol. Se empuja, nunca se tira; deshacer sin límite y reiniciar. Cinco cuartos con mecánicas nuevas: la
+cocina (empujar), el patio helado (cajas y gatos se resbalan hasta chocar o llegar a piso firme), el cuarto de juegos
+(túneles de tela: lo que entra por una boca sale por la otra, siguiendo derecho), la mudanza (dos gatos y cajas grandes
+de 2×2 que solo se mueven si los dos empujan del mismo lado) y los desafíos. Las reglas (`public/games/solcito/shared/rules.js`)
+traen un resolvedor a lo ancho que calculó el mínimo de movidas de cada uno de los 23 niveles (`shared/levels.js`); las
+pruebas lo verifican. Estrellas según las movidas, cuartos que se abren de a poco y gatos dibujados con código
+(`art.js`) que caminan, se resbalan, se meten en los túneles, se ponen contentos y al final se duermen en las cajas.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego

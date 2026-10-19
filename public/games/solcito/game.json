@@ -1,0 +1,19 @@
+{
+  "id": "solcito",
+  "title": { "es": "Solcito", "en": "Sunny Spot" },
+  "description": {
+    "es": "Rompecabezas de gatos que empujan cajas al sol para echarse la siesta. Cocina, patio helado, túneles de tela y una mudanza con cajas grandes para dos gatos: 23 niveles con deshacer y el mínimo de movidas de cada uno.",
+    "en": "A puzzle about cats pushing boxes into the sun for a nap. Kitchen, frozen yard, fabric tunnels and a move with big boxes for two cats: 23 levels with undo and the fewest moves for each."
+  },
+  "categories": ["puzzle", "casual"],
+  "tags": ["sokoban", "cajas", "boxes", "gatos", "cats", "empujar", "push", "hielo", "ice", "tuneles", "portales", "logica", "logic"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "canvas2d",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["keyboard", "mouse", "touch", "gamepad"],
+  "features": { "online": false, "multiplayer": false, "maxPlayers": 1, "story": false },
+  "order": 44
+}

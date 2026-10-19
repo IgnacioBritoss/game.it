@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Solcito · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sniglet:wght@400;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+
+    <!-- HUD del nivel -->
+    <div class="hud" id="hud" hidden>
+      <div class="top">
+        <button class="round" id="b-menu" aria-label="menú"><i></i><i></i><i></i></button>
+        <div class="title"><small id="h-room"></small><b id="h-name"></b></div>
+        <div class="moves"><b id="h-moves">0</b><small id="h-par"></small></div>
+      </div>
+      <div class="bar">
+        <button class="act swap" id="b-swap"><span class="ic">🐾</span><span data-t="swap"></span><kbd>Tab</kbd></button>
+        <button class="act" id="b-undo"><span class="ic">↶</span><span data-t="undo"></span><kbd>Z</kbd></button>
+        <button class="act" id="b-restart"><span class="ic">⟲</span><span data-t="restart"></span><kbd>R</kbd></button>
+      </div>
+      <div class="hint" id="hint"></div>
+    </div>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="card home">
+        <h1 data-t="title"></h1>
+        <p class="sub" data-t="tagline"></p>
+        <button class="btn sun" id="b-play"><span data-t="play"></span><small id="b-play-sub"></small></button>
+        <button class="btn cream" id="b-levels"><span data-t="levels"></span><small id="h-stars"></small></button>
+        <p class="keys" id="keys"></p>
+      </div>
+    </section>
+
+    <!-- niveles -->
+    <section class="screen" id="s-levels">
+      <div class="card wide">
+        <h2 data-t="levels"></h2>
+        <div class="rooms" id="rooms"></div>
+        <button class="link" id="l-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- cuarto nuevo -->
+    <section class="screen dim" id="s-tip">
+      <div class="card">
+        <p class="kicker" data-t="newRoom"></p>
+        <h2 id="tip-room"></h2>
+        <canvas class="tip-c" id="tip-c" width="140" height="140"></canvas>
+        <p class="sub" id="tip-text"></p>
+        <button class="btn sun" id="tip-go"><span data-t="gotIt"></span></button>
+      </div>
+    </section>
+
+    <!-- ganó -->
+    <section class="screen dim" id="s-win">
+      <div class="card">
+        <h2 id="w-title"></h2>
+        <div class="stars" id="w-stars"></div>
+        <p class="sub" id="w-text"></p>
+        <button class="btn sun" id="w-next"><span data-t="next"></span></button>
+        <p class="sub" id="w-all" data-t="allDone" hidden></p>
+        <div class="row2">
+          <button class="btn cream" id="w-again"><span data-t="again"></span></button>
+          <button class="btn cream" id="w-levels"><span data-t="toLevels"></span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- pausa -->
+    <section class="screen dim" id="s-pause">
+      <div class="card">
+        <h2 data-t="paused"></h2>
+        <button class="btn sun" id="p-resume"><span data-t="resume"></span></button>
+        <div class="row2">
+          <button class="btn cream" id="p-restart"><span data-t="restart"></span></button>
+          <button class="btn cream" id="p-levels"><span data-t="toLevels"></span></button>
+        </div>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

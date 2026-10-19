@@ -5,7 +5,11 @@
  */
 const STATE_MIN_MS = 45; // como mucho ~22 estados por segundo por jugador
 
-export function raceGame({ maxPlayers = 4, countdownMs = 4000, maxMs = 10 * 60e3, graceAfterFirstMs = 45e3, defaults = {}, settings, onStart, validateFinish, rank }) {
+/**
+ * Opcionales: `partial(s)` guarda lo último que mandó cada jugador (por ejemplo cuánto avanzó) y se suma a su fila si no
+ * termina; `listable` + `listInfo(room)` lo muestran en la lista de salas públicas (settings.public).
+ */
+export function raceGame({ maxPlayers = 4, countdownMs = 4000, maxMs = 10 * 60e3, graceAfterFirstMs = 45e3, defaults = {}, settings, onStart, validateFinish, rank, partial, listable = false, listInfo }) {
   function finish(room, api) {
     const d = room.data;
     if (!d || d.over) return;
@@ -26,6 +30,7 @@ export function raceGame({ maxPlayers = 4, countdownMs = 4000, maxMs = 10 * 60e3
     maxPlayers,
     defaults,
     settings,
+    ...(listable ? { listable: true, listInfo } : {}),
     view(room) {
       const d = room.data;
       return d ? { race: { startAt: d.startAt, ...d.pub, results: d.results } } : { race: null };
@@ -43,6 +48,7 @@ export function raceGame({ maxPlayers = 4, countdownMs = 4000, maxMs = 10 * 60e3
         d.last.set(p.id, now);
         const s = Array.isArray(msg.s) ? msg.s.slice(0, 8).map(Number) : null;
         if (!s || s.some((v) => !Number.isFinite(v))) return false;
+        if (partial) d.partial[p.id] = partial(s, d);
         api.broadcast({ t: 'state', id: p.id, s }, p.id);
         return;
       }

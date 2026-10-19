@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#120e3a"/><stop offset="1" stop-color="#5a32b0"/></linearGradient>
+    <linearGradient id="pole" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8f7de0"/><stop offset=".45" stop-color="#c9bcff"/><stop offset="1" stop-color="#7d6bd0"/></linearGradient>
+    <radialGradient id="ball" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#fff6c8"/><stop offset=".25" stop-color="#ffd23f"/><stop offset="1" stop-color="#d99a00"/></radialGradient>
+    <radialGradient id="glow" cx=".5" cy="1" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <clipPath id="hz"><path d="M189.5 109.5 L258.5 112.9 A100 28 0 0 1 224.3 129.4 L179.3 114.4 A30 8.4 0 0 0 189.5 109.5Z"/></clipPath>
+    <mask id="m1"><rect width="320" height="200" fill="#fff"/><path d="M160 40 L290 71 L305 100 L189 100Z" fill="#000"/></mask>
+    <mask id="m2"><rect width="320" height="200" fill="#fff"/><path d="M160 108 L75 150 L70 178 L-10 178 L-10 120Z" fill="#000"/></mask>
+    <mask id="m3"><rect width="320" height="200" fill="#fff"/><path d="M160 172 L245 130 L330 130 L330 156Z" fill="#000"/></mask>
+  </defs>
+  <rect width="320" height="200" fill="url(#bg)"/>
+  <rect width="320" height="200" fill="url(#glow)"/>
+  <g fill="#fff" opacity=".7"><circle cx="30" cy="22" r="1.2"/><circle cx="62" cy="64" r=".9"/><circle cx="276" cy="30" r="1.4"/><circle cx="300" cy="120" r="1"/><circle cx="24" cy="150" r="1.1"/><circle cx="250" cy="186" r=".9"/><circle cx="96" cy="12" r=".8"/></g>
+  <rect x="145" y="-4" width="30" height="208" fill="url(#pole)"/>
+
+  <!-- anillo de abajo -->
+  <g mask="url(#m3)">
+    <ellipse cx="160" cy="184" rx="100" ry="28" fill="#1fa7c0"/>
+    <rect x="60" y="172" width="200" height="12" fill="#1fa7c0"/>
+    <ellipse cx="160" cy="172" rx="100" ry="28" fill="#3ee8ff"/>
+    <ellipse cx="160" cy="172" rx="92" ry="25" fill="none" stroke="#a6f6ff" stroke-width="2" opacity=".6"/>
+    <ellipse cx="160" cy="172" rx="30" ry="8.4" fill="#9f8de8"/>
+  </g>
+  <!-- anillo del medio, con peligro y la mancha -->
+  <g mask="url(#m2)">
+    <ellipse cx="160" cy="120" rx="100" ry="28" fill="#1fa7c0"/>
+    <rect x="60" y="108" width="200" height="12" fill="#1fa7c0"/>
+    <ellipse cx="160" cy="108" rx="100" ry="28" fill="#3ee8ff"/>
+    <ellipse cx="160" cy="108" rx="92" ry="25" fill="none" stroke="#a6f6ff" stroke-width="2" opacity=".6"/>
+    <ellipse cx="160" cy="108" rx="30" ry="8.4" fill="#b3a3f5"/>
+  </g>
+  <path d="M258.5 112.9 A100 28 0 0 1 224.3 129.4 L224.3 141.4 A100 28 0 0 0 258.5 124.9Z" fill="#b8124f"/>
+  <path d="M189.5 109.5 L258.5 112.9 A100 28 0 0 1 224.3 129.4 L179.3 114.4 A30 8.4 0 0 0 189.5 109.5Z" fill="#ff2e7e"/>
+  <g stroke="#c4105a" stroke-width="5" opacity=".75" clip-path="url(#hz)"><path d="M196 104 L214 132"/><path d="M214 104 L232 132"/><path d="M232 104 L250 132"/><path d="M250 104 L268 132"/></g>
+  <path d="M146 128 q4 -5 13 -4 q9 -3 15 2 q6 3 -2 6 q-7 3 -14 1 q-9 2 -12 -5z" fill="#ffd23f"/>
+  <g fill="#ffd23f"><circle cx="137" cy="126" r="2"/><circle cx="182" cy="123" r="1.6"/><circle cx="178" cy="133" r="1.4"/></g>
+  <!-- anillo de arriba -->
+  <g mask="url(#m1)">
+    <ellipse cx="160" cy="52" rx="100" ry="28" fill="#1fa7c0"/>
+    <rect x="60" y="40" width="200" height="12" fill="#1fa7c0"/>
+    <ellipse cx="160" cy="40" rx="100" ry="28" fill="#3ee8ff"/>
+    <ellipse cx="160" cy="40" rx="92" ry="25" fill="none" stroke="#a6f6ff" stroke-width="2" opacity=".6"/>
+    <ellipse cx="160" cy="40" rx="30" ry="8.4" fill="#c2b4ff"/>
+  </g>
+  <!-- escombros del anillo que se rompió -->
+  <g fill="#3ee8ff"><path d="M268 70 l14 -4 l3 8 l-14 4z" opacity=".9"/><path d="M290 88 l10 2 l-2 7 l-10 -2z" opacity=".7"/><path d="M238 80 l9 -6 l4 6 l-9 6z" opacity=".8"/></g>
+  <!-- pelota -->
+  <g stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".55"><path d="M150 62 v-9"/><path d="M160 58 v-12"/><path d="M170 62 v-9"/></g>
+  <circle cx="160" cy="86" r="13" fill="url(#ball)"/>
+  <ellipse cx="155" cy="80" rx="4" ry="2.6" fill="#fff" opacity=".85"/>
+</svg>

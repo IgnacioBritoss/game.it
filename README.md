@@ -33,7 +33,7 @@ Hay una plantilla lista en [`templates/juego-base/`](templates/juego-base/) y `n
 
 **Publicado en Render** (cada push a `main` se despliega solo):
 - Web: https://game-it-63r9.onrender.com (sitio estático: `npm ci && npm run build` → `dist/`)
-- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball y Trotamundos): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
+- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos y Espiral): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
   Variables: `ALLOWED_ORIGINS` (orígenes permitidos, separados por coma). La IP de cada cliente (para los límites por IP) se detecta sola cuando hay un proxy delante (solo se confía en los encabezados si quien se conecta por TCP es una dirección interna); se puede fijar con `CLIENT_IP_HEADER` (p. ej. `cf-connecting-ip`) o `TRUST_PROXY_HOPS` (cuántos proxies agregan una entrada a `X-Forwarded-For`, contando desde la derecha). `MAX_RT_ROOMS` (4 por defecto) es el tope de salas en tiempo real a la vez (Ameba, Serpentina, Clashball, Pádel y las arenas nuevas): el servidor gratis de Render tiene 0,1 CPU; al llegar al tope, crear otra devuelve `server_full_rt`. `/health` informa `rt: { rooms, max, avgTickMs }`. Límites ajustables en `server/index.js` (`CFG`).
 - En desarrollo: `npm run server` levanta el servidor local en `ws://localhost:8787`, que los juegos online usan automáticamente.
 
@@ -399,6 +399,21 @@ reconexión; el servidor lleva los relojes y el puntaje. Diseño completo y deci
   si Google responde con un bloqueo). Para sumar lugares o famosos se agrega a la lista, se valida y se vuelve a armar.
 - **Pruebas:** `npm run test:trotamundos` corre las pruebas de la lógica compartida, los datos, el servidor (con clientes `ws`
   reales) y el cliente online (hace falta `npm ci --prefix server` una vez; tarda unos 40 s y va aparte de `npm test`).
+
+### Espiral (torre que gira)
+
+La pelota rebota siempre en el mismo lugar y lo que gira es la torre (arrastrar, ← →/A D o mando): por los huecos cae, el
+peligro (franjas) la hace perder y al pasar 3 anillos seguidos sin tocar se prende fuego y rompe el próximo, aunque sea
+peligro. Pasar anillos suma con combo creciente (× el nivel). La lógica es pura y está en `public/games/espiral/shared/tower.js`
+(misma en el navegador, el servidor y las pruebas): torres con semilla, dificultad por nivel (huecos más chicos, más peligro,
+anillos que giran solos desde el nivel 4 y peligros que titilan desde el 7) y reglas de justicia probadas con muchas semillas
+(siempre hay hueco y piso, se arranca sobre piso y nunca hay peligro justo debajo de un hueco quieto). La vista
+(`scene.js`, three.js) arma cada anillo como un barrido con bisel en una sola malla, deja manchas de pintura, rompe los
+anillos en pedazos y cambia de paleta por sección. Modos: **Niveles** (el nivel alcanzado y el récord quedan en
+`gameit:espiral:*`; revivir con anuncio opcional), **Torre del día** (la misma para todos ese día, contra reloj: perder te
+devuelve al comienzo de la sección) y **Carrera online** de hasta 8 (`server/games/espiral.js` sobre `_race.js`: salas
+públicas para "Partida rápida" o privadas con código; cada uno manda su avance y se ven como fantasmas; el servidor rechaza
+tiempos menores que caer toda la torre a la velocidad máxima y ordena a los que no llegaron por cuánto bajaron).
 
 ## Juegos diarios
 

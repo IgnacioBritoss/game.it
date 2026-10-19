@@ -1,0 +1,19 @@
+{
+  "id": "espiral",
+  "title": { "es": "Espiral", "en": "Spiral" },
+  "description": {
+    "es": "Girá la torre y dejá caer la pelota por los huecos hasta el fondo, sin tocar el peligro. Niveles, torre del día y carrera online.",
+    "en": "Spin the tower and drop the ball through the gaps all the way down without touching danger. Levels, a daily tower and online races."
+  },
+  "categories": ["arcade", "casual", "online", "multijugador"],
+  "tags": ["helix", "torre", "tower", "pelota", "ball", "caer", "drop", "girar", "spin", "3d", "carrera", "race", "diario"],
+  "thumbnail": "thumb.svg",
+  "entry": "index.html",
+  "tech": "three",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "portrait",
+  "input": ["mouse", "keyboard", "touch", "gamepad"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 8, "daily": false, "story": false },
+  "order": 38
+}

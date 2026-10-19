@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Brasas · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+
+    <!-- HUD -->
+    <div class="hud" id="hud" hidden>
+      <div class="xp"><div class="xp-fill" id="xp-fill"></div><span class="lvl" id="lvl">1</span></div>
+      <div class="hud-row">
+        <div class="slots">
+          <div class="slot-row" id="slots-w"></div>
+          <div class="slot-row small" id="slots-p"></div>
+        </div>
+        <div class="clock">
+          <div class="clock-time" id="clock">5:00</div>
+          <div class="sky"><div class="sky-fill" id="sky-fill"></div><i class="moon"></i><i class="sun"></i></div>
+        </div>
+        <div class="counts">
+          <span class="count"><i class="ic-skull"></i><b id="kills">0</b></span>
+          <span class="count"><i class="ic-coin"></i><b id="gold">0</b></span>
+        </div>
+        <button class="pause-btn" id="b-pause" aria-label="pausa"><i></i><i></i></button>
+      </div>
+      <div class="boss" id="boss" hidden>
+        <b data-t="bossName"></b>
+        <div class="boss-bar"><div class="boss-fill" id="boss-fill"></div></div>
+      </div>
+      <div class="toast" id="toast"></div>
+      <div class="tut" id="tut" hidden></div>
+    </div>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="card home">
+        <canvas class="logo" id="logo" width="180" height="180"></canvas>
+        <h1 data-t="title"></h1>
+        <p class="sub" data-t="tagline"></p>
+        <div class="nights">
+          <button class="btn fire" id="b-short"><span data-t="short"></span><small id="b-short-sub"></small></button>
+          <button class="btn fire deep" id="b-long"><span data-t="long"></span><small id="b-long-sub"></small></button>
+        </div>
+        <div class="row2">
+          <button class="btn ghost" id="b-shop"><span data-t="shop"></span><small id="b-shop-sub"></small></button>
+          <button class="btn ghost" id="b-help"><span data-t="help"></span><small id="b-help-sub"></small></button>
+        </div>
+        <p class="keys" id="keys"></p>
+      </div>
+    </section>
+
+    <!-- subir de nivel -->
+    <section class="screen dim" id="s-level">
+      <div class="level">
+        <p class="kicker" id="level-kicker"></p>
+        <h2 data-t="levelUp"></h2>
+        <div class="cards" id="cards"></div>
+        <button class="btn ghost slim" id="b-reroll"><span></span></button>
+      </div>
+    </section>
+
+    <!-- cofre -->
+    <section class="screen dim" id="s-chest">
+      <div class="card chest">
+        <h2 id="chest-title" data-t="chest"></h2>
+        <canvas class="chest-c" id="chest-c" width="300" height="220"></canvas>
+        <div class="loot" id="loot"></div>
+        <button class="btn fire" id="b-chest"><span></span></button>
+      </div>
+    </section>
+
+    <!-- pausa -->
+    <section class="screen dim" id="s-pause">
+      <div class="card">
+        <h2 data-t="paused"></h2>
+        <div class="build" id="pause-build"></div>
+        <button class="btn fire" id="b-resume"><span data-t="resume"></span></button>
+        <div class="toggles">
+          <button class="tog" id="t-nums"><span data-t="optNums"></span><b></b></button>
+          <button class="tog" id="t-shake"><span data-t="optShake"></span><b></b></button>
+        </div>
+        <button class="link" id="b-quit" data-t="quit"></button>
+      </div>
+    </section>
+
+    <!-- final -->
+    <section class="screen" id="s-over">
+      <div class="card over">
+        <p class="kicker" id="over-kicker"></p>
+        <h2 id="over-title"></h2>
+        <p class="sub over-sub" id="over-sub"></p>
+        <div class="stats" id="over-stats"></div>
+        <div class="gold-won" id="over-gold"></div>
+        <div class="dmg" id="over-dmg"></div>
+        <button class="btn gold" id="b-revive" hidden><span data-t="revive"></span><small data-t="reviveSub"></small></button>
+        <button class="btn fire" id="b-again"><span data-t="again"></span></button>
+        <div class="row2">
+          <button class="btn ghost" id="b-over-shop"><span data-t="shop"></span></button>
+          <button class="btn ghost" id="b-over-menu"><span data-t="menu"></span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- mejoras -->
+    <section class="screen" id="s-shop">
+      <div class="card wide">
+        <h2 data-t="shop"></h2>
+        <p class="sub" data-t="shopLong"></p>
+        <div class="purse"><i class="ic-coin"></i><b id="shop-gold">0</b></div>
+        <div class="shop" id="shop"></div>
+        <button class="link" data-go="home" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- cómo se juega -->
+    <section class="screen" id="s-help">
+      <div class="card wide">
+        <h2 data-t="help"></h2>
+        <ul class="howto" id="howto"></ul>
+        <h3 data-t="evosTitle"></h3>
+        <p class="sub" data-t="evosLong"></p>
+        <div class="recipes" id="recipes"></div>
+        <button class="link" data-go="home" data-t="back"></button>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

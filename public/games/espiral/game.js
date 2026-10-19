@@ -366,7 +366,7 @@ let last = performance.now();
 let lastCount = 0;
 function frame(now) {
   requestAnimationFrame(frame);
-  let dt = Math.min(0.05, (now - last) / 1000);
+  let dt = Math.max(0, Math.min(0.05, (now - last) / 1000));
   last = now;
   if (G.paused) dt = 0;
   const run = S.run;

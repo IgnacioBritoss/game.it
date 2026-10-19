@@ -1,0 +1,19 @@
+{
+  "id": "brasas",
+  "title": { "es": "Brasas", "en": "Embers" },
+  "description": {
+    "es": "Sos una brasita en un bosque oscuro: aguantá hasta el amanecer. Las armas atacan solas; subí de nivel, elegí mejoras, evolucioná armas y vencé al Señor de la Bruma.",
+    "en": "You are a little ember in a dark forest: hold on until dawn. Weapons attack on their own; level up, pick upgrades, evolve weapons and beat the Lord of the Mist."
+  },
+  "categories": ["accion", "arcade"],
+  "tags": ["survivors", "bullet heaven", "roguelite", "hordas", "horde", "fuego", "fire", "noche", "night", "evoluciones", "mejoras", "upgrades"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "canvas2d",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["keyboard", "mouse", "touch", "gamepad"],
+  "features": { "online": false, "multiplayer": false, "maxPlayers": 1, "story": false },
+  "order": 42
+}

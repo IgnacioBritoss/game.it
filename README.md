@@ -460,6 +460,20 @@ compu (1 a 3), local (2 a 4), práctica y **online por carriles paralelos** de h
 en su carril cuando quiere, el servidor simula el tiro con la misma física y decide los pinos, y los demás lo ven en el carril
 de al lado; si alguien no tira en 45 s o se va, tira la máquina por él.
 
+### Brasas (sobrevivir la noche)
+
+Una brasita en un bosque oscuro que tiene que aguantar hasta el amanecer (noche corta de 5 minutos o larga de 10). Solo se
+mueve (teclado, mando, joystick táctil que aparece donde se apoya el dedo, o el mouse apretado): las armas atacan solas. Hay
+7 armas de 6 niveles (chispas, órbita, látigo, rayo, brasero, calor y estrellas fugaces) y 7 objetos de 5 niveles; en cada
+nivel se elige 1 de 3 cartas (con dos cambios por noche). Las élites doradas dejan cofres, y un arma al máximo con su objeto
+evoluciona al abrir uno (7 evoluciones para descubrir). Las oleadas (`public/games/brasas/shared/data.js`) traen sombras,
+murciélagos, lobos, ojos que disparan, gólems, fantasmas que atraviesan y babosas que se dividen, con rondas de murciélagos,
+manadas, muros de sombras y el Señor de la Bruma al 90 % de la noche. La simulación (`shared/sim.js`) es pura y determinista
+con una grilla espacial para cientos de enemigos. El dibujo (`render.js`, `art.js`) es canvas 2D: un velo de noche con
+agujeros de luz alrededor del fuego, ojitos que brillan en la oscuridad y un amanecer que quema todo. El oro que se junta
+compra mejoras permanentes (fuerza, vida, paso, atracción, codicia y una segunda llama), y al final hay un desglose del daño
+de cada arma.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego

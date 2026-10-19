@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Micelio · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+
+    <!-- HUD (lo ubica game.js según el frasco) -->
+    <div class="hud" id="hud" hidden>
+      <div class="box score-box" id="score-box">
+        <small data-t="score"></small>
+        <b id="score">0</b>
+        <span id="best"></span>
+      </div>
+      <div class="box next-box" id="next-box">
+        <small data-t="next"></small>
+        <canvas id="next" width="96" height="96"></canvas>
+      </div>
+      <div class="box timer" id="timer" hidden>3:00</div>
+      <div class="box chart" id="chart-box"><canvas id="chart"></canvas></div>
+      <div class="rivals" id="rivals" hidden></div>
+    </div>
+    <div class="banner" id="banner"><canvas id="banner-c" width="120" height="120"></canvas><div><small data-t="newSpecies"></small><b id="banner-name"></b></div></div>
+    <div class="toast" id="toast"></div>
+    <div class="count" id="count"></div>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="card">
+        <canvas class="logo" id="logo" width="160" height="110"></canvas>
+        <h1 data-t="title"></h1>
+        <p class="sub" data-t="tagline"></p>
+        <button class="btn moss" id="b-play"><span data-t="play"></span><small id="b-play-sub"></small></button>
+        <div class="row2">
+          <button class="btn amber" id="b-daily"><span data-t="daily"></span><small id="b-daily-sub"></small></button>
+          <button class="btn red" id="b-online"><span data-t="online"></span><small data-t="onlineSub"></small></button>
+        </div>
+        <p class="keys" id="keys"></p>
+        <p class="found" id="found"></p>
+      </div>
+    </section>
+
+    <!-- se llenó -->
+    <section class="screen" id="s-over">
+      <div class="card">
+        <h2 data-t="over"></h2>
+        <canvas class="over-sprite" id="over-sprite" width="130" height="130"></canvas>
+        <div class="big" id="over-score">0</div>
+        <p class="sub" id="over-best"></p>
+        <div class="stats" id="over-stats"></div>
+        <button class="btn moss" id="b-again"><span data-t="again"></span></button>
+        <button class="btn amber" id="b-share" hidden><span data-t="share"></span></button>
+        <p class="status" id="share-status"></p>
+        <button class="link" data-go="home" data-t="menu"></button>
+      </div>
+    </section>
+
+    <!-- online: entrar -->
+    <section class="screen" id="s-online">
+      <div class="card">
+        <h2 data-t="online"></h2>
+        <p class="sub" data-t="onlineLong"></p>
+        <label class="lbl" for="on-name" data-t="yourName"></label>
+        <input class="field" id="on-name" maxlength="16" autocomplete="off" spellcheck="false" />
+        <button class="btn moss" id="on-quick"><span data-t="quick"></span><small data-t="quickSub"></small></button>
+        <button class="btn red" id="on-create"><span data-t="create"></span><small data-t="createSub"></small></button>
+        <div class="join">
+          <input class="field code" id="on-code" maxlength="5" autocomplete="off" spellcheck="false" placeholder="ABCDE" aria-label="código" />
+          <button class="btn amber" id="on-join"><span data-t="join"></span></button>
+        </div>
+        <p class="status" id="on-status"></p>
+        <button class="link" data-go="home" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- online: sala -->
+    <section class="screen" id="s-lobby">
+      <div class="card">
+        <p class="kicker" data-t="room"></p>
+        <button class="code-big" id="lobby-code">-----</button>
+        <p class="hint2" data-t="tapToCopy"></p>
+        <ul class="plist" id="lobby-players"></ul>
+        <div class="opt">
+          <span class="lbl" data-t="time"></span>
+          <div class="seg" id="seg-time"><button data-v="2">2 min</button><button data-v="3">3 min</button><button data-v="5">5 min</button></div>
+        </div>
+        <div class="opt">
+          <span class="lbl" data-t="spores"></span>
+          <div class="seg" id="seg-spores"><button data-v="on" data-t="sporesOn"></button><button data-v="off" data-t="sporesOff"></button></div>
+        </div>
+        <button class="btn moss" id="lobby-start"><span data-t="start"></span></button>
+        <p class="status" id="lobby-status"></p>
+        <button class="link" id="lobby-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <!-- online: resultados -->
+    <section class="screen" id="s-results">
+      <div class="card">
+        <h2 id="res-title"></h2>
+        <ol class="rank" id="res-rank"></ol>
+        <button class="btn moss" id="res-again"><span></span></button>
+        <button class="link" id="res-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

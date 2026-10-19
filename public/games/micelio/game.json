@@ -1,0 +1,19 @@
+{
+  "id": "micelio",
+  "title": { "es": "Micelio", "en": "Mycelium" },
+  "description": {
+    "es": "Soltá hongos en un frasco y juntá los iguales para descubrir 11 especies sin llenarlo. Hongos del día y duelo online con esporas.",
+    "en": "Drop mushrooms into a jar and merge matching ones to discover 11 species without filling it. A daily jar and online duels with spores."
+  },
+  "categories": ["puzzle", "casual", "online", "multijugador"],
+  "tags": ["suika", "fusion", "merge", "hongos", "mushrooms", "frasco", "jar", "fisica", "physics", "duelo", "duel", "diario"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "canvas2d",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "portrait",
+  "input": ["mouse", "keyboard", "touch", "gamepad"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 8, "story": false },
+  "order": 40
+}

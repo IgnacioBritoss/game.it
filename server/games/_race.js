@@ -7,9 +7,11 @@ const STATE_MIN_MS = 45; // como mucho ~22 estados por segundo por jugador
 
 /**
  * Opcionales: `partial(s)` guarda lo último que mandó cada jugador (por ejemplo cuánto avanzó) y se suma a su fila si no
- * termina; `listable` + `listInfo(room)` lo muestran en la lista de salas públicas (settings.public).
+ * termina; `listable` + `listInfo(room)` lo muestran en la lista de salas públicas (settings.public); `maxMs` puede ser
+ * una función de la sala (partidas con tiempo elegido); `extra(room, api, p, msg, d)` recibe los mensajes propios del
+ * juego durante la partida (devuelve false si eran inválidos).
  */
-export function raceGame({ maxPlayers = 4, countdownMs = 4000, maxMs = 10 * 60e3, graceAfterFirstMs = 45e3, defaults = {}, settings, onStart, validateFinish, rank, partial, listable = false, listInfo }) {
+export function raceGame({ maxPlayers = 4, countdownMs = 4000, maxMs = 10 * 60e3, graceAfterFirstMs = 45e3, defaults = {}, settings, onStart, validateFinish, rank, partial, listable = false, listInfo, extra }) {
   function finish(room, api) {
     const d = room.data;
     if (!d || d.over) return;
@@ -38,7 +40,7 @@ export function raceGame({ maxPlayers = 4, countdownMs = 4000, maxMs = 10 * 60e3
     start(room, api) {
       room.data = { startAt: Date.now() + countdownMs, results: [], last: new Map(), pub: {}, partial: {}, over: false };
       onStart(room, room.data);
-      api.setTimer('max', countdownMs + maxMs, () => finish(room, api));
+      api.setTimer('max', countdownMs + (typeof maxMs === 'function' ? maxMs(room) : maxMs), () => finish(room, api));
     },
     message(room, api, p, msg) {
       const d = room.data;
@@ -63,7 +65,9 @@ export function raceGame({ maxPlayers = 4, countdownMs = 4000, maxMs = 10 * 60e3
         if (d.results.length === 1 && graceAfterFirstMs) api.setTimer('grace', graceAfterFirstMs, () => finish(room, api));
         maybeEnd(room, api);
         api.sync();
+        return;
       }
+      if (extra && !d.over) return extra(room, api, p, msg, d);
     },
     leave(room, api) {
       maybeEnd(room, api);

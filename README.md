@@ -33,7 +33,7 @@ Hay una plantilla lista en [`templates/juego-base/`](templates/juego-base/) y `n
 
 **Publicado en Render** (cada push a `main` se despliega solo):
 - Web: https://game-it-63r9.onrender.com (sitio estático: `npm ci && npm run build` → `dist/`)
-- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral y Cruce): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
+- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral, Cruce y Micelio): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
   Variables: `ALLOWED_ORIGINS` (orígenes permitidos, separados por coma). La IP de cada cliente (para los límites por IP) se detecta sola cuando hay un proxy delante (solo se confía en los encabezados si quien se conecta por TCP es una dirección interna); se puede fijar con `CLIENT_IP_HEADER` (p. ej. `cf-connecting-ip`) o `TRUST_PROXY_HOPS` (cuántos proxies agregan una entrada a `X-Forwarded-For`, contando desde la derecha). `MAX_RT_ROOMS` (4 por defecto) es el tope de salas en tiempo real a la vez (Ameba, Serpentina, Clashball, Pádel y las arenas nuevas): el servidor gratis de Render tiene 0,1 CPU; al llegar al tope, crear otra devuelve `server_full_rt`. `/health` informa `rt: { rooms, max, avgTickMs }`. Límites ajustables en `server/index.js` (`CFG`).
 - En desarrollo: `npm run server` levanta el servidor local en `ws://localhost:8787`, que los juegos online usan automáticamente.
 
@@ -430,6 +430,20 @@ se mueve cada cuadro. Modos: **infinito** (récord, monedas y 6 personajes que s
 `gameit:cruce:*`; revivir con anuncio opcional), **Camino del día** (mismo mundo para todos ese día) y **Carrera online**
 de hasta 8 (`server/games/cruce.js` sobre `_race.js`, con el flujo compartido de `public/shared/race-lobby.js`): meta a
 60, 100 o 150 filas, puntos de control cada 25, fantasmas con nombre y tiempos imposibles rechazados.
+
+### Micelio (fusionar hongos en un frasco)
+
+Se apunta (mouse, arrastrar, ← → o mando) y se suelta un hongo; dos iguales que se tocan se funden en la especie
+siguiente (11, del Botoncito al Ancestral; dos Ancestrales desaparecen con 100 puntos) y si la pila asoma por encima de
+la línea durante 2,2 s se termina. La física (`public/games/micelio/shared/physics.js`) es propia: círculos con impulsos
+secuenciales (rebote chico y fricción que los hace rodar), 4 subpasos y 7 iteraciones por cuadro, corrección de posición
+y fusiones donde el hongo nuevo crece y empuja a los vecinos; está probada apilando 50 hongos sin que se atraviesen. Cada
+especie se dibuja por código (`species.js`: sombrero con su patrón, tallo con cara que cambia al caer o al dormirse) en un
+sprite cacheado por escala. Las especies descubiertas y el récord quedan en `gameit:micelio:*`. Modos: **clásico**,
+**Hongos del día** (la misma secuencia para todos ese día) y **Duelo online** de hasta 8 (`server/games/micelio.js` sobre
+`_race.js`, que ahora acepta tope de tiempo por sala y mensajes propios): misma secuencia para todos, 2, 3 o 5 minutos,
+gana el mayor puntaje y, con esporas activadas, crear un hongo grande le tira hongos chiquitos a un rival al azar (el
+servidor limita la frecuencia y rechaza puntajes imposibles para el tiempo jugado).
 
 ## Juegos diarios
 

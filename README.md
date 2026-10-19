@@ -33,7 +33,7 @@ Hay una plantilla lista en [`templates/juego-base/`](templates/juego-base/) y `n
 
 **Publicado en Render** (cada push a `main` se despliega solo):
 - Web: https://game-it-63r9.onrender.com (sitio estático: `npm ci && npm run build` → `dist/`)
-- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral, Cruce y Micelio): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
+- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral, Cruce, Micelio y Bolos): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
   Variables: `ALLOWED_ORIGINS` (orígenes permitidos, separados por coma). La IP de cada cliente (para los límites por IP) se detecta sola cuando hay un proxy delante (solo se confía en los encabezados si quien se conecta por TCP es una dirección interna); se puede fijar con `CLIENT_IP_HEADER` (p. ej. `cf-connecting-ip`) o `TRUST_PROXY_HOPS` (cuántos proxies agregan una entrada a `X-Forwarded-For`, contando desde la derecha). `MAX_RT_ROOMS` (4 por defecto) es el tope de salas en tiempo real a la vez (Ameba, Serpentina, Clashball, Pádel y las arenas nuevas): el servidor gratis de Render tiene 0,1 CPU; al llegar al tope, crear otra devuelve `server_full_rt`. `/health` informa `rt: { rooms, max, avgTickMs }`. Límites ajustables en `server/index.js` (`CFG`).
 - En desarrollo: `npm run server` levanta el servidor local en `ws://localhost:8787`, que los juegos online usan automáticamente.
 
@@ -444,6 +444,21 @@ sprite cacheado por escala. Las especies descubiertas y el récord quedan en `ga
 `_race.js`, que ahora acepta tope de tiempo por sala y mensajes propios): misma secuencia para todos, 2, 3 o 5 minutos,
 gana el mayor puntaje y, con esporas activadas, crear un hongo grande le tira hongos chiquitos a un rival al azar (el
 servidor limita la frecuencia y rechaza puntajes imposibles para el tiempo jugado).
+
+### Bolos (bowling de 10 pinos)
+
+Se arrastra la bola para ubicarla y se desliza hacia arriba para tirar: el ángulo del gesto apunta, la velocidad al soltar
+es la fuerza y la curva del final suma efecto (también hay botones de efecto y, con teclado o mando, ← → mover, A D apuntar,
+Q E efecto y Espacio sostenido para la fuerza). La física (`public/games/bolos/shared/lane.js`) es 2D vista desde arriba y
+determinista (solo + − × ÷ √): la bola resbala hasta los 9 m y después engancha según el efecto (hasta ~45 cm), los pinos
+tienen masa real contra la bola, se chocan entre sí, rebotan en las paredes y se van al foso o a la canaleta; entrando al
+bolsillo hay plenos seguido y de frente al 1 quedan splits, como en una bolera. Las reglas (`shared/rules.js`) son las del
+bowling, en 5 cuadros (máximo 150) o 10 (máximo 300). La compu (`shared/cpu.js`) prueba tiros simulándolos y les suma un
+error según el nivel (en 10 cuadros promedia ~135, ~167 y ~209). La bolera (`scene.js`, three.js) tiene carriles de madera
+con flechas, reflejos en el carril, pinos torneados que vuelan y caen, la barredora y los carriles vecinos. Modos: contra la
+compu (1 a 3), local (2 a 4), práctica y **online por carriles paralelos** de hasta 6 (`server/games/bolos.js`): cada uno tira
+en su carril cuando quiere, el servidor simula el tiro con la misma física y decide los pinos, y los demás lo ven en el carril
+de al lado; si alguien no tira en 45 s o se va, tira la máquina por él.
 
 ## Juegos diarios
 

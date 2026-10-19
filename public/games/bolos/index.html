@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Bolos · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div id="stage"></div>
+
+    <!-- HUD -->
+    <div class="board" id="board" hidden></div>
+    <div class="turn" id="turn"></div>
+    <div class="callout" id="callout"></div>
+    <div class="pins" id="pins" hidden></div>
+    <div class="aim" id="aimhud" hidden>
+      <div class="spin" id="spin" role="radiogroup" aria-label="efecto">
+        <button data-s="-1" title="engancha a la izquierda">↶↶</button><button data-s="-0.5">↶</button><button data-s="0" class="on">↑</button><button data-s="0.5">↷</button><button data-s="1">↷↷</button>
+      </div>
+      <p class="hint" id="hint"></p>
+      <div class="power" id="power" hidden><i id="power-i"></i></div>
+    </div>
+    <button class="skip" id="skip" hidden data-t="skip"></button>
+    <div class="wait" id="wait" hidden></div>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="card">
+        <h1 data-t="title"></h1>
+        <p class="sub" data-t="tagline"></p>
+        <button class="btn neon" id="b-cpu"><span data-t="vsCpu"></span><small data-t="vsCpuSub"></small></button>
+        <div class="row2">
+          <button class="btn" id="b-local"><span data-t="local"></span><small data-t="localSub"></small></button>
+          <button class="btn pink" id="b-online"><span data-t="online"></span><small data-t="onlineSub"></small></button>
+        </div>
+        <button class="btn ghost" id="b-practice"><span data-t="practice"></span></button>
+        <p class="keys" id="keys"></p>
+      </div>
+    </section>
+
+    <!-- preparar partida (compu o local) -->
+    <section class="screen" id="s-setup">
+      <div class="card">
+        <h2 id="setup-title"></h2>
+        <div class="opt" id="opt-rivals">
+          <span class="lbl" data-t="rivals"></span>
+          <div class="seg" id="seg-rivals"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button></div>
+        </div>
+        <div class="opt" id="opt-level">
+          <span class="lbl" data-t="level"></span>
+          <div class="seg" id="seg-level"><button data-v="easy" data-t="easy"></button><button data-v="normal" data-t="normal"></button><button data-v="pro" data-t="pro"></button></div>
+        </div>
+        <div class="opt" id="opt-people">
+          <span class="lbl" data-t="people"></span>
+          <div class="seg" id="seg-people"><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div>
+        </div>
+        <div class="opt">
+          <span class="lbl" data-t="framesLbl"></span>
+          <div class="seg" id="seg-nframes"><button data-v="5" data-t="f5"></button><button data-v="10" data-t="f10"></button></div>
+        </div>
+        <button class="btn neon" id="b-go"><span data-t="go"></span></button>
+        <button class="link" data-go="home" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- fin de partida -->
+    <section class="screen" id="s-over">
+      <div class="card">
+        <h2 id="over-title"></h2>
+        <ol class="rank" id="over-rank"></ol>
+        <div class="stats" id="over-stats"></div>
+        <button class="btn neon" id="b-again"><span data-t="again"></span></button>
+        <button class="link" data-go="home" data-t="menu"></button>
+      </div>
+    </section>
+
+    <!-- online: entrar -->
+    <section class="screen" id="s-online">
+      <div class="card">
+        <h2 data-t="online"></h2>
+        <p class="sub" data-t="onlineLong"></p>
+        <label class="lbl" for="on-name" data-t="yourName"></label>
+        <input class="field" id="on-name" maxlength="16" autocomplete="off" spellcheck="false" />
+        <button class="btn neon" id="on-quick"><span data-t="quick"></span><small data-t="quickSub"></small></button>
+        <button class="btn pink" id="on-create"><span data-t="create"></span><small data-t="createSub"></small></button>
+        <div class="join">
+          <input class="field code" id="on-code" maxlength="5" autocomplete="off" spellcheck="false" placeholder="ABCDE" aria-label="código" />
+          <button class="btn" id="on-join"><span data-t="join"></span></button>
+        </div>
+        <p class="status" id="on-status"></p>
+        <button class="link" data-go="home" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- online: sala -->
+    <section class="screen" id="s-lobby">
+      <div class="card">
+        <p class="kicker" data-t="room"></p>
+        <button class="code-big" id="lobby-code">-----</button>
+        <p class="hint2" data-t="tapToCopy"></p>
+        <ul class="plist" id="lobby-players"></ul>
+        <div class="opt">
+          <span class="lbl" data-t="framesLbl"></span>
+          <div class="seg" id="seg-frames"><button data-v="5" data-t="f5"></button><button data-v="10" data-t="f10"></button></div>
+        </div>
+        <button class="btn neon" id="lobby-start"><span data-t="start"></span></button>
+        <p class="status" id="lobby-status"></p>
+        <button class="link" id="lobby-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <!-- online: resultados -->
+    <section class="screen" id="s-results">
+      <div class="card">
+        <h2 id="res-title"></h2>
+        <ol class="rank" id="res-rank"></ol>
+        <button class="btn neon" id="res-again"><span></span></button>
+        <button class="link" id="res-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

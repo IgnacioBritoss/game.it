@@ -1,0 +1,19 @@
+{
+  "id": "bolos",
+  "title": { "es": "Bolos", "en": "Bowling" },
+  "description": {
+    "es": "Bowling de 10 pinos en una bolera de neón: deslizá para tirar y curvá para enganchar. Contra la compu, de a varios o online por carriles paralelos.",
+    "en": "10-pin bowling in a neon alley: swipe to roll and curve to hook. Against the computer, local multiplayer or online on side-by-side lanes."
+  },
+  "categories": ["deporte", "casual", "online", "multijugador"],
+  "tags": ["bowling", "bolos", "pinos", "pins", "strike", "pleno", "3d", "deporte", "sports", "compu"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "three",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["mouse", "keyboard", "touch", "gamepad"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 6, "localPlayers": 4, "cpu": true, "story": false },
+  "order": 41
+}

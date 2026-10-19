@@ -33,7 +33,7 @@ Hay una plantilla lista en [`templates/juego-base/`](templates/juego-base/) y `n
 
 **Publicado en Render** (cada push a `main` se despliega solo):
 - Web: https://game-it-63r9.onrender.com (sitio estático: `npm ci && npm run build` → `dist/`)
-- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral, Cruce, Micelio y Bolos): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
+- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral, Cruce, Micelio, Bolos y Vuelo): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
   Variables: `ALLOWED_ORIGINS` (orígenes permitidos, separados por coma). La IP de cada cliente (para los límites por IP) se detecta sola cuando hay un proxy delante (solo se confía en los encabezados si quien se conecta por TCP es una dirección interna); se puede fijar con `CLIENT_IP_HEADER` (p. ej. `cf-connecting-ip`) o `TRUST_PROXY_HOPS` (cuántos proxies agregan una entrada a `X-Forwarded-For`, contando desde la derecha). `MAX_RT_ROOMS` (4 por defecto) es el tope de salas en tiempo real a la vez (Ameba, Serpentina, Clashball, Pádel y las arenas nuevas): el servidor gratis de Render tiene 0,1 CPU; al llegar al tope, crear otra devuelve `server_full_rt`. `/health` informa `rt: { rooms, max, avgTickMs }`. Límites ajustables en `server/index.js` (`CFG`).
 - En desarrollo: `npm run server` levanta el servidor local en `ws://localhost:8787`, que los juegos online usan automáticamente.
 
@@ -473,6 +473,21 @@ con una grilla espacial para cientos de enemigos. El dibujo (`render.js`, `art.j
 agujeros de luz alrededor del fuego, ojitos que brillan en la oscuridad y un amanecer que quema todo. El oro que se junta
 compra mejoras permanentes (fuerza, vida, paso, atracción, codicia y una segunda llama), y al final hay un desglose del daño
 de cada arma.
+
+### Vuelo (salto de esquí)
+
+Salto de esquí en 3D (three.js). Se mantiene apretado para largar y bajar agachado (corrigiendo el equilibrio de costado),
+se suelta justo en el borde de la mesa —una barra marca el momento: perfecto, bueno, temprano o tarde— y en el aire las
+ráfagas mueven el cuerpo: hay que mantener el punto en el centro del círculo; cerca del piso se vuelve a apretar para el
+telemark, cuando se cierra el anillo. La física (`public/games/vuelo/shared/hill.js`) es pura y determinista: rampa,
+sustentación y resistencia del estilo en V, viento de frente que sostiene y de cola que hunde, y un perfil de caída armado
+debajo del vuelo de un salto de referencia, así que los saltos buenos pasan el K y aterrizan suave. Hay tres trampolines
+(normal K95, grande K120 y de vuelo K200, cada uno a otra hora del día). Los puntos son como en la realidad: distancia
+desde el K más estilo de 5 jueces (se descartan la nota más alta y la más baja). Modos: Copa (3 trampolines × 2 rondas
+contra 7 saltadores de la compu que saltan con la misma física), salto libre con el récord propio marcado en la nieve,
+Viento del día (3 saltos con el mismo viento para todos) y **competencia online** de hasta 8 (`server/games/vuelo.js`):
+mismos vientos por ronda, cada uno salta cuando quiere y ve a los demás como fantasmas; el servidor valida distancias y
+estilos y suma los puntos.
 
 ## Juegos diarios
 

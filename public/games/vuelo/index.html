@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Vuelo · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,500;0,700;0,800;0,900;1,800;1,900&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+
+    <!-- HUD del salto -->
+    <div class="hud" id="hud" hidden>
+      <div class="tag" id="tag"><b id="tag-hill"></b><span id="tag-info"></span></div>
+      <div class="wind" id="wind"><i class="wind-arrow" id="wind-arrow"></i><b id="wind-v">0,0</b><small id="wind-t"></small></div>
+      <button class="pause-btn" id="b-pause" aria-label="pausa"><i></i><i></i></button>
+      <div class="speed" id="speed" hidden><b id="speed-v">0</b><small>km/h</small></div>
+      <div class="prompt" id="prompt"></div>
+      <div class="timing" id="timing" hidden><div class="t-zone"></div><div class="t-mark" id="t-mark"></div><small data-t="release"></small></div>
+      <div class="lean" id="lean" hidden><div class="lean-dot" id="lean-dot"></div></div>
+      <div class="balance" id="balance" hidden><div class="b-ring"></div><div class="b-safe"></div><div class="b-dot" id="b-dot"></div><div class="b-tele" id="b-tele"></div></div>
+      <div class="callout" id="callout"></div>
+      <div class="dist" id="dist"></div>
+      <div class="rivals" id="rivals" hidden></div>
+      <div class="touch-pad left" id="pad-l" hidden><span data-t="padBalance"></span></div>
+      <div class="touch-pad right" id="pad-r" hidden><span data-t="padAction"></span></div>
+    </div>
+
+    <!-- resultado de un salto (abajo, deja ver la escena) -->
+    <div class="sheet" id="sheet" hidden>
+      <div class="sheet-top"><b class="big" id="r-dist">0,0 m</b><span class="land" id="r-land"></span></div>
+      <div class="judges" id="r-judges"></div>
+      <div class="pts" id="r-pts"></div>
+      <div class="notes" id="r-notes"></div>
+      <div class="sheet-btns">
+        <button class="btn sun" id="r-again"><span data-t="again"></span><kbd>R</kbd></button>
+        <button class="btn ice" id="r-next"><span data-t="next"></span></button>
+        <button class="btn ghost" id="r-menu"><span data-t="menu"></span></button>
+      </div>
+    </div>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="card home">
+        <div class="logo"><svg viewBox="0 0 120 70" aria-hidden="true"><path d="M8 58 L52 30 L58 33" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M60 26 C80 14 96 14 112 18" fill="none" stroke="#ffd23f" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 9"/><circle cx="62" cy="22" r="7" fill="#ff4f5e"/></svg></div>
+        <h1 data-t="title"></h1>
+        <p class="sub" data-t="tagline"></p>
+        <button class="btn sun" id="b-cup"><span data-t="cup"></span><small id="b-cup-sub"></small></button>
+        <div class="row2">
+          <button class="btn ice" id="b-free"><span data-t="free"></span><small data-t="freeSub"></small></button>
+          <button class="btn ice" id="b-daily"><span data-t="daily"></span><small id="b-daily-sub"></small></button>
+        </div>
+        <button class="btn berry" id="b-online"><span data-t="online"></span><small data-t="onlineSub"></small></button>
+        <p class="keys" id="keys"></p>
+      </div>
+    </section>
+
+    <!-- elegir trampolín -->
+    <section class="screen" id="s-hills">
+      <div class="card wide">
+        <h2 data-t="pickHill"></h2>
+        <div class="hills" id="hills"></div>
+        <button class="link" data-go="home" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- tabla de la copa -->
+    <section class="screen" id="s-board">
+      <div class="card wide">
+        <p class="kicker" id="board-kicker"></p>
+        <h2 id="board-title"></h2>
+        <ol class="table" id="board"></ol>
+        <button class="btn sun" id="board-go"><span></span></button>
+        <button class="link" id="board-quit" data-t="quitCup"></button>
+      </div>
+    </section>
+
+    <!-- cómo se juega (primera vez) -->
+    <section class="screen" id="s-tut">
+      <div class="card wide">
+        <h2 data-t="howTitle"></h2>
+        <ol class="how" id="how"></ol>
+        <button class="btn sun" id="tut-go"><span data-t="gotIt"></span></button>
+      </div>
+    </section>
+
+    <!-- pausa -->
+    <section class="screen dim" id="s-pause">
+      <div class="card">
+        <h2 data-t="paused"></h2>
+        <button class="btn sun" id="b-resume"><span data-t="resume"></span></button>
+        <button class="btn ghost" id="b-help"><span data-t="howTitle"></span></button>
+        <button class="link" id="b-quit" data-t="quit"></button>
+      </div>
+    </section>
+
+    <!-- online: entrar -->
+    <section class="screen" id="s-online">
+      <div class="card">
+        <h2 data-t="online"></h2>
+        <p class="sub" data-t="onlineLong"></p>
+        <label class="lbl" for="on-name" data-t="yourName"></label>
+        <input class="field" id="on-name" maxlength="16" autocomplete="off" spellcheck="false" />
+        <button class="btn sun" id="on-quick"><span data-t="quick"></span><small data-t="quickSub"></small></button>
+        <button class="btn berry" id="on-create"><span data-t="create"></span><small data-t="createSub"></small></button>
+        <div class="join">
+          <input class="field code" id="on-code" maxlength="5" autocomplete="off" spellcheck="false" placeholder="ABCDE" aria-label="código" />
+          <button class="btn ice" id="on-join"><span data-t="join"></span></button>
+        </div>
+        <p class="status" id="on-status"></p>
+        <button class="link" data-go="home" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- online: sala -->
+    <section class="screen" id="s-lobby">
+      <div class="card">
+        <p class="kicker" data-t="room"></p>
+        <button class="code-big" id="lobby-code">-----</button>
+        <p class="hint2" data-t="tapToCopy"></p>
+        <ul class="plist" id="lobby-players"></ul>
+        <div class="opt">
+          <span class="lbl" data-t="hill"></span>
+          <div class="seg" id="seg-hill"><button data-v="normal" data-t="hNormal"></button><button data-v="grande" data-t="hGrande"></button><button data-v="vuelo" data-t="hVuelo"></button></div>
+        </div>
+        <div class="opt">
+          <span class="lbl" data-t="rounds"></span>
+          <div class="seg" id="seg-rounds"><button data-v="2">2</button><button data-v="3">3</button></div>
+        </div>
+        <button class="btn sun" id="lobby-start"><span data-t="start"></span></button>
+        <p class="status" id="lobby-status"></p>
+        <button class="link" id="lobby-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <!-- online: resultados -->
+    <section class="screen" id="s-results">
+      <div class="card wide">
+        <h2 id="res-title"></h2>
+        <ol class="table" id="res-rank"></ol>
+        <button class="btn sun" id="res-again"><span></span></button>
+        <button class="link" id="res-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

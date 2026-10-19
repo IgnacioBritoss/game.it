@@ -1,0 +1,19 @@
+{
+  "id": "vuelo",
+  "title": { "es": "Vuelo", "en": "Soar" },
+  "description": {
+    "es": "Salto de esquí en 3D: bajá agachado, soltá justo en el borde, mantené el equilibrio contra las ráfagas y clavá el telemark. Copa en 3 trampolines, viento del día y competencia online.",
+    "en": "3D ski jumping: tuck down the in-run, release right at the edge, keep your balance against gusts and stick the telemark. A 3-hill cup, daily wind and online contests."
+  },
+  "categories": ["deporte", "arcade", "online", "multijugador"],
+  "tags": ["salto de esqui", "ski jump", "esqui", "ski", "nieve", "snow", "invierno", "winter", "telemark", "viento", "wind", "3d", "diario"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "three.js + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "landscape",
+  "input": ["keyboard", "mouse", "touch", "gamepad"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 8, "story": false },
+  "order": 43
+}

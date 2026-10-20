@@ -315,3 +315,32 @@ test('modo infinito: no termina, trae jefes y la vista previa coincide con la ol
   for (const id of TOWER_IDS) assert.ok(TOWERS[id].specs.a && TOWERS[id].specs.b);
   assert.equal(LIVES, 20);
 });
+
+test('regresiones: el veneno renovado toma la fuerza nueva, las lentitudes se suman y las crías no reciben la explosión que mató a la madre', () => {
+  const g = new Game({ map: 'arroyo' });
+  g.callWave();
+  g.queue.length = 0;
+  const en = g.spawn('caracol', 0, 4);
+  en.hp = en.max = 1e6;
+  for (let i = 0; i < 3; i++) g.addPoison(en, { dps: 6, dur: 4, src: 99, stacks: 3 });
+  g.addPoison(en, { dps: 20, dur: 4, src: 99, stacks: 3, spread: 1.3 });
+  assert.equal(en.poison.length, 3);
+  assert.ok(en.poison.some((p) => p.dps === 20 && p.spread === 1.3), 'el dardo nuevo renueva con su veneno');
+  // lentitudes: la de la lluvia (más débil y larga) sigue cuando termina la del frío
+  const b = g.spawn('hormiga', 0, 4);
+  g.slowDown(b, 0.48, 2);
+  g.slowDown(b, 0.4, 4);
+  assert.equal(b.slow, 0.48);
+  for (let i = 0; i < 150; i++) {
+    b.d = 4;
+    g.step(1 / 60);
+  }
+  assert.ok(b.slowT > 0 && Math.abs(b.slow - 0.4) < 1e-9, 'después de 2,5 s queda la lentitud de la lluvia');
+  // explosión que mata a una oruga: las larvas nacen enteras
+  const cat = g.spawn('oruga', 0, 6);
+  cat.hp = 1;
+  g.explode(cat.x, cat.y, 1.1, 42, 'phys', null);
+  const larvae = g.enemies.filter((x) => x.e === 'larva' && !x.dead);
+  assert.equal(larvae.length, 2);
+  for (const l of larvae) assert.equal(l.hp, l.max);
+});

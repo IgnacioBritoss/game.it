@@ -182,7 +182,7 @@ export const MAPS = [
     name: { es: 'El arroyo', en: 'The creek' },
     sub: { es: 'El sendero cruza el agua dos veces.', en: 'The trail crosses the water twice.' },
     paths: [[[-1, 9], [3, 9], [3, 2], [8, 2], [8, 9], [13, 9], [13, 2], [17, 2], [17, 7]]],
-    water: { from: [11, -1], to: [6, 12], width: 1 },
+    water: { from: [16, -1], to: [10, 12], width: 1 },
     waves: 15,
     coins: 260,
     towers: ['champi', 'bejin', 'escarcha', 'amanita'],

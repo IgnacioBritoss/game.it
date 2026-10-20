@@ -334,6 +334,7 @@ export class Game {
       a: 0,
       slow: 0,
       slowT: 0,
+      slows: [],
       freezeT: 0,
       rootT: 0,
       stunT: 0,
@@ -411,19 +412,25 @@ export class Game {
   addPoison(en, p) {
     const same = en.poison.filter((x) => x.src === p.src);
     if (same.length >= (p.stacks || 3)) {
-      // renueva la más vieja
-      same.sort((a, b) => a.t - b.t)[0].t = p.dur;
+      // renueva la más vieja con lo que trae el dardo (si el hongo mejoró, el veneno también)
+      Object.assign(same.sort((a, b) => a.t - b.t)[0], { dps: p.dps, t: p.dur, dur: p.dur, spread: p.spread, stacks: p.stacks });
     } else en.poison.push({ dps: p.dps, t: p.dur, dur: p.dur, src: p.src, spread: p.spread, stacks: p.stacks });
     if (p.weaken) {
       en.weakT = p.dur;
       en.weakK = Math.max(en.weakK, p.weaken);
     }
   }
+  /** Cada lentitud dura lo suyo; el bicho va a la velocidad de la más fuerte que siga activa. */
   slowDown(en, k, t) {
-    if (k >= en.slow || en.slowT <= 0) {
-      en.slow = Math.max(k, en.slowT > 0 ? en.slow : 0);
-      en.slowT = Math.max(en.slowT, t);
-    }
+    const same = en.slows.find((x) => x.k === k);
+    if (same) same.t = Math.max(same.t, t);
+    else en.slows.push({ k, t });
+    this.slowSync(en);
+  }
+  slowSync(en) {
+    en.slows = en.slows.filter((x) => x.t > 0);
+    en.slow = en.slows.reduce((m, x) => Math.max(m, x.k), 0);
+    en.slowT = en.slows.reduce((m, x) => Math.max(m, x.t), 0);
   }
 
   // ------------------------------------------------------------ a quién apunta
@@ -486,7 +493,8 @@ export class Game {
       }
       case 'aura': {
         let n = 0;
-        for (const en of this.enemies) {
+        // sobre una copia: las crías que nacen en el pulso no lo reciben
+        for (const en of [...this.enemies]) {
           if (!this.inRange(tw, S, en)) continue;
           n++;
           this.hurt(en, S.dmg, D.dt, tw);
@@ -497,7 +505,7 @@ export class Game {
         break;
       }
       case 'chain': {
-        const pts = [[tw.x, tw.y - 0.35]];
+        const pts = [[tw.x, tw.y]];
         const hit = new Set();
         let cur = tg, dmg = S.dmg;
         for (let i = 0; i < S.chain && cur; i++) {
@@ -521,7 +529,7 @@ export class Game {
         break;
       }
       case 'dart':
-        this.shots.push({ k: 'dart', x: tw.x, y: tw.y - 0.2, tg, tx: tg.x, ty: tg.y, sp: 11, dmg: S.dmg, dt: D.dt, src: tw, poison: { dps: S.poison, dur: S.poisonT, src: tw.id, spread: S.spread, stacks: S.stacks, weaken: S.weaken } });
+        this.shots.push({ k: 'dart', x: tw.x, y: tw.y, tg, tx: tg.x, ty: tg.y, sp: 11, dmg: S.dmg, dt: D.dt, src: tw, poison: { dps: S.poison, dur: S.poisonT, src: tw.id, spread: S.spread, stacks: S.stacks, weaken: S.weaken } });
         this.ev.push({ t: 'shoot', tower: tw });
         break;
       case 'snipe': {
@@ -542,7 +550,7 @@ export class Game {
   }
 
   explode(x, y, r, dmg, dt, src) {
-    for (const en of this.enemies) {
+    for (const en of [...this.enemies]) {
       if (en.dead || ENEMIES[en.e].fly) continue;
       const d = dist(x, y, en.x, en.y);
       if (d > r) continue;
@@ -594,7 +602,11 @@ export class Game {
       if (en.dead) continue;
       const E = ENEMIES[en.e];
       en.hitT = Math.max(0, en.hitT - dt);
-      for (const k of ['slowT', 'freezeT', 'rootT', 'stunT', 'shellT', 'weakT']) if (en[k] > 0) en[k] = Math.max(0, en[k] - dt);
+      for (const k of ['freezeT', 'rootT', 'stunT', 'shellT', 'weakT']) if (en[k] > 0) en[k] = Math.max(0, en[k] - dt);
+      if (en.slows.length) {
+        for (const x of en.slows) x.t -= dt;
+        this.slowSync(en);
+      }
       if (en.weakT <= 0) en.weakK = 0;
       // veneno
       if (en.poison.length) {
@@ -721,7 +733,7 @@ export class Game {
     // nubes de esporas
     for (const c of this.clouds) {
       c.t -= dt;
-      for (const en of this.enemies)
+      for (const en of [...this.enemies])
         if (!en.dead && !ENEMIES[en.e].fly && dist(en.x, en.y, c.x, c.y) < c.r) this.hurt(en, c.dps * dt, 'magic', c.src);
     }
     this.clouds = this.clouds.filter((c) => c.t > 0);

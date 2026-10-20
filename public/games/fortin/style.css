@@ -1089,3 +1089,29 @@ h3 {
     font-size: 11px;
   }
 }
+
+/* teléfonos muy angostos: el botón de oleada queda solo con el ícono */
+@media (max-width: 380px) {
+  #wave-txt {
+    display: none;
+  }
+  .wave-btn {
+    padding: 0;
+    width: 34px;
+  }
+  .chip {
+    padding: 0 6px 0 5px;
+  }
+}
+@media (max-width: 560px) {
+  .toast {
+    width: min(360px, 94vw);
+  }
+  .toast img {
+    width: 44px;
+    height: 44px;
+  }
+  .toast b {
+    font-size: 15px;
+  }
+}

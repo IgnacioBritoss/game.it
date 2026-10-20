@@ -6,7 +6,7 @@
  * Simulación en shared/sim.js y datos en shared/data.js (puros, probados en tests/fortin.test.mjs); dibujos en art.js
  * y la vista en render.js.
  */
-import { Game, T as TILE, makeWave } from './shared/sim.js';
+import { Game, T as TILE, makeWave, WAVE_GAP, EARLY_BONUS } from './shared/sim.js';
 import { TOWERS, TOWER_IDS, ENEMIES, POWERS, MAPS, COLS, ROWS, LIVES } from './shared/data.js';
 import { View } from './render.js';
 import { towerIcon, bugIcon, paintGround, drawTower } from './art.js';
@@ -29,7 +29,8 @@ const TXT = {
   modeCamp: { es: 'Campaña', en: 'Campaign' },
   modeEndless: { es: 'Infinito', en: 'Endless' },
   campSub: { es: '{n} oleadas · estrellas según las vidas que te queden', en: '{n} waves · stars by lives left' },
-  endlessSub: { es: 'Oleadas sin fin, cada vez más duras. Récord: oleada {n}', en: 'Endless waves, harder and harder. Best: wave {n}' },
+  endlessSub: { es: 'Oleadas sin fin, cada vez más duras. Récord: {n} oleadas', en: 'Endless waves, harder and harder. Best: {n} waves' },
+  endlessSub1: { es: 'Oleadas sin fin, cada vez más duras. Récord: 1 oleada', en: 'Endless waves, harder and harder. Best: 1 wave' },
   endlessLocked: { es: 'Ganá este mapa para jugarlo en modo infinito.', en: 'Win this map to play it in endless mode.' },
   locked: { es: 'Ganá el mapa anterior para abrirlo.', en: 'Win the previous map to unlock it.' },
   playSub: { es: '{m}', en: '{m}' },
@@ -40,8 +41,8 @@ const TXT = {
   incoming: { es: 'Vienen…', en: 'Incoming…' },
   pRain: { es: 'Lluvia', en: 'Rain' },
   pRoots: { es: 'Raíces', en: 'Roots' },
-  aimRain: { es: 'Tocá dónde querés que llueva', en: 'Tap where you want it to rain' },
-  aimRoots: { es: 'Tocá dónde salen las raíces (no atrapan a los que vuelan)', en: 'Tap where the roots burst (they can’t catch flyers)' },
+  aimRain: { es: 'Tocá donde querés que llueva', en: 'Tap where you want it to rain' },
+  aimRoots: { es: 'Tocá donde querés las raíces (no atrapan a los que vuelan)', en: 'Tap where the roots should burst (they can’t catch flyers)' },
   paused: { es: 'Pausa', en: 'Paused' },
   resume: { es: 'Seguir', en: 'Resume' },
   restart: { es: 'Empezar el mapa de nuevo', en: 'Restart the map' },
@@ -49,8 +50,10 @@ const TXT = {
   won: { es: '¡El tocón está a salvo!', en: 'The stump is safe!' },
   lost: { es: 'Los bichos entraron al tocón', en: 'The bugs got into the stump' },
   wonSub: { es: 'Te quedaron {n} vidas.', en: 'You kept {n} lives.' },
+  wonSub1: { es: 'Te quedó 1 vida.', en: 'You kept 1 life.' },
   lostSub: { es: 'Llegaste a la oleada {n} de {t}.', en: 'You reached wave {n} of {t}.' },
   endlessEnd: { es: 'Aguantaste {n} oleadas', en: 'You held out for {n} waves' },
+  endlessEnd1: { es: 'Aguantaste 1 oleada', en: 'You held out for 1 wave' },
   endlessBest: { es: '¡Nuevo récord!', en: 'New record!' },
   endlessPrev: { es: 'Récord: {n}', en: 'Best: {n}' },
   next: { es: 'Siguiente mapa', en: 'Next map' },
@@ -71,7 +74,7 @@ const TXT = {
   tFirst: { es: 'al primero', en: 'first' },
   tLast: { es: 'al último', en: 'last' },
   tStrong: { es: 'al más fuerte', en: 'strongest' },
-  tClose: { es: 'al más cerca', en: 'closest' },
+  tClose: { es: 'al más cercano', en: 'closest' },
   stDmg: { es: 'daño', en: 'damage' },
   stRate: { es: 'por seg', en: 'per sec' },
   stRange: { es: 'alcance', en: 'range' },
@@ -80,6 +83,13 @@ const TXT = {
   stChain: { es: 'saltos', en: 'jumps' },
   noAir: { es: 'No le pega a lo que vuela.', en: 'Can’t hit flyers.' },
   needCoins: { es: 'Te faltan {n} semillas', en: 'You need {n} more seeds' },
+  needCoins1: { es: 'Te falta 1 semilla', en: 'You need 1 more seed' },
+  buildHint: { es: 'Elegí qué hongo plantar acá.', en: 'Pick a mushroom to plant here.' },
+  hTowers: { es: 'Hongos', en: 'Mushrooms' },
+  hBugs: { es: 'Bichos', en: 'Bugs' },
+  aSpeed: { es: 'Velocidad', en: 'Speed' },
+  aPause: { es: 'Pausa', en: 'Pause' },
+  aClose: { es: 'Cerrar', en: 'Close' },
   newBug: { es: '¡Bicho nuevo!', en: 'New bug!' },
   bossComing: { es: '¡Se viene un jefe!', en: 'A boss is coming!' },
   waveToast: { es: 'Oleada {n}', en: 'Wave {n}' },
@@ -103,6 +113,8 @@ const t = (k, v) => {
   if (v) for (const x in v) s = s.replace(`{${x}}`, v[x]);
   return s;
 };
+/** Variante en singular (`clave1`) cuando n es 1. */
+const tn = (k, n, v = {}) => (n === 1 && TXT[k + '1'] ? t(k + '1', v) : t(k, { n, ...v }));
 const lang = () => (G.prefs.lang === 'en' ? 'en' : 'es');
 const TARGETS = ['first', 'last', 'strong', 'close'];
 const TARGET_TXT = { first: 'tFirst', last: 'tLast', strong: 'tStrong', close: 'tClose' };
@@ -288,7 +300,9 @@ function start(idx = S.mapIdx, endless = S.endless) {
 
 function showTip() {
   const el = $('tip');
-  if (!S.tip || S.phase !== 'play') {
+  // no tapa el aviso de los poderes ni la hoja de los menús en pantallas angostas
+  const busy = S.aim || ((S.buildAt || S.sel) && innerWidth < 560);
+  if (!S.tip || S.phase !== 'play' || busy) {
     el.hidden = true;
     return;
   }
@@ -298,6 +312,7 @@ function showTip() {
 function advanceTip(to) {
   if (S.tip && to > S.tip) {
     S.tip = to;
+    S.tipT = 0;
     if (to > 4) {
       S.tip = 0;
       tipsSeen.basic = true;
@@ -306,11 +321,26 @@ function advanceTip(to) {
     showTip();
   }
 }
+/** El último consejo se va solo al rato. */
+function updateTip(dt) {
+  if (S.tip !== 4) return;
+  S.tipT = (S.tipT || 0) + dt;
+  if (S.tipT > 9) advanceTip(5);
+}
 
 function step(dt) {
   const g = S.game;
   const ev = g.step(dt);
   for (const e of ev) onEvent(e);
+}
+
+/** Corre una acción del jugador sobre la simulación y reparte los eventos que deja (oleada, poder, venta…). */
+function act(fn) {
+  const g = S.game;
+  const n0 = g.ev.length;
+  const r = fn(g);
+  for (const e of g.ev.splice(n0)) onEvent(e);
+  return r;
 }
 
 function onEvent(e) {
@@ -360,11 +390,14 @@ function onEvent(e) {
       else sfx.roots();
       break;
     case 'won':
-    case 'lost':
-      setTimeout(() => endGame(), 900);
+    case 'lost': {
+      // la pantalla final es de esta partida: si el jugador ya empezó otra, no aparece
+      const g0 = g;
+      setTimeout(() => S.game === g0 && endGame(), 900);
       if (e.t === 'won') sfx.won();
       else sfx.lost();
       break;
+    }
   }
 }
 
@@ -378,7 +411,10 @@ function vibrate(ms) {
 // ---------------------------------------------------------------- avisos
 let toastQ = [];
 let toastT = 0;
+let toastCur = null;
+/** Aviso urgente: se muestra ya y el que estaba en pantalla vuelve después. */
 function toast(o) {
+  if (toastT > 0 && toastCur && !toastCur.big) toastQ.unshift(toastCur);
   toastQ.unshift(o);
   toastT = 0;
   nextToast();
@@ -390,6 +426,7 @@ function queueToast(o) {
 function nextToast() {
   const el = $('toast');
   const o = toastQ.shift();
+  toastCur = o || null;
   if (!o) {
     el.hidden = true;
     return;
@@ -422,7 +459,8 @@ function refreshHud(force = false) {
   const g = S.game;
   if (!g) return;
   const nextIn = g.nextT;
-  const key = [g.coins, g.lives, g.wave, g.phase, nextIn == null ? -1 : Math.ceil(nextIn), S.speed, g.queue.length > 0].join('|');
+  const bonus = nextIn == null ? -1 : Math.ceil(nextIn * EARLY_BONUS);
+  const key = [g.coins, g.lives, g.wave, g.phase, bonus, S.speed, g.queue.length > 0, innerWidth < 430].join('|');
   if (!force && key === hudKey) return updateRing();
   hudKey = key;
   $('coins').textContent = g.coins;
@@ -434,7 +472,7 @@ function refreshHud(force = false) {
   const canCall = g.phase === 'build' || (g.phase === 'run' && nextIn != null && g.wave < g.total);
   wb.disabled = !canCall;
   wb.classList.toggle('go', g.phase === 'build');
-  $('wave-txt').textContent = g.phase === 'build' ? t('start') : canCall ? t('callEarly', { n: Math.ceil(nextIn * 3) }) : t('incoming');
+  $('wave-txt').textContent = g.phase === 'build' ? t('start') : canCall ? t('callEarly', { n: bonus }) : t('incoming');
   $('speed-lbl').textContent = `${S.speed}×`;
   // próxima oleada
   const pv = $('preview');
@@ -449,7 +487,7 @@ function refreshHud(force = false) {
 function updateRing() {
   const g = S.game;
   const ring = $('wave-ring');
-  const k = g.nextT != null ? 1 - g.nextT / 14 : g.phase === 'build' ? 1 : 0;
+  const k = g.nextT != null ? 1 - g.nextT / WAVE_GAP : g.phase === 'build' ? 1 : 0;
   ring.style.strokeDashoffset = String(106.8 * (1 - clamp(k, 0, 1)));
   for (const k2 of Object.keys(POWERS)) {
     const b = $(`p-${k2}`);
@@ -471,9 +509,9 @@ function openBuild(tx, ty) {
     const cost = TOWERS[id].levels[0].cost;
     return `<button class="opt${avail ? '' : ' lock'}${g.coins < cost ? ' poor' : ''}" data-tw="${id}" ${avail ? '' : 'disabled'}><kbd>${i + 1}</kbd><img src="${towerIcon(id)}" alt=""><b><i class="ic-seed"></i>${cost}</b></button>`;
   }).join('');
-  $('build-info').innerHTML = `<b>${t('tip1').replace(/<[^>]+>/g, '')}</b>`;
   setBuildInfo(null);
   el.hidden = false;
+  showTip();
   placeMenu(el, tx + 0.5, ty + 0.5);
   for (const b of $$('#build-opts .opt')) {
     b.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && hoverOpt(b.dataset.tw));
@@ -489,14 +527,14 @@ function hoverOpt(id) {
 function setBuildInfo(id) {
   const el = $('build-info');
   if (!id) {
-    el.innerHTML = '';
+    el.textContent = t('buildHint');
     return;
   }
   const D = TOWERS[id];
   const L = D.levels[0];
   const g = S.game;
   const lack = L.cost - g.coins;
-  el.innerHTML = `<b>${G.t(D.name)}</b> · ${G.t(D.desc)}${D.air ? '' : ` <i>${t('noAir')}</i>`}${lack > 0 ? `<br><span style="color:#b03020">${t('needCoins', { n: lack })}</span>` : ''}`;
+  el.innerHTML = `<b>${G.t(D.name)}</b> · ${G.t(D.desc)}${D.air ? '' : ` <i>${t('noAir')}</i>`}${lack > 0 ? `<br><span style="color:#b03020">${tn('needCoins', lack)}</span>` : ''}`;
 }
 function pickOpt(id, e) {
   const g = S.game;
@@ -515,13 +553,21 @@ function pickOpt(id, e) {
     return;
   }
   const [tx, ty] = S.buildAt;
-  if (g.build(tx, ty, id)) {
-    sfx.build();
-    view.event({ t: 'build', tower: g.towers[g.towers.length - 1] }, g);
-    advanceTip(2);
-    closeMenus();
-    refreshHud(true);
+  if (doBuild(tx, ty, id)) closeMenus();
+}
+/** Planta y reparte los eventos (el sonido, la nube de tierra, el consejo siguiente). */
+function doBuild(tx, ty, id) {
+  const g = S.game;
+  if (g.coins < TOWERS[id].levels[0].cost || !g.canBuild(tx, ty, id)) {
+    sfx.denied();
+    return null;
   }
+  const tw = act(() => g.build(tx, ty, id));
+  if (!tw) return null;
+  sfx.build();
+  advanceTip(2);
+  refreshHud(true);
+  return tw;
 }
 
 function openTower(tw) {
@@ -532,6 +578,8 @@ function openTower(tw) {
   el.hidden = false;
   placeMenu(el, tw.x, tw.y);
   advanceTip(4);
+  showTip();
+  if (!G.prefs.touch) setTimeout(() => ($('#tw-up .up') || $('tw-target'))?.focus?.({ preventScroll: true }), 30);
 }
 
 function statCells(S0, S1, D) {
@@ -613,13 +661,12 @@ function doUpgrade(k, e) {
     renderTowerMenu(k);
     return;
   }
-  const ok = g.upgrade(tw, k === 'up' ? null : k);
+  const ok = act(() => g.upgrade(tw, k === 'up' ? null : k));
   if (!ok) {
     sfx.denied();
     return;
   }
   sfx.upgrade();
-  view.event({ t: 'upgrade', tower: tw }, g);
   S.armed = null;
   renderTowerMenu();
   placeMenu($('tower-menu'), tw.x, tw.y);
@@ -634,7 +681,7 @@ function doSell(e) {
     renderTowerMenu();
     return;
   }
-  g.sell(tw);
+  act(() => g.sell(tw));
   sfx.sell();
   closeMenus();
   refreshHud(true);
@@ -654,6 +701,7 @@ function closeMenus() {
   S.ghostType = null;
   $('build-menu').hidden = true;
   $('tower-menu').hidden = true;
+  showTip();
 }
 function refreshMenus() {
   if (S.buildAt) {
@@ -663,12 +711,16 @@ function refreshMenus() {
   }
   if (S.sel) {
     if (!S.game.towers.includes(S.sel)) closeMenus();
-    else
+    else {
       for (const b of $$('#tw-up .up')) {
         const D = TOWERS[S.sel.type];
         const cost = b.dataset.up === 'up' ? D.levels[S.sel.lv]?.cost : D.specs[b.dataset.up].cost;
         b.classList.toggle('poor', S.game.coins < cost);
       }
+      // la devolución baja al 70 % cuando empieza la primera oleada
+      const v = S.game.sellValue(S.sel);
+      $('tw-sell').textContent = S.armed === 'sell' ? t('sellSure', { n: v }) : t('sell', { n: v });
+    }
   }
 }
 
@@ -677,9 +729,11 @@ function tapWorld(wx, wy) {
   const g = S.game;
   if (!g || S.phase !== 'play') return;
   if (S.aim) {
-    if (g.usePower(S.aim, wx, wy)) {
+    const kind = S.aim;
+    if (act(() => g.usePower(kind, wx, wy))) {
       S.aim = null;
       $('aim-hint').hidden = true;
+      showTip();
     } else sfx.denied();
     refreshHud(true);
     return;
@@ -693,11 +747,7 @@ function tapWorld(wx, wy) {
     return openTower(tw);
   }
   if (S.placing) {
-    if (g.canBuild(tx, ty, S.placing)) {
-      S.buildAt = [tx, ty];
-      pickOpt(S.placing, { pointerType: 'mouse' });
-      if (!S.keepPlacing) S.placing = null;
-    } else sfx.denied();
+    if (doBuild(tx, ty, S.placing) && !S.keepPlacing) S.placing = null;
     return;
   }
   if (g.canBuild(tx, ty)) {
@@ -715,6 +765,7 @@ function setAim(kind) {
     S.aim = null;
     $('aim-hint').hidden = true;
     updateRing();
+    showTip();
     return;
   }
   if (g.powers[kind].cd > 0 || g.phase !== 'run') {
@@ -726,17 +777,21 @@ function setAim(kind) {
   $('aim-hint').textContent = t(kind === 'lluvia' ? 'aimRain' : 'aimRoots');
   $('aim-hint').hidden = false;
   updateRing();
+  showTip();
 }
 
 function callWave() {
   const g = S.game;
   if (!g || S.phase !== 'play') return;
-  const bonus = g.callWave();
+  const wasRun = g.phase === 'run';
+  const bonus = act(() => g.callWave());
   if (bonus > 0) {
     view.text(g.map.paths[0].pts[1][0], g.map.paths[0].pts[1][1], `+${bonus}`, '#ffe08a', true);
     sfx.sell();
+    // el último consejo era justamente este
+    if (S.tip === 4) advanceTip(5);
   }
-  advanceTip(3);
+  if (!wasRun) advanceTip(3);
   refreshHud(true);
 }
 
@@ -745,39 +800,43 @@ function endGame() {
   const g = S.game;
   if (!g || S.ended) return;
   S.ended = true;
-  const id = g.def.id;
-  const p = (progress[id] ||= { stars: 0, endless: 0 });
-  let sub = '', kicker = G.t(g.def.name);
+  const p = (progress[g.def.id] ||= { stars: 0, endless: 0 });
   const won = g.phase === 'won';
-  let title;
+  const info = { won, waves: Math.max(0, g.wave - 1), prevEndless: p.endless || 0, stars: g.stars() };
+  if (g.endless) p.endless = Math.max(p.endless || 0, info.waves);
+  else p.stars = Math.max(p.stars || 0, info.stars);
+  store.set('progress', progress);
+  S.endInfo = info;
+  renderEnd();
+  show('end');
+}
+
+/** Textos de la pantalla final (se rehacen si cambia el idioma). */
+function renderEnd() {
+  const g = S.game, info = S.endInfo;
+  if (!g || !info) return;
+  let title, sub;
   if (g.endless) {
-    const waves = Math.max(0, g.wave - 1);
-    title = t('endlessEnd', { n: waves });
-    sub = waves > p.endless ? t('endlessBest') : t('endlessPrev', { n: p.endless });
-    p.endless = Math.max(p.endless, waves);
+    title = tn('endlessEnd', info.waves);
+    sub = info.waves > info.prevEndless ? t('endlessBest') : t('endlessPrev', { n: info.prevEndless });
     $('end-stars').innerHTML = '';
   } else {
-    title = won ? t('won') : t('lost');
-    sub = won ? t('wonSub', { n: g.lives }) : t('lostSub', { n: g.wave, t: g.total });
-    const st = g.stars();
-    p.stars = Math.max(p.stars, st);
-    $('end-stars').innerHTML = won ? [1, 2, 3].map((i) => `<i class="${i <= st ? 'on' : ''}">★</i>`).join('') : '';
+    title = info.won ? t('won') : t('lost');
+    sub = info.won ? tn('wonSub', g.lives) : t('lostSub', { n: g.wave, t: g.total });
+    $('end-stars').innerHTML = info.won ? [1, 2, 3].map((i) => `<i class="${i <= info.stars ? 'on' : ''}">★</i>`).join('') : '';
   }
-  store.set('progress', progress);
-  $('end-kicker').textContent = kicker;
+  $('end-kicker').textContent = G.t(g.def.name);
   $('end-title').textContent = title;
   $('end-sub').textContent = sub;
   $('end-stats').innerHTML = [
     [g.stats.kills, 'sKills'],
-    [g.endless ? Math.max(0, g.wave - 1) : g.wave, 'sWaves'],
+    [g.endless ? info.waves : g.wave, 'sWaves'],
     [g.towers.length, 'sTowers'],
   ]
     .map(([v, k]) => `<div class="stat"><b>${v}</b><span>${t(k)}</span></div>`)
     .join('');
-  const hasNext = won && !g.endless && S.mapIdx < MAPS.length - 1;
-  $('b-next').hidden = !hasNext;
+  $('b-next').hidden = !(info.won && !g.endless && S.mapIdx < MAPS.length - 1);
   $('next-lbl').textContent = t('next');
-  show('end');
 }
 
 // ---------------------------------------------------------------- pantallas
@@ -850,8 +909,8 @@ function renderHome() {
   $('m-endless').disabled = !canEndless;
   $('m-camp').classList.toggle('on', !S.endless);
   $('m-endless').classList.toggle('on', S.endless);
-  $('mode-sub').textContent = S.endless ? t('endlessSub', { n: p.endless || 0 }) : canEndless || S.mapIdx === 0 ? t('campSub', { n: m.waves }) : t('campSub', { n: m.waves });
-  if (!canEndless && S.endless === false) $('m-endless').title = t('endlessLocked');
+  $('mode-sub').textContent = S.endless ? tn('endlessSub', p.endless || 0) : t('campSub', { n: m.waves });
+  $('m-endless').title = canEndless ? '' : t('endlessLocked');
   $('play-sub').textContent = `${S.mapIdx + 1}. ${G.t(m.name)}${S.endless ? ` · ${t('modeEndless')}` : ''}`;
 }
 
@@ -883,8 +942,14 @@ function drawLogo() {
 
 function pause() {
   if (S.phase !== 'play') return;
-  $('pause-sub').textContent = `${G.t(S.game.def.name)} · ${S.game.endless ? t('waveN', { n: S.game.wave }) : t('waveOf', { n: Math.max(1, S.game.wave), t: S.game.total })}`;
+  renderPauseSub();
   show('pause');
+}
+function renderPauseSub() {
+  const g = S.game;
+  if (!g) return;
+  const n = Math.max(1, g.wave);
+  $('pause-sub').textContent = `${G.t(g.def.name)} · ${g.endless ? t('waveN', { n }) : t('waveOf', { n, t: g.total })}`;
 }
 function resume() {
   if (S.phase !== 'pause') return;
@@ -913,6 +978,7 @@ function frame(now) {
     if (n >= 12) S.acc = 0;
     view.update(dt * Math.min(S.speed, 2));
     updateToast(dt);
+    updateTip(dt);
     refreshHud();
   }
   if (g && S.phase !== 'menu' && S.phase !== 'help') {
@@ -934,7 +1000,8 @@ let menuIdx = -1;
 function drawMenuBg(dt) {
   if (menuIdx !== S.mapIdx || !menuGame) {
     menuIdx = S.mapIdx;
-    menuGame = new Game({ map: S.mapIdx });
+    // en modo infinito: los bichos no se terminan nunca
+    menuGame = new Game({ map: S.mapIdx, endless: true });
     // unos hongos de adorno
     const spots = [];
     for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (menuGame.tile(x, y) === TILE.GRASS) spots.push([x, y]);
@@ -1020,6 +1087,12 @@ addEventListener('keydown', (e) => {
     }
     if ((e.code === 'KeyV' || e.code === 'Delete' || e.code === 'Backspace') && S.sel) return doSell('key');
     if (e.code === 'KeyT' && S.sel) return cycleTarget();
+    // dentro de un menú, las flechas pasan de botón en botón
+    if (d && document.activeElement?.closest?.('.menu')) {
+      e.preventDefault();
+      menuNav(d);
+      return;
+    }
     // cursor por teclado
     if (d && !document.activeElement?.closest?.('.menu')) {
       e.preventDefault();
@@ -1042,6 +1115,16 @@ addEventListener('keydown', (e) => {
   } else if (S.phase === 'help' && e.code === 'Escape') backFromHelp();
 });
 
+/** Mueve el foco entre los botones del menú abierto (teclado y joystick). */
+function menuNav(d) {
+  const menu = document.activeElement?.closest?.('.menu');
+  if (!menu) return;
+  const list = [...menu.querySelectorAll('button')].filter((b) => !b.disabled && !b.hidden && b.offsetParent);
+  const i = list.indexOf(document.activeElement);
+  const step = d === 'left' || d === 'up' ? -1 : 1;
+  list[(i + step + list.length) % list.length]?.focus({ preventScroll: true });
+}
+
 function toggleSpeed() {
   S.speed = S.speed === 1 ? 2 : S.speed === 2 ? 3 : 1;
   sfx.click();
@@ -1059,7 +1142,10 @@ function pollPad(dt) {
       const ax = gp.axes[0] || 0, ay = gp.axes[1] || 0;
       let dx = (b(15) ? 1 : 0) - (b(14) ? 1 : 0) + (Math.abs(ax) > 0.5 ? Math.sign(ax) : 0);
       let dy = (b(13) ? 1 : 0) - (b(12) ? 1 : 0) + (Math.abs(ay) > 0.5 ? Math.sign(ay) : 0);
-      if ((dx || dy) && padT <= 0 && !document.activeElement?.closest?.('.menu')) {
+      if ((dx || dy) && padT <= 0 && document.activeElement?.closest?.('.menu')) {
+        padT = 0.18;
+        menuNav(dx < 0 || dy < 0 ? 'left' : 'right');
+      } else if ((dx || dy) && padT <= 0) {
         padT = 0.14;
         if (view.rot) [dx, dy] = [dy, -dx];
         const c = S.cursor || [Math.floor(COLS / 2), Math.floor(ROWS / 2)];
@@ -1143,9 +1229,16 @@ function toMenu() {
 G.onPrefs((p) => {
   document.documentElement.lang = p.lang;
   $$('[data-t]').forEach((n) => (n.textContent = t(n.dataset.t)));
+  $$('[data-t-aria]').forEach((n) => n.setAttribute('aria-label', t(n.dataset.tAria)));
   view.reduced = !!p.reducedMotion;
   if (S.phase === 'menu') renderHome();
   if (S.phase === 'help') renderHelp();
+  if (S.phase === 'pause') renderPauseSub();
+  if (S.phase === 'end') renderEnd();
+  if (S.sel) renderTowerMenu();
+  if (S.buildAt) setBuildInfo(S.ghostType);
+  if (S.aim) $('aim-hint').textContent = t(S.aim === 'lluvia' ? 'aimRain' : 'aimRoots');
+  showTip();
   if (S.game) refreshHud(true);
 }, true);
 addEventListener('resize', layout);

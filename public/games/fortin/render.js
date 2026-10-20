@@ -79,13 +79,23 @@ export class View {
     if (key === this.groundKey) return;
     this.groundKey = key;
     const k = this.s * this.dpr;
+    const inner = document.createElement('canvas');
+    inner.width = Math.ceil(COLS * k);
+    inner.height = Math.ceil(ROWS * k);
+    const ic = inner.getContext('2d');
+    ic.scale(k, k);
+    paintGround(ic, map, theme);
+    // la sombra del mapa se pinta una sola vez, con un margen alrededor
+    const pad = Math.ceil(24 * this.dpr);
     const cv = document.createElement('canvas');
-    cv.width = Math.ceil(COLS * k);
-    cv.height = Math.ceil(ROWS * k);
+    cv.width = inner.width + pad * 2;
+    cv.height = inner.height + pad * 2;
     const c = cv.getContext('2d');
-    c.scale(k, k);
-    paintGround(c, map, theme);
+    c.shadowColor = 'rgba(0,0,0,0.35)';
+    c.shadowBlur = 18 * this.dpr;
+    c.drawImage(inner, pad, pad);
     this.ground = cv;
+    this.groundPad = pad / k;
   }
 
   // ------------------------------------------------------------ efectos (los pide el juego con los eventos)
@@ -113,7 +123,7 @@ export class View {
       case 'kill': {
         const en = e.en;
         this.puff(en.x, en.y, SPLAT[en.e] || '#fff', ENEMIES[en.e].boss ? 40 : 10, ENEMIES[en.e].boss ? 3 : 1.6, 0.5, 0.07);
-        this.text(en.x, en.y - 0.2, `+${e.reward}`, '#ffe08a', ENEMIES[en.e].boss);
+        this.text(en.x, en.y, `+${e.reward}`, '#ffe08a', ENEMIES[en.e].boss);
         this.segs.delete(en.id);
         break;
       }
@@ -134,24 +144,24 @@ export class View {
         this.bolts.push({ pts: e.pts, t: 0, life: e.big ? 0.25 : 0.16, big: e.big });
         break;
       case 'snipe':
-        this.tracers.push({ x0: e.tower.x, y0: e.tower.y - 0.4, x1: e.x, y1: e.y, t: 0, life: 0.14, crit: e.crit });
+        this.tracers.push({ x0: e.tower.x, y0: e.tower.y, x1: e.x, y1: e.y, t: 0, life: 0.14, crit: e.crit });
         this.puff(e.x, e.y, '#fff3c0', 6, 1.6, 0.3, 0.05);
-        if (e.crit) this.text(e.x, e.y - 0.3, '×3', '#ffd34a', true);
+        if (e.crit) this.text(e.x, e.y, '×3', '#ffd34a', true);
         break;
       case 'spread':
         this.puff(e.to.x, e.to.y, '#b8ff6a', 5, 0.8, 0.4, 0.05);
         break;
       case 'build':
       case 'upgrade':
-        this.puff(e.tower.x, e.tower.y + 0.2, '#e8d7b0', 12, 1.6, 0.45, 0.07);
-        this.ring(e.tower.x, e.tower.y + 0.15, 0.6, 'rgba(255,230,140,0.9)', 0.4, 0.06);
+        this.puff(e.tower.x, e.tower.y, '#e8d7b0', 12, 1.6, 0.45, 0.07);
+        this.ring(e.tower.x, e.tower.y, 0.6, 'rgba(255,230,140,0.9)', 0.4, 0.06);
         break;
       case 'sell':
         this.puff(e.tower.x, e.tower.y, '#ffe08a', 14, 2, 0.5, 0.06);
-        this.text(e.tower.x, e.tower.y - 0.3, `+${e.v}`, '#ffe08a');
+        this.text(e.tower.x, e.tower.y, `+${e.v}`, '#ffe08a');
         break;
       case 'shell':
-        this.text(e.en.x, e.en.y - 0.3, '¡!', '#fff');
+        this.text(e.en.x, e.en.y, '!', '#fff');
         break;
       case 'hop':
         this.puff(e.en.x, e.en.y, '#c9a06a', 4, 0.8, 0.3, 0.05);
@@ -233,11 +243,8 @@ export class View {
 
     // piso
     this.worldTf(c);
-    c.save();
-    c.shadowColor = 'rgba(0,0,0,0.35)';
-    c.shadowBlur = 18 * this.dpr;
-    c.drawImage(this.ground, 0, 0, COLS, ROWS);
-    c.restore();
+    const gp = this.groundPad;
+    c.drawImage(this.ground, -gp, -gp, COLS + gp * 2, ROWS + gp * 2);
 
     // casillero bajo el puntero
     if (ui.hoverTile) {
@@ -290,6 +297,7 @@ export class View {
     for (const z of game.zones)
       if (z.kind === 'raices') {
         const k = clamp(z.t / 0.25, 0, 1) * clamp((z.T - z.t) / 0.4, 0, 1);
+        c.save();
         c.strokeStyle = `rgba(110,70,35,${0.9 * k})`;
         c.lineCap = 'round';
         for (let i = 0; i < 14; i++) {
@@ -302,6 +310,7 @@ export class View {
           c.quadraticCurveTo(x + Math.cos(a + 1) * 0.2, y + Math.sin(a + 1) * 0.2, x + Math.cos(a + 2) * 0.15 * k, y + Math.sin(a + 2) * 0.15 * k);
           c.stroke();
         }
+        c.restore();
         c.fillStyle = `rgba(90,60,30,${0.18 * k})`;
         c.beginPath();
         c.arc(z.x, z.y, z.r, 0, TAU);
@@ -330,7 +339,7 @@ export class View {
     });
     {
       const [X, Y] = this.w2s(map.base.x, map.base.y);
-      list.push({ Y: Y + s * 0.4, f: () => drawBase(c, X, Y, s, t, this.hurt) });
+      list.push({ Y: Y + s * 0.4, f: () => drawBase(c, X, Y, s, t, this.hurt, !this.reduced) });
     }
     for (const tw of game.towers) {
       const [X, Y] = this.w2s(tw.x, tw.y);
@@ -386,12 +395,15 @@ export class View {
         c.lineJoin = 'round';
         c.beginPath();
         for (let i = 0; i < b.pts.length; i++) {
-          const [X, Y] = this.w2s(b.pts[i][0], b.pts[i][1]);
+          // el rayo sale del sombrero del hongo (arriba en la pantalla)
+          const [X, Y0] = this.w2s(b.pts[i][0], b.pts[i][1]);
+          const Y = i === 0 ? Y0 - s * 0.6 : Y0;
           if (i === 0) {
             c.moveTo(X, Y);
             continue;
           }
-          const [PX, PY] = this.w2s(b.pts[i - 1][0], b.pts[i - 1][1]);
+          const [PX, PY0] = this.w2s(b.pts[i - 1][0], b.pts[i - 1][1]);
+          const PY = i === 1 ? PY0 - s * 0.6 : PY0;
           for (let j = 1; j <= 4; j++) {
             const q = j / 4;
             const jit = j < 4 ? (Math.random() - 0.5) * s * 0.25 : 0;
@@ -409,7 +421,7 @@ export class View {
       c.strokeStyle = b.crit ? `rgba(255,210,80,${k})` : `rgba(255,250,230,${k})`;
       c.lineWidth = b.crit ? 3 : 2;
       c.beginPath();
-      c.moveTo(X0, Y0 - s * 0.35);
+      c.moveTo(X0, Y0 - s * 0.75);
       c.lineTo(X1, Y1);
       c.stroke();
     }
@@ -469,9 +481,9 @@ export class View {
       c.textAlign = 'center';
       c.lineWidth = Math.max(2, s * 0.08);
       c.strokeStyle = 'rgba(40,25,10,0.8)';
-      c.strokeText(x.str, X, Y - k * s * 0.6);
+      c.strokeText(x.str, X, Y - s * 0.35 - k * s * 0.6);
       c.fillStyle = x.col;
-      c.fillText(x.str, X, Y - k * s * 0.6);
+      c.fillText(x.str, X, Y - s * 0.35 - k * s * 0.6);
     }
     c.globalAlpha = 1;
 

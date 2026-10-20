@@ -333,9 +333,9 @@ export function drawBurrow(c, x, y, s, t, pulse = 0) {
 }
 
 /** El tocón: casa de los hongos. `hurt` 0..1 lo hace temblar y ponerse rojo. */
-export function drawBase(c, x, y, s, t, hurt = 0) {
+export function drawBase(c, x, y, s, t, hurt = 0, shake = true) {
   c.save();
-  c.translate(x + (hurt > 0 ? Math.sin(t * 60) * hurt * 0.05 * s : 0), y);
+  c.translate(x + (hurt > 0 && shake ? Math.sin(t * 60) * hurt * 0.05 * s : 0), y);
   c.scale(s, s);
   // sombra
   c.fillStyle = 'rgba(20,40,10,0.35)';
@@ -445,9 +445,18 @@ export function drawBase(c, x, y, s, t, hurt = 0) {
     c.fill();
   }
   if (hurt > 0) {
-    c.globalCompositeOperation = 'source-atop';
+    // tinte rojo solo sobre el tronco y la tapa
     c.fillStyle = `rgba(255,40,40,${hurt * 0.45})`;
-    c.fillRect(-1, -1.2, 2, 2);
+    c.beginPath();
+    c.moveTo(-0.72, 0.55);
+    c.lineTo(-0.66, -0.35);
+    c.lineTo(0.66, -0.35);
+    c.lineTo(0.72, 0.55);
+    c.quadraticCurveTo(0, 0.75, -0.72, 0.55);
+    c.fill();
+    c.beginPath();
+    c.ellipse(0, -0.35, 0.66, 0.24, 0, 0, TAU);
+    c.fill();
   }
   c.restore();
 }
@@ -952,19 +961,19 @@ export function drawBug(c, e, x, y, s, a, o = {}) {
   const walk = o.walk || 0;
   const fly = o.fly;
   c.save();
-  // sombra (los que vuelan la tienen lejos)
-  const hz = fly ? 0.32 : o.hop || 0;
-  c.fillStyle = 'rgba(20,40,10,0.28)';
-  c.beginPath();
-  c.ellipse(x + hz * 0.3 * s, y + (0.06 + hz * 0.6) * s, 0.28 * s * (o.size || 1), 0.14 * s * (o.size || 1), 0, 0, TAU);
-  c.fill();
-  c.translate(x, y - hz * s * 0.6);
-  // los segmentos (oruga, ciempiés) van en coordenadas de pantalla
+  // los segmentos (oruga, ciempiés) ya vienen en coordenadas de pantalla: no se trasladan
   if (o.segs && o.segs.length) {
     segmented(c, e, s, a, o);
     c.restore();
     return;
   }
+  // sombra (los que vuelan la tienen lejos); `s` ya incluye el tamaño del bicho
+  const hz = fly ? 0.32 : o.hop || 0;
+  c.fillStyle = 'rgba(20,40,10,0.28)';
+  c.beginPath();
+  c.ellipse(x + hz * 0.3 * s, y + (0.06 + hz * 0.6) * s, 0.28 * s, 0.14 * s, 0, 0, TAU);
+  c.fill();
+  c.translate(x, y - hz * s * 0.6);
   c.rotate(a);
   c.scale(s, s);
   switch (e) {

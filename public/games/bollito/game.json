@@ -1,0 +1,19 @@
+{
+  "id": "bollito",
+  "title": { "es": "Bollito", "en": "Paper Toss" },
+  "description": {
+    "es": "Embocá bollitos de papel en el cesto de una oficina en 3D: deslizá para apuntar y medir la fuerza, compensá el viento del ventilador y encadená tiros limpios. Clásico sin fin, desafío diario y partidas online de 2 a 8.",
+    "en": "Toss paper balls into the office bin in 3D: swipe to aim and set the power, compensate for the desk fan's wind and chain swishes. Endless classic, a daily challenge and online matches for 2 to 8."
+  },
+  "categories": ["arcade", "deporte", "casual", "online", "multijugador"],
+  "tags": ["papel", "paper", "bollito", "paper toss", "cesto", "basura", "trash", "bin", "oficina", "office", "viento", "wind", "ventilador", "fan", "punteria", "aim", "3d", "diario", "daily"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "three.js + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["keyboard", "mouse", "touch", "gamepad"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 8, "story": false },
+  "order": 48
+}

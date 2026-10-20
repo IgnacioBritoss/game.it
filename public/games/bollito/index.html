@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Bollito · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@700&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+
+    <!-- HUD del tiro -->
+    <div class="hud" id="hud" hidden>
+      <div class="score-card" id="score-card">
+        <small id="mode-tag"></small>
+        <div class="score-row"><b id="score">0</b><span class="mult" id="mult" hidden></span></div>
+        <div class="marks" id="marks" hidden></div>
+      </div>
+      <div class="top-right">
+        <div class="lives" id="lives"></div>
+        <button class="pause-btn" id="b-pause" aria-label="pausa"><i></i><i></i></button>
+      </div>
+      <div class="rivals" id="rivals" hidden></div>
+      <div class="spot-tag" id="spot-tag"><b id="spot-name"></b><span id="spot-dist"></span></div>
+      <div class="callout" id="callout"></div>
+      <div class="pops" id="pops"></div>
+      <div class="bubble" id="bubble"></div>
+      <div class="count" id="count"></div>
+      <div class="hint" id="hint"></div>
+      <div class="power" id="power">
+        <div class="tube"><div class="fill" id="power-fill"></div><div class="last" id="power-last" hidden></div></div>
+        <b id="power-v">0</b>
+      </div>
+      <div class="wind" id="wind">
+        <div class="dial"><i class="arrow" id="wind-arrow"></i></div>
+        <div class="wtxt"><b id="wind-v">0,0</b><small data-t="ms"></small></div>
+      </div>
+    </div>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="card home">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 150 86">
+            <path d="M14 70 C40 6 96 -2 118 40" fill="none" stroke="#3a2d4a" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 9" />
+            <g transform="translate(14 66)"><path d="M-11 -2 L-6 -11 L3 -12 L11 -6 L12 4 L5 11 L-5 11 L-12 5 Z" fill="#fffdf6" stroke="#3a2d4a" stroke-width="2.5" stroke-linejoin="round" /><path d="M-6 -4 L1 -1 L6 -7 M-3 5 L3 2 L8 5" fill="none" stroke="#3a2d4a" stroke-width="1.6" stroke-linecap="round" /></g>
+            <g transform="translate(118 46)"><path d="M-20 0 L-15 34 L15 34 L20 0 Z" fill="#3f4652" stroke="#3a2d4a" stroke-width="2.5" stroke-linejoin="round" /><path d="M-13 6 L-11 28 M-4 6 L-4 28 M4 6 L4 28 M13 6 L11 28" stroke="#6f7887" stroke-width="2" /><ellipse cx="0" cy="0" rx="21" ry="5" fill="#cfd6df" stroke="#3a2d4a" stroke-width="2.5" /></g>
+          </svg>
+        </div>
+        <h1 data-t="title"></h1>
+        <p class="sub" data-t="tagline"></p>
+        <button class="btn sun" id="b-classic"><span data-t="classic"></span><small id="b-classic-sub"></small></button>
+        <div class="row2">
+          <button class="btn mint" id="b-daily"><span data-t="daily"></span><small id="b-daily-sub"></small></button>
+          <button class="btn coral" id="b-online"><span data-t="online"></span><small data-t="onlineSub"></small></button>
+        </div>
+        <button class="link" id="b-how" data-t="howTitle"></button>
+        <p class="keys" id="keys"></p>
+      </div>
+    </section>
+
+    <!-- cómo se juega -->
+    <section class="screen" id="s-tut">
+      <div class="card wide">
+        <h2 data-t="howTitle"></h2>
+        <ol class="how" id="how"></ol>
+        <button class="btn sun" id="tut-go"><span data-t="gotIt"></span></button>
+      </div>
+    </section>
+
+    <!-- pausa -->
+    <section class="screen dim" id="s-pause">
+      <div class="card">
+        <h2 data-t="paused"></h2>
+        <button class="btn sun" id="b-resume"><span data-t="resume"></span></button>
+        <button class="btn ghost" id="b-help"><span data-t="howTitle"></span></button>
+        <button class="link" id="b-quit" data-t="quit"></button>
+      </div>
+    </section>
+
+    <!-- fin del Clásico -->
+    <section class="screen dim" id="s-over">
+      <div class="card">
+        <p class="kicker" data-t="classic"></p>
+        <h2 id="over-title"></h2>
+        <div class="big-score"><b id="over-score">0</b><small data-t="points"></small></div>
+        <p class="best-line" id="over-best"></p>
+        <div class="stats" id="over-stats"></div>
+        <button class="btn mint" id="over-continue" hidden><span data-t="continueAd"></span><small data-t="continueSub"></small></button>
+        <button class="btn sun" id="over-again"><span data-t="again"></span><kbd>R</kbd></button>
+        <button class="link" id="over-menu" data-t="menu"></button>
+      </div>
+    </section>
+
+    <!-- resultado del Diario -->
+    <section class="screen dim" id="s-daily">
+      <div class="card">
+        <p class="kicker" id="daily-kicker"></p>
+        <h2 id="daily-title"></h2>
+        <div class="big-score"><b id="daily-score">0</b><small data-t="points"></small></div>
+        <div class="squares" id="daily-marks"></div>
+        <div class="stats" id="daily-stats"></div>
+        <button class="btn sun" id="daily-share"><span data-t="share"></span></button>
+        <button class="btn ghost" id="daily-practice"><span data-t="practice"></span></button>
+        <p class="next" id="daily-next"></p>
+        <button class="link" id="daily-menu" data-t="menu"></button>
+      </div>
+    </section>
+
+    <!-- online: entrar -->
+    <section class="screen" id="s-online">
+      <div class="card">
+        <h2 data-t="online"></h2>
+        <p class="sub" data-t="onlineLong"></p>
+        <label class="lbl" for="on-name" data-t="yourName"></label>
+        <input class="field" id="on-name" maxlength="16" autocomplete="off" spellcheck="false" />
+        <button class="btn sun" id="on-quick"><span data-t="quick"></span><small data-t="quickSub"></small></button>
+        <button class="btn coral" id="on-create"><span data-t="create"></span><small data-t="createSub"></small></button>
+        <div class="join">
+          <input class="field code" id="on-code" maxlength="5" autocomplete="off" spellcheck="false" placeholder="ABCDE" aria-label="código" />
+          <button class="btn mint" id="on-join"><span data-t="join"></span></button>
+        </div>
+        <p class="status" id="on-status"></p>
+        <button class="link" data-go="home" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- online: sala -->
+    <section class="screen" id="s-lobby">
+      <div class="card">
+        <p class="kicker" data-t="room"></p>
+        <button class="code-big" id="lobby-code">-----</button>
+        <p class="hint2" data-t="tapToCopy"></p>
+        <ul class="plist" id="lobby-players"></ul>
+        <div class="opt">
+          <span class="lbl" data-t="fan"></span>
+          <div class="seg" id="seg-wind"><button data-v="suave" data-t="wSoft"></button><button data-v="normal" data-t="wNormal"></button><button data-v="fuerte" data-t="wStrong"></button></div>
+        </div>
+        <p class="hint2" data-t="needTwo"></p>
+        <button class="btn sun" id="lobby-start"><span data-t="start"></span></button>
+        <p class="status" id="lobby-status"></p>
+        <button class="link" id="lobby-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <!-- online: resultados -->
+    <section class="screen dim" id="s-results">
+      <div class="card wide">
+        <p class="kicker" data-t="online"></p>
+        <h2 id="res-title"></h2>
+        <ol class="table" id="res-rank"></ol>
+        <button class="btn sun" id="res-again"><span></span></button>
+        <button class="link" id="res-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

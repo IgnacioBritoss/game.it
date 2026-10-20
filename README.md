@@ -546,6 +546,23 @@ pips en su lugar, figuras dibujadas en SVG, frente simplificado en cartas chicas
 al ganar. Arrastrar o tocar (la carta va sola al mejor lugar), deshacer sin límite, estadísticas por juego, partidas que
 se retoman y controles de teclado y joystick.
 
+### Bollito (tirar bollitos al cesto)
+
+Embocar bollitos de papel en el cesto de una oficina en 3D (three.js). Se desliza el dedo o se arrastra el mouse hacia el
+cesto: el ángulo del gesto es la puntería y el largo, la fuerza (con teclado, ← → apuntan y Espacio sostenido carga la
+fuerza; también con mando). Un ventilador de escritorio sopla distinto en cada tiro y el cesto cambia de lugar: en el
+piso, sobre la mesita, arriba del archivero, junto a la impresora o escondido detrás del monitor del compañero (se ve su
+silueta a través de los muebles). La física (`public/games/bollito/shared/physics.js`) es pura y determinista (paso fijo
+de 1/480 s, solo + − × ÷ √): gravedad, arrastre del aire relativo al viento, el aro del cesto como un toro (el bollito
+puede rebotar en el borde o entrar bailando), las paredes del cesto por dentro y por fuera, el piso, los muebles y las
+paredes. Si entra sin tocar el aro es **¡Limpio!** y vale la mitad más; los aciertos seguidos multiplican. Modos: Clásico
+(sin fin, 3 fallos y afuera, la distancia y el viento crecen), Diario (10 tiros con los mismos lugares y vientos para
+todos, para compartir) y **online de 2 a 8** (`server/games/bollito.js`): misma serie para todos, cada uno a su ritmo
+con los puntajes de los demás en vivo; al terminar se mandan los 10 tiros y el servidor los vuelve a simular con la
+misma física para decidir qué entró. La oficina (`scene.js`) tiene ventanales al atardecer, persianas que dibujan rayas
+de sol, un compañero que festeja o se lamenta, papel picado en los tiros limpios y cámara lenta cuando ya se sabe que
+entra.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego

@@ -1,0 +1,20 @@
+{
+  "id": "paciencia",
+  "title": { "es": "Paciencia", "en": "Patience" },
+  "description": {
+    "es": "Los solitarios de siempre: Klondike (robando de a 1 o de a 3), Spider de 1, 2 o 4 palos y FreeCell con sus partidas numeradas, más un reparto del día que siempre se puede ganar.",
+    "en": "The classic solitaires: Klondike (draw 1 or 3), Spider with 1, 2 or 4 suits and FreeCell with its numbered deals, plus a deal of the day that is always winnable."
+  },
+  "categories": ["cartas", "clasicos", "diarios"],
+  "tags": ["solitario", "solitaire", "klondike", "spider", "freecell", "cartas", "cards", "paciencia", "patience", "diario", "daily"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "dom",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["mouse", "touch", "keyboard", "gamepad"],
+  "daily": { "epoch": "2026-10-20" },
+  "features": { "online": false, "multiplayer": false, "maxPlayers": 1, "story": false, "daily": true },
+  "order": 50
+}

@@ -531,6 +531,21 @@ simulación (`public/games/fortin/shared/sim.js`) es pura y las oleadas salen de
 (`art.js`): hongos con ojitos que miran al bicho que apuntan, bichos con patas que caminan y alas que aletean. En
 celulares parados el mapa se gira para que entre grande; se juega con mouse, pantalla táctil, teclado o joystick.
 
+### Paciencia (solitarios)
+
+Los tres solitarios clásicos sobre un paño verde: Klondike (robando de a 1 o de a 3, con los puntos del clásico y el
+bonus por tiempo), Spider de 1, 2 o 4 palos (dos mazos; las escaleras completas del rey al as salen solas) y FreeCell con
+los repartos numerados de Microsoft (la partida n.º 1 es la de siempre). Las reglas (`public/games/paciencia/shared/rules.js`)
+son puras: repartir con semilla, movidas válidas (alternar colores, reyes a columnas vacías, escaleras del mismo palo en
+Spider y la capacidad de FreeCell según celdas y columnas libres), robar, subir solas a las bases las cartas que ya no
+hacen falta, terminar solo y pistas. `shared/solver.js` trae un resolvedor de Klondike sabiendo todo (búsqueda en
+profundidad con poda y estados vistos) que elige el **reparto del día** (siempre ganable, cambia a las 00:00 de
+Argentina, con racha y para compartir) y la opción "solo repartos que se pueden ganar", y uno de FreeCell por mejor
+primero que las pruebas usan para comprobar los repartos. Las cartas son del DOM y se mueven con transiciones: índices,
+pips en su lugar, figuras dibujadas en SVG, frente simplificado en cartas chicas, cuatro dorsos y la cascada clásica
+al ganar. Arrastrar o tocar (la carta va sola al mejor lugar), deshacer sin límite, estadísticas por juego, partidas que
+se retoman y controles de teclado y joystick.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego
@@ -566,6 +581,7 @@ cada carpeta de datos tiene su `LEEME.txt` con las fuentes y licencias. Para sum
 | Vínculos | 16 palabras en 4 grupos ocultos, 4 errores. | `data/puzzles-<idioma>.json` (60 por idioma, escritos para el juego); `node tools/daily/vinculos-check.mjs` los valida. |
 | Colmena | 7 letras en un panal: palabras de 4 o más con la letra central; rangos por % del máximo. | `tools/daily/colmena-gen.mjs` arma 730 panales por idioma con los diccionarios de Mecha; las "rebuscadas" valen sin sumar. |
 | Tibio | Palabra secreta; cada intento devuelve su puesto por cercanía de significado. | Vectores fastText common-crawl (CC BY-SA 3.0, ver `tibio/data/LICENSE.txt`) reducidos con PCA a 96 dimensiones e int8 (≈3 MB por idioma); `tools/daily/tibio-build.py` los regenera. El ranking se calcula en el navegador. |
+| Paciencia | Klondike robando de a 1 con un reparto que siempre se puede ganar; cuentan el tiempo y las jugadas. | Se reparte con la semilla del día y el resolvedor (`paciencia/shared/solver.js`) descarta los repartos imposibles. |
 
 El texto para compartir de cada uno es `game.it · <Juego> #N …` con cuadraditos de colores y el link; en modo práctica no se
 suma nada a las estadísticas. Las listas de respuestas y de puzzles se pueden ampliar sin tocar el código (los desafíos

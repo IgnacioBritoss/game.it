@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Paciencia · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="felt"></div>
+
+    <!-- barra de la partida -->
+    <header class="bar" id="bar" hidden>
+      <div class="bar-l">
+        <b id="mode-name"></b>
+        <small id="deal-name"></small>
+      </div>
+      <div class="bar-c">
+        <span class="stat"><i class="ic ic-time"></i><b id="time">0:00</b></span>
+        <span class="stat"><i class="ic ic-moves"></i><b id="moves">0</b></span>
+        <span class="stat" id="score-wrap"><i class="ic ic-star"></i><b id="score">0</b></span>
+      </div>
+      <div class="bar-r actions" id="actions">
+        <button class="act" id="b-undo"><i class="ic ic-undo"></i><span data-t="undo"></span></button>
+        <button class="act" id="b-hint"><i class="ic ic-hint"></i><span data-t="hint"></span></button>
+        <button class="act" id="b-new"><i class="ic ic-new"></i><span data-t="newDeal"></span></button>
+        <button class="act" id="b-menu"><i class="ic ic-menu"></i><span data-t="menu"></span></button>
+      </div>
+    </header>
+
+    <main class="table" id="table"></main>
+    <canvas class="fx" id="fx" hidden></canvas>
+    <div class="toast" id="toast" hidden></div>
+    <button class="finish" id="b-finish" hidden data-t="finish"></button>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="card-ui home">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"><span class="lc a">A<i>♠</i></span><span class="lc b">K<i>♥</i></span><span class="lc c">Q<i>♦</i></span></div>
+          <div>
+            <h1 data-t="title"></h1>
+            <p class="sub" data-t="tagline"></p>
+          </div>
+        </div>
+        <button class="daily" id="b-daily">
+          <span class="d-ic">☀</span>
+          <span class="d-txt"><b data-t="daily"></b><small id="daily-sub"></small></span>
+          <span class="d-go">›</span>
+        </button>
+        <div class="modes" id="modes"></div>
+        <button class="link" id="b-help" data-t="help"></button>
+      </div>
+    </section>
+
+    <!-- menú en partida -->
+    <section class="screen dim" id="s-pause">
+      <div class="card-ui">
+        <h2 data-t="paused"></h2>
+        <p class="sub" id="pause-sub"></p>
+        <button class="btn gold" id="b-resume"><span data-t="resume"></span></button>
+        <button class="btn" id="b-restart"><span data-t="restart"></span></button>
+        <button class="btn" id="b-new2"><span data-t="newDealLong"></span></button>
+        <div class="opts">
+          <div class="opt-row"><span data-t="optBack"></span><div class="backs" id="backs"></div></div>
+          <button class="tog" id="t-auto"><span data-t="optAuto"></span><b></b></button>
+          <button class="tog" id="t-winnable"><span data-t="optWinnable"></span><b></b></button>
+        </div>
+        <button class="link" id="b-home" data-t="home"></button>
+      </div>
+    </section>
+
+    <!-- ganaste -->
+    <section class="screen" id="s-win">
+      <div class="card-ui win">
+        <p class="kicker" id="win-kicker"></p>
+        <h2 data-t="won"></h2>
+        <div class="win-stats" id="win-stats"></div>
+        <p class="sub" id="win-best"></p>
+        <button class="btn gold" id="b-share" hidden><span data-t="share"></span></button>
+        <button class="btn gold" id="b-again"><span data-t="again"></span></button>
+        <button class="link" id="b-win-home" data-t="home"></button>
+      </div>
+    </section>
+
+    <!-- ayuda -->
+    <section class="screen" id="s-help">
+      <div class="card-ui wide">
+        <h2 data-t="help"></h2>
+        <div id="help-body"></div>
+        <button class="link" id="b-help-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

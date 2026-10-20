@@ -563,6 +563,26 @@ misma física para decidir qué entró. La oficina (`scene.js`) tiene ventanales
 de sol, un compañero que festeja o se lamenta, papel picado en los tiros limpios y cámara lenta cuando ya se sabe que
 entra.
 
+### Prisma (rompecabezas de luz)
+
+Rompecabezas de luz en una sala oscura de museo: rayos de colores salen de los emisores y hay que girar y acomodar
+piezas de vidrio para que cada cristal reciba justo su color, todos a la vez. Hay espejos de dos caras, divisores (medio
+espejo: dejan pasar y además reflejan), prismas (la luz blanca entra por la base de bronce y sale roja a la izquierda,
+verde derecho y azul a la derecha), filtros, portales y paredes; las piezas pueden estar atornilladas, girar con un toque
+(clic derecho o mantener apretado: al revés) o esperar en una bandeja para arrastrarlas al tablero. La luz se suma: rojo
+y verde dan amarillo, rojo y azul magenta, verde y azul cian y los tres, blanco. La óptica
+(`public/games/prisma/shared/optics.js`) es pura: traza todos los rayos a la vez marcando qué colores ya pasaron por
+cada casilla y dirección (así terminan las vueltas en círculo y los cruces). `shared/solver.js` es un resolvedor exacto
+por ramificación y poda —solo prueba cambios en casillas iluminadas— que calcula el mínimo de jugadas de cada nivel, da
+las pistas (la pieza que hay que tocar y dónde va, en dorado) y en las pruebas demuestra que ningún nivel se resuelve
+en menos que su mínimo. Son 40 niveles en cinco capítulos que presentan una idea por vez (Espejos, Divisores, Prismas
+y filtros, Mezclas, Portales y desafíos), con un ejemplo animado de cada pieza nueva, tres estrellas según las jugadas
+y capítulos que se abren de a uno; los primeros de cada capítulo están hechos a mano y el resto salió del generador y se
+eligió con reglas por capítulo. La **Luz del día** (`shared/generator.js`) se arma con la semilla de la fecha: hace
+crecer una red de rayos, pone cristales donde terminan, desarma las piezas y el resolvedor garantiza que tiene solución
+(más difícil de lunes a domingo); se comparte con los colores de sus cristales. Se juega con mouse, pantalla táctil,
+teclado (cursor, Espacio levanta y suelta, Q/E giran) o joystick.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego
@@ -599,6 +619,7 @@ cada carpeta de datos tiene su `LEEME.txt` con las fuentes y licencias. Para sum
 | Colmena | 7 letras en un panal: palabras de 4 o más con la letra central; rangos por % del máximo. | `tools/daily/colmena-gen.mjs` arma 730 panales por idioma con los diccionarios de Mecha; las "rebuscadas" valen sin sumar. |
 | Tibio | Palabra secreta; cada intento devuelve su puesto por cercanía de significado. | Vectores fastText common-crawl (CC BY-SA 3.0, ver `tibio/data/LICENSE.txt`) reducidos con PCA a 96 dimensiones e int8 (≈3 MB por idioma); `tools/daily/tibio-build.py` los regenera. El ranking se calcula en el navegador. |
 | Paciencia | Klondike robando de a 1 con un reparto que siempre se puede ganar; cuentan el tiempo y las jugadas. | Se reparte con la semilla del día y el resolvedor (`paciencia/shared/solver.js`) descarta los repartos imposibles. |
+| Prisma | Rompecabezas de luz: girar y poner espejos, divisores, prismas y filtros para encender los cristales con su color; cuentan las jugadas contra el mínimo. | Lo arma `prisma/shared/generator.js` con la semilla del día y el resolvedor (`shared/solver.js`) garantiza que tiene solución y calcula el mínimo. |
 
 El texto para compartir de cada uno es `game.it · <Juego> #N …` con cuadraditos de colores y el link; en modo práctica no se
 suma nada a las estadísticas. Las listas de respuestas y de puzzles se pueden ampliar sin tocar el código (los desafíos

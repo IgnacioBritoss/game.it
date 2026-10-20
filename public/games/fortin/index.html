@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Fortín · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+
+    <!-- barra de arriba -->
+    <div class="hud" id="hud" hidden>
+      <div class="top" id="top">
+        <div class="chips">
+          <span class="chip lives" title=""><i class="ic-heart"></i><b id="lives">20</b></span>
+          <span class="chip seeds"><i class="ic-seed"></i><b id="coins">0</b></span>
+          <span class="chip wave"><b id="wave-lbl"></b></span>
+        </div>
+        <div class="actions">
+          <button class="wave-btn" id="b-wave"><svg viewBox="0 0 40 40"><circle class="ring" cx="20" cy="20" r="17" /><circle class="fill" id="wave-ring" cx="20" cy="20" r="17" /></svg><span id="wave-txt"></span></button>
+          <button class="round" id="b-speed" aria-label="velocidad"><span id="speed-lbl">1×</span></button>
+          <button class="round" id="b-pause" aria-label="pausa"><i class="ic-pause"></i></button>
+        </div>
+      </div>
+      <div class="preview" id="preview" hidden></div>
+      <div class="powers" id="powers">
+        <button class="power" id="p-lluvia" data-p="lluvia"><i class="ic-rain"></i><span class="cd"></span><small data-t="pRain"></small><kbd>Q</kbd></button>
+        <button class="power" id="p-raices" data-p="raices"><i class="ic-roots"></i><span class="cd"></span><small data-t="pRoots"></small><kbd>W</kbd></button>
+      </div>
+      <div class="aim-hint" id="aim-hint" hidden></div>
+      <div class="toast" id="toast" hidden></div>
+      <div class="tip" id="tip" hidden></div>
+
+      <!-- plantar -->
+      <div class="menu build" id="build-menu" hidden>
+        <div class="opts" id="build-opts"></div>
+        <div class="info" id="build-info"></div>
+      </div>
+      <!-- hongo elegido -->
+      <div class="menu tower" id="tower-menu" hidden>
+        <div class="tw-head">
+          <img id="tw-icon" alt="" />
+          <div>
+            <b id="tw-name"></b>
+            <small id="tw-lv"></small>
+          </div>
+          <button class="x" id="tw-close" aria-label="cerrar">×</button>
+        </div>
+        <div class="tw-stats" id="tw-stats"></div>
+        <div class="tw-up" id="tw-up"></div>
+        <div class="tw-row">
+          <button class="mini" id="tw-target"></button>
+          <button class="mini sell" id="tw-sell"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="card home">
+        <div class="brand">
+          <canvas id="logo" width="160" height="160"></canvas>
+          <div>
+            <h1 data-t="title"></h1>
+            <p class="sub" data-t="tagline"></p>
+          </div>
+        </div>
+        <div class="maps" id="maps"></div>
+        <div class="mode">
+          <button class="seg on" id="m-camp" data-t="modeCamp"></button>
+          <button class="seg" id="m-endless" data-t="modeEndless"></button>
+        </div>
+        <p class="mode-sub" id="mode-sub"></p>
+        <button class="btn green" id="b-play"><span data-t="play"></span><small id="play-sub"></small></button>
+        <button class="btn ghost" id="b-help"><span data-t="help"></span></button>
+      </div>
+    </section>
+
+    <!-- ayuda -->
+    <section class="screen" id="s-help">
+      <div class="card wide">
+        <h2 data-t="help"></h2>
+        <ul class="howto" id="howto"></ul>
+        <h3 data-t="hTowers"></h3>
+        <div class="dex" id="dex-towers"></div>
+        <h3 data-t="hBugs"></h3>
+        <div class="dex bugs" id="dex-bugs"></div>
+        <button class="link" id="b-help-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- pausa -->
+    <section class="screen dim" id="s-pause">
+      <div class="card">
+        <h2 data-t="paused"></h2>
+        <p class="sub" id="pause-sub"></p>
+        <button class="btn green" id="b-resume"><span data-t="resume"></span></button>
+        <button class="btn ghost" id="b-restart"><span data-t="restart"></span></button>
+        <button class="btn ghost" id="b-pause-help"><span data-t="help"></span></button>
+        <button class="link" id="b-quit" data-t="quit"></button>
+      </div>
+    </section>
+
+    <!-- final -->
+    <section class="screen dim" id="s-end">
+      <div class="card end">
+        <p class="kicker" id="end-kicker"></p>
+        <h2 id="end-title"></h2>
+        <div class="stars" id="end-stars"></div>
+        <p class="sub" id="end-sub"></p>
+        <div class="stats" id="end-stats"></div>
+        <button class="btn green" id="b-next"><span id="next-lbl"></span></button>
+        <button class="btn ghost" id="b-retry"><span data-t="retry"></span></button>
+        <button class="link" id="b-menu" data-t="menu"></button>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

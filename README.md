@@ -515,6 +515,22 @@ puntos (`dmd.js`) es un DMD de 128 × 32 con letras de mapa de bits, destellos, 
 pelotas cromadas). Teclado, mouse, pantalla táctil (mitades para los flippers, botones de lanzar y sacudir) y joystick.
 Récords locales con las mejores cinco partidas; cuando no se juega, la máquina juega sola.
 
+### Fortín (defensa de torres)
+
+Defensa de torres en un claro del bosque: los bichos salen de sus cuevas y marchan por el sendero hasta el tocón donde
+viven los hongos. Se plantan hongos en el pasto: Champi (esporas), Bejín (bombas de esporas en parábola, no alcanza a lo
+que vuela), Escarcha (pulsos de frío que frenan), Amanita (dardos de veneno que ignoran la coraza), Fosforito (rayos que
+saltan) y Colmenilla (tiro largo al más duro); cada uno con tres niveles y dos especialidades a elegir (ráfaga o
+perforante, gran nube o racimo, congelar o ventisca, plaga o debilitar, tormenta o sobrecarga, certero o cazador). Nueve
+clases de bichos (hormigas, escarabajos con coraza, caracoles que se esconden, polillas y avispas que vuelan, orugas que se parten,
+grillos que saltan, cucarachas que se curan) y tres jefes (escarabajo rinoceronte, reina avispa que suelta avispas y un
+ciempiés gigante que suelta pedazos). Lluvia y raíces como poderes, oleadas que se adelantan a cambio de semillas, cinco
+mapas con estrellas que se abren de a uno (uno con arroyo y puentes, dos con caminos dobles) y un modo infinito. La
+simulación (`public/games/fortin/shared/sim.js`) es pura y las oleadas salen de un generador determinista por mapa
+(`shared/data.js`), equilibrado con un bot que juega solo; las pruebas juegan partidas enteras. Todo se dibuja con código
+(`art.js`): hongos con ojitos que miran al bicho que apuntan, bichos con patas que caminan y alas que aletean. En
+celulares parados el mapa se gira para que entre grande; se juega con mouse, pantalla táctil, teclado o joystick.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego

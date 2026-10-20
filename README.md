@@ -500,6 +500,21 @@ traen un resolvedor a lo ancho que calculó el mínimo de movidas de cada uno de
 pruebas lo verifican. Estrellas según las movidas, cuartos que se abren de a poco y gatos dibujados con código
 (`art.js`) que caminan, se resbalan, se meten en los túneles, se ponen contentos y al final se duermen en las cajas.
 
+### Nébula (pinball)
+
+Pinball espacial de una mesa, con física propia (`public/games/nebula/shared/physics.js`): pelotas con gravedad y
+~1200 subpasos por segundo para que nada se atraviese, flippers que le pasan a la pelota la velocidad de su superficie,
+hongos y gomas que patean, blancos fijos y de caída, una órbita con molinete, la rampa del cometa (la pelota viaja sola
+por arriba y baja al carril izquierdo), el agujero negro que atrapa y escupe, y la compuerta del lanzador. Las reglas
+(`shared/rules.js`) son las de una máquina de verdad: letras N-É-B-U-L-A que prenden el agujero negro, tres misiones en
+orden (lluvia de cometas con multibola y jackpots en la rampa, hipervelocidad de puntos triples y carrera estelar
+siguiendo las flechas), combos de rampa y órbita, carriles de arriba que suben el bonus (los flippers corren las luces),
+tiro preciso, pelota salvada, bola extra, SUPERNOVA, bonus de fin de pelota y TILT si se sacude de más. El visor de
+puntos (`dmd.js`) es un DMD de 128 × 32 con letras de mapa de bits, destellos, zoom y estrellas; la mesa se dibuja en
+`render.js` (nebulosas, el horizonte de un planeta, luces que se prenden, el agujero negro girando, rampa de vidrio y
+pelotas cromadas). Teclado, mouse, pantalla táctil (mitades para los flippers, botones de lanzar y sacudir) y joystick.
+Récords locales con las mejores cinco partidas; cuando no se juega, la máquina juega sola.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego

@@ -1,0 +1,19 @@
+{
+  "id": "nebula",
+  "title": { "es": "Nébula", "en": "Nebula" },
+  "description": {
+    "es": "Pinball espacial: prendé las letras NÉBULA, entrá al agujero negro y cumplí misiones de multibola, hipervelocidad y carrera estelar. Rampa, órbita, combos y TILT.",
+    "en": "Space pinball: light the NÉBULA letters, shoot the black hole and complete multiball, hyperspeed and star rush missions. Ramp, orbit, combos and TILT."
+  },
+  "categories": ["arcade", "clasicos"],
+  "tags": ["pinball", "flipper", "flippers", "espacio", "space", "multibola", "multiball", "neón", "neon", "retro", "arcade"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "canvas2d",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "portrait",
+  "input": ["keyboard", "mouse", "touch", "gamepad"],
+  "features": { "online": false, "multiplayer": false, "maxPlayers": 1, "story": false },
+  "order": 45
+}

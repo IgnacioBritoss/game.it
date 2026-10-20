@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Nébula · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+
+    <!-- durante el juego -->
+    <div class="hud" id="hud" hidden>
+      <button class="pause-btn" id="b-pause" aria-label="pausa"><i></i><i></i></button>
+      <button class="touch-btn launch" id="b-launch" hidden><svg viewBox="0 0 100 100"><circle class="ring" cx="50" cy="50" r="44" /><circle class="fill" id="launch-fill" cx="50" cy="50" r="44" /></svg><span data-t="launch"></span></button>
+      <button class="touch-btn nudge" id="b-nudge" hidden><span data-t="nudge"></span></button>
+      <div class="tut" id="tut" hidden></div>
+    </div>
+    <div class="keys-panel" id="keys-panel" hidden></div>
+    <div class="side-panel" id="side-panel" hidden></div>
+    <div class="rotate-hint" id="rotate-hint" hidden data-t="rotate"></div>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="card home">
+        <h1 class="logo"><span>N</span><span>É</span><span>B</span><span>U</span><span>L</span><span>A</span></h1>
+        <p class="sub" data-t="tagline"></p>
+        <p class="best" id="home-best"></p>
+        <button class="btn neon" id="b-play"><span data-t="play"></span></button>
+        <button class="btn ghost" id="b-help"><span data-t="help"></span></button>
+        <p class="keys" id="home-keys"></p>
+      </div>
+    </section>
+
+    <!-- cómo se juega -->
+    <section class="screen" id="s-help">
+      <div class="card wide">
+        <h2 data-t="help"></h2>
+        <ul class="howto" id="howto"></ul>
+        <h3 data-t="missionsTitle"></h3>
+        <div class="missions" id="missions"></div>
+        <button class="link" id="b-help-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- pausa -->
+    <section class="screen dim" id="s-pause">
+      <div class="card">
+        <h2 data-t="paused"></h2>
+        <button class="btn neon" id="b-resume"><span data-t="resume"></span></button>
+        <div class="toggles">
+          <button class="tog" id="t-shake"><span data-t="optShake"></span><b></b></button>
+          <button class="tog" id="t-vib"><span data-t="optVib"></span><b></b></button>
+        </div>
+        <button class="btn ghost" id="b-restart"><span data-t="restart"></span></button>
+        <button class="link" id="b-quit" data-t="quit"></button>
+      </div>
+    </section>
+
+    <!-- final -->
+    <section class="screen" id="s-over">
+      <div class="card over">
+        <p class="kicker" data-t="overTitle"></p>
+        <div class="final" id="over-score">0</div>
+        <p class="record" id="over-record" hidden data-t="newBest"></p>
+        <div class="stats" id="over-stats"></div>
+        <h3 data-t="topTitle"></h3>
+        <ol class="top" id="over-top"></ol>
+        <button class="btn gold" id="b-more" hidden><span data-t="oneMore"></span><small data-t="oneMoreSub"></small></button>
+        <button class="btn neon" id="b-again"><span data-t="again"></span></button>
+        <button class="link" id="b-menu" data-t="menu"></button>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

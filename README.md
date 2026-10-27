@@ -583,6 +583,22 @@ crecer una red de rayos, pone cristales donde terminan, desarma las piezas y el 
 (más difícil de lunes a domingo); se comparte con los colores de sus cristales. Se juega con mouse, pantalla táctil,
 teclado (cursor, Espacio levanta y suelta, Q/E giran) o joystick.
 
+### Abismo (lluvia de balas bajo el mar)
+
+Danmaku vertical: un submarino chiquito que brilla baja por tres etapas —el Arrecife con la luz del sol, el Bosque de
+algas y La fosa, iluminada solo por bichos bioluminiscentes— esquivando medusas, peces globo que se inflan y revientan en
+anillos, anguilas, minas, mantas y señuelos de rape, hasta un jefe por etapa (Pulpo gigante, Rape abisal y Leviatán) con
+fases con nombre que se ganan por daño o se pierden por tiempo. Dispara solo; el modo preciso (Shift, un segundo dedo o
+un botón del mando) frena el submarino, cierra el disparo y muestra el punto débil, que es lo único que se puede golpear;
+el sonar (X, doble toque o el botón) borra las balas y las vuelve perlitas. Puntos por roces, perlas y una cadena que
+multiplica; potencia de 1 a 4, vidas extra por puntos, continuar después de perder, tres dificultades, práctica de las
+etapas alcanzadas y récords por dificultad. En el celular se mueve arrastrando en cualquier lado (el dedo nunca tapa el
+submarino). La simulación (`public/games/abismo/shared/sim.js`) es determinista a 60 pasos por segundo con semilla,
+grupos reciclados para mil balas y guiones de etapa como datos (`shared/stages.js`, `shared/bosses.js`,
+`shared/patterns.js`: anillos, espirales, abanicos apuntados, olas, flores); un piloto automático (`shared/bot.js`)
+juega las pruebas. El dibujo (`render.js`, `art.js`) es canvas 2D con sprites pre-dibujados, nieve marina con
+paralaje, rayos de luz cerca de la superficie y brillos aditivos.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego

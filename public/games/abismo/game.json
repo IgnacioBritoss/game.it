@@ -1,0 +1,19 @@
+{
+  "id": "abismo",
+  "title": { "es": "Abismo", "en": "Abyss" },
+  "description": {
+    "es": "Lluvia de balas bajo el mar: bajá con tu submarino por el arrecife, el bosque de algas y la fosa esquivando medusas, peces globo, anguilas y minas hasta el Pulpo gigante, el Rape abisal y el Leviatán. Modo preciso, sonar, roces, perlas y cadena.",
+    "en": "A bullet storm under the sea: dive your submarine through the reef, the kelp forest and the trench, dodging jellyfish, pufferfish, eels and mines on your way to the Giant Octopus, the Abyssal Anglerfish and the Leviathan. Focus mode, sonar, grazing, pearls and chains."
+  },
+  "categories": ["accion", "arcade"],
+  "tags": ["danmaku", "bullet hell", "shmup", "shooter", "naves", "submarino", "submarine", "mar", "sea", "jefes", "bosses", "esquivar", "dodge"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "canvas2d",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "portrait",
+  "input": ["keyboard", "mouse", "touch", "gamepad"],
+  "features": { "online": false, "multiplayer": false, "maxPlayers": 1, "story": false },
+  "order": 49
+}

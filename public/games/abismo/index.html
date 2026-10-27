@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Abismo · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body class="in-menu">
+    <canvas id="c"></canvas>
+
+    <!-- durante la inmersión -->
+    <div class="hud" id="hud" hidden>
+      <div class="hud-top" id="hud-top">
+        <div class="score-box">
+          <small class="lbl" data-t="score"></small>
+          <b id="score">0</b>
+          <small class="hi"><span data-t="hi"></span> <span id="hi">0</span></small>
+        </div>
+        <div class="stock">
+          <div class="row"><small class="lbl" data-t="lives"></small><span class="icons" id="lives"></span></div>
+          <div class="row"><small class="lbl" data-t="bombs"></small><span class="icons" id="bombs"></span></div>
+        </div>
+        <div class="pow">
+          <small class="lbl" data-t="power"></small>
+          <div class="power" id="power"></div>
+        </div>
+        <button class="pause-btn" id="b-pause" aria-label="pausa"><i></i><i></i></button>
+        <div class="prog"><i id="prog-fill"></i></div>
+      </div>
+      <aside class="side" id="side">
+        <small class="lbl" id="side-stage"></small>
+        <b class="side-name" id="side-name"></b>
+        <div class="side-depth"><small class="lbl" data-t="depth"></small><b id="depth">0 m</b></div>
+        <div class="side-grid">
+          <div><small class="lbl" data-t="graze"></small><b id="side-graze">0</b></div>
+          <div><small class="lbl" data-t="pearls"></small><b id="side-pearls">0</b></div>
+          <div><small class="lbl" data-t="chain"></small><b id="side-chain">0</b></div>
+          <div><small class="lbl">&nbsp;</small><b id="side-diff"></b></div>
+        </div>
+        <ul class="side-keys">
+          <li><kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd><span>WASD</span></li>
+          <li><kbd>Shift</kbd><span data-t="optFocusShort"></span></li>
+          <li><kbd>X</kbd><span data-t="bombs"></span></li>
+          <li><kbd>Esc</kbd><span data-t="paused"></span></li>
+        </ul>
+      </aside>
+      <div class="chain" id="chain"><b id="chain-x">×1</b><span id="chain-n">0</span><i id="chain-bar"></i></div>
+      <div class="boss" id="boss" hidden>
+        <div class="boss-top"><b id="boss-name"></b><div class="pips" id="boss-pips"></div><span id="boss-time"></span></div>
+        <div class="boss-bar"><i id="boss-fill"></i></div>
+      </div>
+      <div class="banner" id="banner"></div>
+      <div class="toast" id="toast"></div>
+      <div class="tut" id="tut" hidden></div>
+      <div class="tally" id="tally" hidden>
+        <h2 id="tally-title"></h2>
+        <div class="tally-rows" id="tally-rows"></div>
+        <small id="tally-skip"></small>
+      </div>
+    </div>
+    <button class="sonar-btn" id="b-sonar" hidden aria-label="sonar">
+      <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="6" /><path d="M20 20a17 17 0 0 0 0 24M44 20a17 17 0 0 1 0 24M13 13a27 27 0 0 0 0 38M51 13a27 27 0 0 1 0 38" /></svg>
+    </button>
+    <div class="rotate" id="rotate" hidden data-t="rotate"></div>
+
+    <!-- inicio -->
+    <section class="screen" id="s-menu">
+      <div class="card home">
+        <canvas class="logo" id="logo" width="160" height="160"></canvas>
+        <h1 data-t="title"></h1>
+        <p class="sub" data-t="tagline"></p>
+        <div class="diffs" id="diffs">
+          <button class="diff" data-d="facil"><span></span><small></small></button>
+          <button class="diff" data-d="normal"><span></span><small></small></button>
+          <button class="diff" data-d="dificil"><span></span><small></small></button>
+        </div>
+        <button class="btn sea" id="b-play"><span data-t="play"></span></button>
+        <div class="row2">
+          <button class="btn ghost" id="b-practice"><span data-t="practice"></span></button>
+          <button class="btn ghost" id="b-help"><span data-t="help"></span></button>
+        </div>
+        <p class="keys" id="home-keys"></p>
+      </div>
+    </section>
+
+    <!-- práctica -->
+    <section class="screen" id="s-practice">
+      <div class="card wide">
+        <h2 data-t="practiceTitle"></h2>
+        <p class="sub"><span data-t="practiceSub"></span> <b id="practice-diff"></b></p>
+        <div class="stages" id="stages"></div>
+        <button class="link" id="b-practice-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- cómo se juega -->
+    <section class="screen" id="s-help">
+      <div class="card wide">
+        <h2 data-t="help"></h2>
+        <ul class="howto" id="howto"></ul>
+        <button class="link" id="b-help-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- pausa -->
+    <section class="screen dim" id="s-pause">
+      <div class="card">
+        <h2 data-t="paused"></h2>
+        <button class="btn sea" id="b-resume"><span data-t="resume"></span></button>
+        <div class="toggles">
+          <button class="tog" id="t-shake"><span data-t="optShake"></span><b></b></button>
+          <button class="tog" id="t-hitbox"><span data-t="optHitbox"></span><b></b></button>
+          <button class="tog" id="t-sens"><span data-t="optSens"></span><b></b></button>
+        </div>
+        <button class="btn ghost" id="b-restart"><span data-t="restart"></span></button>
+        <button class="link" id="b-quit" data-t="quit"></button>
+      </div>
+    </section>
+
+    <!-- continuar -->
+    <section class="screen dim" id="s-continue">
+      <div class="card cont">
+        <h2 data-t="contTitle"></h2>
+        <div class="count">
+          <svg viewBox="0 0 110 110"><circle class="track" cx="55" cy="55" r="48" /><circle class="ring" id="cont-ring" cx="55" cy="55" r="48" /></svg>
+          <b id="cont-n">10</b>
+        </div>
+        <p class="cont-score" id="cont-score">0</p>
+        <p class="sub" data-t="contSub"></p>
+        <button class="btn gold" id="b-cont"><span data-t="contYes"></span></button>
+        <button class="link" id="b-giveup" data-t="contNo"></button>
+      </div>
+    </section>
+
+    <!-- resultados -->
+    <section class="screen dim" id="s-over">
+      <div class="card over">
+        <p class="kicker" id="over-kicker"></p>
+        <h2 id="over-title"></h2>
+        <div class="final" id="over-score">0</div>
+        <p class="record" id="over-record" hidden data-t="newBest"></p>
+        <p class="note" id="over-note" hidden data-t="practiceNote"></p>
+        <div class="stats" id="over-stats"></div>
+        <h3 id="over-top-title"></h3>
+        <ol class="top" id="over-top"></ol>
+        <button class="btn sea" id="b-again"><span data-t="again"></span></button>
+        <button class="link" id="b-menu" data-t="menu"></button>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

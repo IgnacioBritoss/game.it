@@ -1,0 +1,20 @@
+{
+  "id": "generala",
+  "title": { "es": "Generala", "en": "Generala" },
+  "description": {
+    "es": "El juego de dados de siempre en una mesa de paño 3D: tres tiradas para armar escalera, full, póker o generala y una planilla que se llena. Contra la compu, en la misma pantalla, online de 2 a 6 y la generala del día con los mismos dados para todos.",
+    "en": "The classic dice game on a 3D felt table: three rolls to build a straight, full house, four of a kind or Generala, and a score sheet to fill. Against the computer, pass and play, online for 2 to 6 and a daily Generala with the same dice for everyone."
+  },
+  "categories": ["clasicos", "casual", "online", "multijugador", "diarios"],
+  "tags": ["dados", "dice", "generala", "yahtzee", "cubilete", "escalera", "full", "poker", "póker", "planilla", "3d", "diario", "daily"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "three.js + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["keyboard", "mouse", "touch", "gamepad"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 6, "story": false, "daily": true },
+  "daily": { "epoch": "2026-10-27" },
+  "order": 51
+}

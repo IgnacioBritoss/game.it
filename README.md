@@ -599,6 +599,22 @@ grupos reciclados para mil balas y guiones de etapa como datos (`shared/stages.j
 juega las pruebas. El dibujo (`render.js`, `art.js`) es canvas 2D con sprites pre-dibujados, nieve marina con
 paralaje, rayos de luz cerca de la superficie y brillos aditivos.
 
+### Generala (dados)
+
+El juego de dados de toda la vida en una mesa de paño en 3D (three.js) con cubilete de cuero: cinco dados, hasta tres
+tiradas por turno guardando los que se quiera (se tocan y van a la fila de adelante) y una planilla escrita a mano con
+los once casilleros: del 1 al 6, escalera (también 3-4-5-6-1), full, póker, generala y doble; servidas en la primera
+tirada valen 5 más y la generala servida gana en el acto (se puede desactivar). La planilla muestra cuánto daría cada
+casillero libre y resalta los dados que cuentan; anotar (o tachar) se confirma con un segundo toque. Las reglas
+(`public/games/generala/shared/rules.js`) son puras; la compu (`shared/bot.js`) calcula sobre las 252 manos posibles qué
+dados guardar para lo que se espera sacar con las tiradas que quedan y en qué casillero anotar según lo que promete
+cada uno si se lo deja libre (fácil mira una tirada y se equivoca, difícil mira las dos; promedian ~150 y ~160 puntos).
+La mesa (`shared/table.js`: turnos, tiempo, ausentes, lo que ve cada uno) corre igual en el navegador y en el servidor.
+Modos: contra la compu (1 a 3 rivales, tres niveles), en la misma pantalla de 2 a 6, **online de 2 a 6**
+(`server/games/generala.js`: el servidor tira los dados y valida cada jugada, el anfitrión puede sumar compus y si alguien
+se va lo reemplaza la compu) y la **generala del día**: cada dado de cada tirada sale de la fecha, así todos ven los
+mismos dados en el mismo lugar aunque guarden otros, y se comparte la planilla en cuadraditos.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego
@@ -636,6 +652,7 @@ cada carpeta de datos tiene su `LEEME.txt` con las fuentes y licencias. Para sum
 | Tibio | Palabra secreta; cada intento devuelve su puesto por cercanía de significado. | Vectores fastText common-crawl (CC BY-SA 3.0, ver `tibio/data/LICENSE.txt`) reducidos con PCA a 96 dimensiones e int8 (≈3 MB por idioma); `tools/daily/tibio-build.py` los regenera. El ranking se calcula en el navegador. |
 | Paciencia | Klondike robando de a 1 con un reparto que siempre se puede ganar; cuentan el tiempo y las jugadas. | Se reparte con la semilla del día y el resolvedor (`paciencia/shared/solver.js`) descarta los repartos imposibles. |
 | Prisma | Rompecabezas de luz: girar y poner espejos, divisores, prismas y filtros para encender los cristales con su color; cuentan las jugadas contra el mínimo. | Lo arma `prisma/shared/generator.js` con la semilla del día y el resolvedor (`shared/solver.js`) garantiza que tiene solución y calcula el mínimo. |
+| Generala | Once turnos de generala solo, con los mismos dados para todos (cada dado sale de la fecha aunque se guarden otros); cuenta el puntaje. | Los valores salen de la semilla del día (`daily.js`) en `generala/game.js`; la mesa es la misma que la de las partidas normales. |
 
 El texto para compartir de cada uno es `game.it · <Juego> #N …` con cuadraditos de colores y el link; en modo práctica no se
 suma nada a las estadísticas. Las listas de respuestas y de puzzles se pueden ampliar sin tocar el código (los desafíos

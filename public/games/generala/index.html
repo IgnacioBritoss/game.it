@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Generala · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="game" id="game">
+      <div class="players" id="players"></div>
+      <div class="stage" id="stage">
+        <div class="banner" id="banner"></div>
+        <div class="callout" id="callout"><b id="callout-t"></b><small id="callout-s"></small></div>
+        <button class="pause" id="b-pause" aria-label="pausa"><i></i><i></i></button>
+        <div class="clock" id="clock" hidden><b id="clock-t"></b></div>
+      </div>
+      <div class="action" id="action">
+        <button class="roll" id="b-roll">
+          <span id="roll-t"></span>
+          <i class="dots" id="roll-dots"><b></b><b></b><b></b></i>
+        </button>
+        <p class="status" id="status"></p>
+      </div>
+      <aside class="sheet" id="sheet">
+        <div class="sheet-head" id="sheet-head"></div>
+        <div class="sheet-body" id="sheet-body"></div>
+        <div class="confirm" id="confirm" hidden>
+          <button class="btn sun" id="b-write"></button>
+          <button class="btn ghost" id="b-cancel" aria-label="cancelar">✕</button>
+        </div>
+      </aside>
+    </main>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="card home">
+        <div class="logo" aria-hidden="true">
+          <span class="die d5"><i></i><i></i><i></i><i></i><i></i></span>
+          <span class="die d5 b"><i></i><i></i><i></i><i></i><i></i></span>
+          <span class="die d5 c"><i></i><i></i><i></i><i></i><i></i></span>
+        </div>
+        <h1 data-t="title"></h1>
+        <p class="sub" data-t="tagline"></p>
+        <button class="btn sun" id="b-cpu"><span data-t="vsCpu"></span><small data-t="vsCpuSub"></small></button>
+        <div class="row2">
+          <button class="btn" id="b-local"><span data-t="local"></span><small data-t="localSub"></small></button>
+          <button class="btn coral" id="b-online"><span data-t="online"></span><small data-t="onlineSub"></small></button>
+        </div>
+        <button class="btn mint" id="b-daily"><span data-t="daily"></span><small id="b-daily-sub"></small></button>
+        <button class="link" id="b-rules" data-t="rulesTitle"></button>
+      </div>
+    </section>
+
+    <!-- contra la compu -->
+    <section class="screen" id="s-cpu">
+      <div class="card">
+        <h2 data-t="vsCpu"></h2>
+        <div class="opt"><span class="lbl" data-t="rivals"></span><div class="seg" id="o-rivals"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button></div></div>
+        <div class="opt"><span class="lbl" data-t="level"></span><div class="seg" id="o-level"><button data-v="1" data-t="lv1"></button><button data-v="2" data-t="lv2"></button><button data-v="3" data-t="lv3"></button></div></div>
+        <div class="opt"><span class="lbl" data-t="servidaOpt"></span><div class="seg" id="o-servida"><button data-v="1" data-t="yes"></button><button data-v="0" data-t="no"></button></div></div>
+        <button class="btn sun" id="b-cpu-go"><span data-t="go"></span></button>
+        <button class="link" id="b-cpu-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- en la misma pantalla -->
+    <section class="screen" id="s-local">
+      <div class="card">
+        <h2 data-t="local"></h2>
+        <p class="sub small" data-t="localHelp"></p>
+        <div class="opt"><span class="lbl" data-t="players"></span><div class="seg" id="o-count"><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button><button data-v="6">6</button></div></div>
+        <div class="names" id="names"></div>
+        <div class="opt"><span class="lbl" data-t="servidaOpt"></span><div class="seg" id="o-servida2"><button data-v="1" data-t="yes"></button><button data-v="0" data-t="no"></button></div></div>
+        <button class="btn sun" id="b-local-go"><span data-t="go"></span></button>
+        <button class="link" id="b-local-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- online -->
+    <section class="screen" id="s-online">
+      <div class="card">
+        <h2 data-t="online"></h2>
+        <p class="sub small" data-t="onlineLong"></p>
+        <input class="field" id="on-name" maxlength="16" autocomplete="off" spellcheck="false" />
+        <button class="btn sun" id="on-create"><span data-t="create"></span><small data-t="createSub"></small></button>
+        <div class="join">
+          <input class="field code" id="on-code" maxlength="5" autocomplete="off" spellcheck="false" placeholder="ABCDE" aria-label="código" />
+          <button class="btn mint" id="on-join"><span data-t="join"></span></button>
+        </div>
+        <p class="status" id="on-status"></p>
+        <button class="link" id="on-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- sala -->
+    <section class="screen" id="s-lobby">
+      <div class="card">
+        <p class="kicker" data-t="room"></p>
+        <button class="code-big" id="lobby-code">-----</button>
+        <p class="hint2" data-t="tapToCopy"></p>
+        <ul class="plist" id="lobby-players"></ul>
+        <div id="lobby-host">
+          <div class="opt"><span class="lbl" data-t="addCpu"></span><div class="seg" data-k="bots"><button data-v="0">0</button><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div></div>
+          <div class="opt"><span class="lbl" data-t="level"></span><div class="seg" data-k="level"><button data-v="1" data-t="lv1"></button><button data-v="2" data-t="lv2"></button><button data-v="3" data-t="lv3"></button></div></div>
+          <div class="opt"><span class="lbl" data-t="servidaOpt"></span><div class="seg" data-k="servida"><button data-v="1" data-t="yes"></button><button data-v="0" data-t="no"></button></div></div>
+        </div>
+        <button class="btn sun" id="lobby-start"><span data-t="start"></span></button>
+        <p class="status" id="lobby-status"></p>
+        <button class="link" id="lobby-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <!-- cómo se juega -->
+    <section class="screen" id="s-rules">
+      <div class="card wide">
+        <h2 data-t="rulesTitle"></h2>
+        <div class="rules" id="rules-body"></div>
+        <button class="btn sun" id="b-rules-ok"><span data-t="gotIt"></span></button>
+      </div>
+    </section>
+
+    <!-- pausa -->
+    <section class="screen dim" id="s-pause">
+      <div class="card">
+        <h2 data-t="paused"></h2>
+        <button class="btn sun" id="b-resume"><span data-t="resume"></span></button>
+        <button class="btn ghost" id="b-p-rules"><span data-t="rulesTitle"></span></button>
+        <button class="link" id="b-quit" data-t="quit"></button>
+      </div>
+    </section>
+
+    <!-- fin -->
+    <section class="screen dim" id="s-over">
+      <div class="card">
+        <p class="kicker" id="over-kicker"></p>
+        <h2 id="over-title"></h2>
+        <ol class="ranking" id="over-rank"></ol>
+        <div class="stats" id="over-stats" hidden></div>
+        <p class="next-day" id="over-next" hidden><span data-t="nextDaily"></span> <b id="over-clock">00:00:00</b></p>
+        <button class="btn mint" id="b-share" hidden><span data-t="share"></span></button>
+        <p class="status" id="over-status"></p>
+        <button class="btn sun" id="b-again"><span id="b-again-t"></span></button>
+        <button class="link" id="b-over-menu" data-t="menu"></button>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

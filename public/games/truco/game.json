@@ -1,0 +1,20 @@
+{
+  "id": "truco",
+  "title": { "es": "Truco", "en": "Truco" },
+  "description": {
+    "es": "El truco argentino con el mazo español dibujado a mano: truco, retruco y vale cuatro, envido y falta envido, flor opcional y los porotos con fósforos. Contra la compu (que lee tus cantos y también miente), mano a mano o en parejas, online 1 vs 1 o 2 vs 2 y el truco del día con las mismas cartas para todos.",
+    "en": "Argentine truco with a hand-drawn Spanish deck: truco, retruco and vale cuatro, envido and falta envido, optional flor and matchstick scoring. Against the computer (it reads your calls and bluffs too), one on one or in pairs, online 1 vs 1 or 2 vs 2, and a daily truco with the same cards for everyone."
+  },
+  "categories": ["cartas", "clasicos", "online", "multijugador", "diarios"],
+  "tags": ["truco", "cartas", "cards", "naipes", "mazo español", "spanish deck", "envido", "flor", "parejas", "2 vs 2", "argentina", "diario", "daily"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "dom + svg + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["keyboard", "mouse", "touch", "gamepad"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 4, "cpu": true, "story": false, "daily": true },
+  "daily": { "epoch": "2026-10-27" },
+  "order": 52
+}

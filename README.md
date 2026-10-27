@@ -615,6 +615,23 @@ Modos: contra la compu (1 a 3 rivales, tres niveles), en la misma pantalla de 2 
 se va lo reemplaza la compu) y la **generala del día**: cada dado de cada tirada sale de la fecha, así todos ven los
 mismos dados en el mismo lugar aunque guarden otros, y se comparte la planilla en cuadraditos.
 
+### Truco (cartas españolas)
+
+El truco argentino con el mazo español de 40 cartas dibujado en SVG (`public/games/truco/cards.js`: oros, copas, espadas
+y bastos con las pintas del marco, los anchos grandes y la sota, el caballo y el rey vestidos por palo) sobre una mesa de
+paño, con los porotos anotados con fósforos. Está todo: tres bazas con parda, truco, retruco y vale cuatro (solo sube el
+que quiso el último canto), envido, real envido y falta envido que se encadenan (y "el envido está primero" cuando te
+cantan truco antes de tirar), mazo, flor opcional (se canta sola, anula el envido y se cobra al terminar la primera baza)
+y partidas a 15 o a 30. Las reglas (`shared/rules.js`) son puras; la mesa (`shared/table.js`: turnos, cantos, puntos,
+tiempo por jugada, ausentes) corre igual en el navegador y en el servidor y a cada jugador le manda solo sus cartas. La
+compu (`shared/bot.js`) decide con lo mismo que ve una persona: reparte muchas veces las cartas que no vio (respetando lo
+que se dijo en el envido y quién cantó flor), juega cada mano hasta el final para estimar la chance de ganarla, le da peso
+a los cantos del rival (y se da cuenta si canta todo el tiempo) y miente de vez en cuando; tres niveles. Modos: contra la
+compu mano a mano o en parejas (con un compañero de la compu), **online 1 vs 1 o 2 vs 2** (`server/games/truco.js`: el
+servidor mezcla y reparte, el anfitrión elige parejas mezcladas o juntas, puntos, flor y nivel de la compu que completa
+los lugares, y si alguien se desconecta juega la compu por él) y el **truco del día**, una partida a 15 contra Don Mate con
+las mismas cartas para todos en cada mano.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego
@@ -653,6 +670,7 @@ cada carpeta de datos tiene su `LEEME.txt` con las fuentes y licencias. Para sum
 | Paciencia | Klondike robando de a 1 con un reparto que siempre se puede ganar; cuentan el tiempo y las jugadas. | Se reparte con la semilla del día y el resolvedor (`paciencia/shared/solver.js`) descarta los repartos imposibles. |
 | Prisma | Rompecabezas de luz: girar y poner espejos, divisores, prismas y filtros para encender los cristales con su color; cuentan las jugadas contra el mínimo. | Lo arma `prisma/shared/generator.js` con la semilla del día y el resolvedor (`shared/solver.js`) garantiza que tiene solución y calcula el mínimo. |
 | Generala | Once turnos de generala solo, con los mismos dados para todos (cada dado sale de la fecha aunque se guarden otros); cuenta el puntaje. | Los valores salen de la semilla del día (`daily.js`) en `generala/game.js`; la mesa es la misma que la de las partidas normales. |
+| Truco | Una partida a 15 contra Don Mate con las mismas cartas para todos (cada mano sale de la fecha); cuenta si ganaste y por cuánto. | El mazo de cada mano y la suerte de la compu salen de la semilla del día (`daily.js`) en `truco/game.js`; la mesa es la misma que la de las partidas normales. |
 
 El texto para compartir de cada uno es `game.it · <Juego> #N …` con cuadraditos de colores y el link; en modo práctica no se
 suma nada a las estadísticas. Las listas de respuestas y de puzzles se pueden ampliar sin tocar el código (los desafíos

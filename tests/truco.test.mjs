@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { DECK, power, envido, envidoCards, hasFlor, florPts, envidoNext, envidoAccepted, envidoRejected, faltaValue, bazaWinner, handWinner, envidoResult, florResult, trucoValue, trucoRejected, shuffled, seatOrder, isCard } from '../public/games/truco/shared/rules.js';
 import { decide } from '../public/games/truco/shared/bot.js';
 import { Table, PACE } from '../public/games/truco/shared/table.js';
-import { cardSVG, backSVG } from '../public/games/truco/cards.js';
+import { cardSVG, backSVG } from '../public/shared/spanish-deck.js';
 import { rng as seeded } from '../public/shared/daily.js';
 import { startServer, connect, wait } from './helpers.mjs';
 

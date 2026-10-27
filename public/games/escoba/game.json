@@ -1,0 +1,20 @@
+{
+  "id": "escoba",
+  "title": { "es": "Escoba de 15", "en": "Escoba" },
+  "description": {
+    "es": "El clásico de la baraja española: sumá 15 con las cartas de la mesa y barrela entera para hacer escoba. Contra la compu (que cuenta las cartas que ya salieron), de a dos, tres o en parejas, online de 2 a 4 y la escoba del día con las mismas cartas para todos.",
+    "en": "The classic Spanish-deck game: make 15 with the cards on the table and sweep it clean for an escoba. Against the computer (which counts the cards already played), 2, 3 or in pairs, online for 2 to 4 and a daily escoba with the same cards for everyone."
+  },
+  "categories": ["cartas", "clasicos", "online", "multijugador", "diarios"],
+  "tags": ["escoba", "escoba de 15", "cartas", "cards", "naipes", "mazo español", "spanish deck", "quince", "15", "parejas", "argentina", "diario", "daily"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "dom + svg + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["keyboard", "mouse", "touch", "gamepad"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 4, "cpu": true, "story": false, "daily": true },
+  "daily": { "epoch": "2026-10-27" },
+  "order": 53
+}

@@ -617,7 +617,7 @@ mismos dados en el mismo lugar aunque guarden otros, y se comparte la planilla e
 
 ### Truco (cartas españolas)
 
-El truco argentino con el mazo español de 40 cartas dibujado en SVG (`public/games/truco/cards.js`: oros, copas, espadas
+El truco argentino con el mazo español de 40 cartas dibujado en SVG (`public/shared/spanish-deck.js`, compartido con los demás juegos de naipes: oros, copas, espadas
 y bastos con las pintas del marco, los anchos grandes y la sota, el caballo y el rey vestidos por palo) sobre una mesa de
 paño, con los porotos anotados con fósforos. Está todo: tres bazas con parda, truco, retruco y vale cuatro (solo sube el
 que quiso el último canto), envido, real envido y falta envido que se encadenan (y "el envido está primero" cuando te
@@ -631,6 +631,22 @@ compu mano a mano o en parejas (con un compañero de la compu), **online 1 vs 1 
 servidor mezcla y reparte, el anfitrión elige parejas mezcladas o juntas, puntos, flor y nivel de la compu que completa
 los lugares, y si alguien se desconecta juega la compu por él) y el **truco del día**, una partida a 15 contra Don Mate con
 las mismas cartas para todos en cada mano.
+
+### Escoba de 15 (baraja española)
+
+El clásico de la baraja española con las 40 cartas de `public/shared/spanish-deck.js` sobre un paño verde azulado: tirás una
+carta y te llevás las de la mesa que con la tuya suman 15 (la sota vale 8, el caballo 9 y el rey 10), si se puede levantar
+hay que levantar y dejar la mesa limpia es una escoba. Al terminar cada ronda se cuentan escobas, más cartas, más oros, más
+sietes y el siete de oros, a 21 o a 11. Se juega tocando: elegís una carta de la mano, las cartas de la mesa que forman
+alguna suma de 15 se iluminan, tocás las que querés (la cuenta aparece al lado: "7 + 5 + 3 = 15 ✓") y confirmás; si hay una
+sola forma ya queda elegida. Las reglas (`shared/rules.js`) son puras (`captures` encuentra todas las formas de levantar);
+la mesa (`shared/table.js`: reparto, turnos, escobas, puntos por ronda, tiempo por jugada, ausentes) corre igual en el
+navegador y en el servidor y a cada jugador le manda solo sus cartas. La compu (`shared/bot.js`) puntúa cada jugada posible
+por lo que se lleva (cartas, oros, sietes, el velo, una escoba) menos lo que le deja servido al rival: la ganancia esperada
+de su mejor respuesta con las cartas que todavía pueden tener; el nivel difícil cuenta lo que ya se levantó (le gana al
+fácil 97 de 100 y al normal 70 de 100) y la "Pista" usa esa misma cabeza. Modos: contra la compu de a 2, 3 o en parejas de a
+4, **online de 2 a 4** (`server/games/escoba.js`: el servidor reparte, entre rondas sigue en cuanto todos tocan "Siguiente" y si
+alguien se desconecta juega la compu por él) y la **escoba del día**, una ronda contra Don Mate con las mismas cartas para todos.
 
 ## Juegos diarios
 
@@ -671,6 +687,7 @@ cada carpeta de datos tiene su `LEEME.txt` con las fuentes y licencias. Para sum
 | Prisma | Rompecabezas de luz: girar y poner espejos, divisores, prismas y filtros para encender los cristales con su color; cuentan las jugadas contra el mínimo. | Lo arma `prisma/shared/generator.js` con la semilla del día y el resolvedor (`shared/solver.js`) garantiza que tiene solución y calcula el mínimo. |
 | Generala | Once turnos de generala solo, con los mismos dados para todos (cada dado sale de la fecha aunque se guarden otros); cuenta el puntaje. | Los valores salen de la semilla del día (`daily.js`) en `generala/game.js`; la mesa es la misma que la de las partidas normales. |
 | Truco | Una partida a 15 contra Don Mate con las mismas cartas para todos (cada mano sale de la fecha); cuenta si ganaste y por cuánto. | El mazo de cada mano y la suerte de la compu salen de la semilla del día (`daily.js`) en `truco/game.js`; la mesa es la misma que la de las partidas normales. |
+| Escoba | Una ronda de escoba contra Don Mate con las mismas cartas para todos (la baraja sale de la fecha); cuenta si ganaste y por cuánto. | El mazo de la ronda y la suerte de la compu salen de la semilla del día (`daily.js`) en `escoba/game.js`; la mesa es la misma que la de las partidas normales. |
 
 El texto para compartir de cada uno es `game.it · <Juego> #N …` con cuadraditos de colores y el link; en modo práctica no se
 suma nada a las estadísticas. Las listas de respuestas y de puzzles se pueden ampliar sin tocar el código (los desafíos

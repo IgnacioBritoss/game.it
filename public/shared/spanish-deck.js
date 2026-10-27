@@ -1,9 +1,12 @@
 /**
- * Truco — el mazo español dibujado en SVG: oros, copas, espadas y bastos con sus pintas (los cortes del marco que
- * dicen el palo: ninguno los oros, uno las copas, dos las espadas, tres los bastos), los anchos grandes, y la sota,
- * el caballo y el rey vestidos con los colores de cada palo. Cada carta es una imagen (data URI) que se arma una vez.
+ * La baraja española de 40 cartas dibujada en SVG (la usan Truco, Escoba y los demás juegos de naipes): oros, copas,
+ * espadas y bastos con sus pintas (los cortes del marco que dicen el palo: ninguno los oros, uno las copas, dos las
+ * espadas, tres los bastos), los anchos grandes, y la sota, el caballo y el rey vestidos con los colores de cada palo.
+ * Una carta es un texto con el número y el palo ('1e' ancho de espadas, '7o', '12c', '4b'; e espadas · b bastos ·
+ * o oros · c copas). Cada carta es una imagen (data URI) que se arma una sola vez.
  */
-import { num, suit } from './shared/rules.js';
+const num = (c) => parseInt(c, 10);
+const suit = (c) => c[c.length - 1];
 
 const W = 200, H = 300;
 const INK = { o: '#a8690f', c: '#b02a1f', e: '#22449a', b: '#2d7535' };

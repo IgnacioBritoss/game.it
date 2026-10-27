@@ -49,8 +49,9 @@ import vuelo from './games/vuelo.js';
 import bollito from './games/bollito.js';
 import generala from './games/generala.js';
 import truco from './games/truco.js';
+import escoba from './games/escoba.js';
 
-const GAMES = { minigolf, tictactoe, connect4, drift, doodle, clashball, chess, ameba, serpentina, billar, chispa, mecha, garabato, telefono, padel, naval, estela, sumo, rey, territorio, caida, voleyball, trotamundos, espiral, cruce, micelio, bolos, vuelo, bollito, generala, truco };
+const GAMES = { minigolf, tictactoe, connect4, drift, doodle, clashball, chess, ameba, serpentina, billar, chispa, mecha, garabato, telefono, padel, naval, estela, sumo, rey, territorio, caida, voleyball, trotamundos, espiral, cruce, micelio, bolos, vuelo, bollito, generala, truco, escoba };
 /** Módulo de un juego por nombre (solo propios: evita "constructor", "__proto__", etc.). */
 const gameMod = (g) => (typeof g === 'string' && Object.hasOwn(GAMES, g) ? GAMES[g] : null);
 /**

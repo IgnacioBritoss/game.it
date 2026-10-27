@@ -3,11 +3,11 @@
  * (y la flor, si se juega con flor) y los porotos anotados con fósforos. Contra la compu (mano a mano o en parejas),
  * online 1 vs 1 o 2 vs 2 (el servidor reparte) y el truco del día, con las mismas cartas para todos.
  * Reglas en shared/rules.js, la compu en shared/bot.js, la mesa (turnos, cantos, puntos) en shared/table.js y el
- * mazo dibujado en cards.js.
+ * mazo dibujado en /shared/spanish-deck.js.
  */
 import { DECK, TRUCO, teamOf, envido, hasFlor, shuffled, seatOrder } from './shared/rules.js';
 import { Table, PACE } from './shared/table.js';
-import { cardURL } from './cards.js';
+import { cardURL } from '/shared/spanish-deck.js';
 import { OnlineRoom, netText, defaultName, share as shareRoom, roomFromUrl } from '/shared/online.js';
 import { tone, noise, notes, unlock } from '/shared/sfx.js';
 import { today, dayNumber, msUntilNext, fmtClock, loadDay, saveDay, record, loadStats, markPortal, share, shareLink, rng as seeded } from '/shared/daily.js';

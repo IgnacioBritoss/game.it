@@ -1,0 +1,19 @@
+{
+  "id": "puntos",
+  "title": { "es": "Puntos y cajas", "en": "Dots and Boxes" },
+  "description": {
+    "es": "Puntitos y rayitas de cuaderno: uní los puntos, cerrá cajas y jugá otra vez. Contra la compu en cinco niveles con pistas y deshacer, de a dos en la misma pantalla u online con reloj y revancha. Tableros de 3×3 a 6×6.",
+    "en": "Notebook dots and boxes: join the dots, close boxes and go again. Against the computer on five levels with hints and undo, two players on one screen or online with a clock and rematch. Boards from 3×3 to 6×6."
+  },
+  "categories": ["estrategia", "clasicos", "online", "multijugador", "casual"],
+  "tags": ["puntos y cajas", "dots and boxes", "puntitos", "rayitas", "cuadritos", "timbiriche", "cuaderno", "notebook", "cajas", "boxes", "lapicera", "reloj", "clock", "2 jugadores", "ia"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "svg + web worker + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["mouse", "touch", "keyboard"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 2, "localPlayers": 2, "cpu": true, "story": false },
+  "order": 61
+}

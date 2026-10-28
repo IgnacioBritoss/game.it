@@ -764,6 +764,23 @@ por turno (con la barra de tiempo en la tarjeta del jugador; si se vence dos vec
 corta con victoria si quedan menos de dos en juego, deja la revancha al anfitrión, arma partidas rápidas por salas públicas y
 reconecta con el tablero tal cual estaba.
 
+### Puntos y cajas (puntitos y rayitas)
+
+El de los cuadernos (`public/games/puntos/`): se unen puntos vecinos con rayas, el que cierra la cuarta raya de una caja se la queda y
+juega de nuevo, y gana quien termina con más cajas. Tableros de 3×3 a 6×6 sobre una hoja cuadriculada (o un pizarrón, con el tema oscuro) con
+rayas de lapicera azul y roja trazadas con una curvita a mano y cajas marcadas con X y O. Las reglas (`shared/rules.js`, sin DOM,
+compartidas por el navegador, el worker de la compu y el servidor) están comprobadas contra una implementación aparte por coordenadas en
+cientos de partidas al azar, y deshacer vuelve a la posición exacta. La compu (`shared/engine.js`) suma habilidades por nivel: toma
+cajas, evita regalar (rayas "seguras"), regala lo mínimo cuando ya no quedan, cuida la paridad de las rayas seguras y **resuelve el
+final exacto** con una búsqueda negamax con tabla de transposición (hasta 23 rayas libres en el nivel experto, comprobada contra probar
+todas las partidas, incluida la jugada de dejar dos cajas para quedarse el control); piensa en un worker (`ai.js`) y cada nivel le gana al
+anterior en partidas con ventaja alternada. Se juega acercando el dedo a una raya (se marca) y soltando; se puede deslizar para
+cambiar de raya antes de soltar. Hay pista, deshacer (contra la compu vuelve al comienzo de tu último turno), partida guardada para
+**Continuar** y repaso raya por raya al terminar. **Online** (`server/games/puntos.js`): el servidor valida cada raya con las mismas
+reglas y lleva el reloj con incremento (2+0 a 15+10; cerrar una caja deja el reloj corriendo para el mismo jugador), la primera
+jugada de cada lado tiene 40 s o se anula, hay rendición, revancha con quien empieza alternado, partida rápida por salas públicas y
+reconexión con la partida en curso.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego

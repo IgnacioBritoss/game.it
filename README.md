@@ -703,6 +703,22 @@ servidor valida cada jugada con las mismas reglas y lleva el reloj con increment
 tiene 40 s o se anula, hay rendición, revancha con los colores cambiados, partida rápida por salas públicas y reconexión con la
 partida en curso.
 
+### Bloques
+
+Puzzle de piezas sobre un tablero de 8×8 (`public/games/bloques/`): se arrastran tres piezas por vez (37 formas, que no se
+giran), cada fila o columna completa se limpia y los puntos suben con las líneas simultáneas, el combo (hasta ×4, se pierde tras tres
+jugadas sin limpiar) y el bonus de tablero limpio. El motor (`shared/engine.js`, sin DOM y compartido con el servidor) arma las
+manos de dos maneras: en el **clásico** son adaptativas, se prueba que las tres piezas se puedan colocar enteras en algún orden;
+en el **diario** y la **carrera** salen solo de la semilla y el número de mano, así que son iguales para todos. Con el dedo la pieza
+se levanta por encima del pulgar y se engancha a la casilla más cercana donde entra, marcando qué líneas completaría; las limpiezas
+se animan con casilleros fantasma, chispas en un canvas, texto flotante, sacudida opcional y vibración. Hay **pista** (3 por
+partida, en el clásico) y la partida clásica se guarda sola para **Continuar**. La **carrera online** (`server/games/bloques.js`,
+sobre las carreras `_race.js`) da las mismas manos a hasta 6 jugadores por 1:30, 3:00 o 5:00; gana quien más puntos junta, no
+quien termina primero. Para que nadie invente un puntaje, cada jugador entrega sus colocaciones (2 caracteres cada una) y el
+servidor **rehace la partida** con el mismo motor: el puntaje que cuenta es el que sale de ahí y se rechaza lo que no cabe en el
+tiempo que pasó. El **diario** guarda un solo intento por día y el resultado se comparte como
+`game.it · Bloques #N · puntos`.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego
@@ -744,6 +760,7 @@ cada carpeta de datos tiene su `LEEME.txt` con las fuentes y licencias. Para sum
 | Truco | Una partida a 15 contra Don Mate con las mismas cartas para todos (cada mano sale de la fecha); cuenta si ganaste y por cuánto. | El mazo de cada mano y la suerte de la compu salen de la semilla del día (`daily.js`) en `truco/game.js`; la mesa es la misma que la de las partidas normales. |
 | Escoba | Una ronda de escoba contra Don Mate con las mismas cartas para todos (la baraja sale de la fecha); cuenta si ganaste y por cuánto. | El mazo de la ronda y la suerte de la compu salen de la semilla del día (`daily.js`) en `escoba/game.js`; la mesa es la misma que la de las partidas normales. |
 | Sudoku | Un puzzle por día, igual para todos (fácil lunes y martes, medio miércoles y jueves, difícil viernes y sábado, experto el domingo); cuenta el tiempo. | La semilla es la fecha (`sudoku:daily:AAAA-MM-DD`) y el generador de `sudoku/shared/engine.js` da siempre el mismo puzzle; el resultado y la racha se guardan con `daily.js`. |
+| Bloques | Una partida de bloques con las mismas piezas para todos (cada mano sale de la fecha y no depende de cómo juegues) y un solo intento; cuenta el puntaje. | La semilla es la fecha (`bloques-daily-AAAA-MM-DD`) y `bloques/shared/engine.js` da siempre las mismas manos; el resultado y la racha se guardan con `daily.js`. |
 
 El texto para compartir de cada uno es `game.it · <Juego> #N …` con cuadraditos de colores y el link; en modo práctica no se
 suma nada a las estadísticas. Las listas de respuestas y de puzzles se pueden ampliar sin tocar el código (los desafíos

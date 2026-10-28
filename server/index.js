@@ -53,8 +53,9 @@ import escoba from './games/escoba.js';
 import sudoku from './games/sudoku.js';
 import damas from './games/damas.js';
 import reversi from './games/reversi.js';
+import bloques from './games/bloques.js';
 
-const GAMES = { minigolf, tictactoe, connect4, drift, doodle, clashball, chess, ameba, serpentina, billar, chispa, mecha, garabato, telefono, padel, naval, estela, sumo, rey, territorio, caida, voleyball, trotamundos, espiral, cruce, micelio, bolos, vuelo, bollito, generala, truco, escoba, sudoku, damas, reversi };
+const GAMES = { minigolf, tictactoe, connect4, drift, doodle, clashball, chess, ameba, serpentina, billar, chispa, mecha, garabato, telefono, padel, naval, estela, sumo, rey, territorio, caida, voleyball, trotamundos, espiral, cruce, micelio, bolos, vuelo, bollito, generala, truco, escoba, sudoku, damas, reversi, bloques };
 /** Módulo de un juego por nombre (solo propios: evita "constructor", "__proto__", etc.). */
 const gameMod = (g) => (typeof g === 'string' && Object.hasOwn(GAMES, g) ? GAMES[g] : null);
 /**

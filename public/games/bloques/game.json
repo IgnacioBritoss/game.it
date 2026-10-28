@@ -1,0 +1,20 @@
+{
+  "id": "bloques",
+  "title": { "es": "Bloques", "en": "Blocks" },
+  "description": {
+    "es": "Puzzle de piezas sobre un tablero de 8×8: arrastrá, completá filas y columnas, encadená combos y no te quedes sin lugar. Clásico con récord y partida guardada, bloques del día con las mismas piezas para todos y carrera online donde el servidor comprueba tu puntaje.",
+    "en": "Block puzzle on an 8×8 board: drag, complete rows and columns, chain combos and don’t run out of room. Classic with a best score and saved game, daily blocks with the same pieces for everyone and an online race where the server verifies your score."
+  },
+  "categories": ["puzzle", "casual", "online", "multijugador", "diarios"],
+  "tags": ["bloques", "blocks", "puzzle", "piezas", "pieces", "tetris", "1010", "block blast", "filas", "lines", "combo", "arrastrar", "drag", "diario", "daily", "carrera", "race"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "dom + canvas + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["mouse", "touch"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 6, "cpu": false, "story": false, "daily": true },
+  "daily": { "epoch": "2026-10-28" },
+  "order": 57
+}

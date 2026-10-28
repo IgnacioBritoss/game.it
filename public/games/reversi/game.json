@@ -1,0 +1,19 @@
+{
+  "id": "reversi",
+  "title": { "es": "Reversi", "en": "Reversi" },
+  "description": {
+    "es": "Reversi con fichas que se dan vuelta en cadena: contra la compu en cinco niveles (resuelve el final a la perfección) con pistas y deshacer, de a dos en la misma pantalla u online con reloj y revancha. Pases automáticos y repaso de la partida.",
+    "en": "Reversi with chain-flipping discs: against the computer on five levels (it solves the endgame perfectly) with hints and undo, two players on one screen or online with a clock and rematch. Automatic passes and game review."
+  },
+  "categories": ["estrategia", "clasicos", "online", "multijugador", "casual"],
+  "tags": ["reversi", "othello", "tablero", "board", "fichas", "discs", "esquinas", "corners", "reloj", "clock", "2 jugadores", "ia"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "dom + css 3d + web worker + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["mouse", "touch", "keyboard"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 2, "localPlayers": 2, "cpu": true, "story": false },
+  "order": 56
+}

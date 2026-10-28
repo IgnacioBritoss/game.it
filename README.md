@@ -687,6 +687,22 @@ y lleva el reloj con incremento (3+2, 5+0, 10+0, 15+10, 30+0), la primera jugada
 y aceptación de tablas, rendición, revancha con los colores cambiados, partida rápida por salas públicas y reconexión con la
 partida en curso.
 
+### Reversi
+
+Reversi con fichas que se dan vuelta en cadena sobre fieltro verde (`public/games/reversi/`). Las reglas (`shared/rules.js`,
+sin DOM, compartidas por el navegador, el worker de la compu y el servidor) resuelven el **pase automático**: si el rival no
+puede mover sigue el mismo jugador, y la partida termina cuando ninguno puede; el generador de jugadas está verificado con perft
+contra los números conocidos (4, 12, 56, 244, 1396, 8200, 55092, 390216). La compu (`shared/engine.js`) es un alfa-beta con
+profundización iterativa y tabla de transposición que evalúa casillas, movilidad, esquinas, frontera y bordes estables, y
+tiene un **resolvedor exacto del final** (el nivel experto resuelve las últimas 15 casillas y el difícil las últimas 12; el
+resolvedor está comprobado contra probar todas las partidas, también con pases); piensa en un worker (`ai.js`) con 5 niveles
+cuyos bajos eligen con ruido para equivocarse como una persona. Se juega tocando una casilla: se marcan las jugadas posibles, la
+ficha cae y las encerradas se dan vuelta en cadena (volteo 3D en CSS), con contadores, aviso de pase, pista, deshacer contra la
+compu, partida guardada para **Continuar** y repaso jugada por jugada al terminar. **Online** (`server/games/reversi.js`): el
+servidor valida cada jugada con las mismas reglas y lleva el reloj con incremento (2+0 a 15+10), la primera jugada de cada lado
+tiene 40 s o se anula, hay rendición, revancha con los colores cambiados, partida rápida por salas públicas y reconexión con la
+partida en curso.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego

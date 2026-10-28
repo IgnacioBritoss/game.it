@@ -733,6 +733,21 @@ gana quien más puntos junta; cada jugador entrega sus movimientos (un carácter
 partida** con el mismo motor: el puntaje que cuenta sale de ahí y se rechaza lo que no cabe en el tiempo que pasó. El **diario** tiene
 un solo intento por día con las mismas fichas para todos y se comparte como `game.it · Fusión #N · ficha más alta`.
 
+### Mancala (Kalah)
+
+Mancala clásico con semillas de colores sobre un tablero de madera (`public/games/mancala/`). Las reglas (`shared/rules.js`, sin DOM,
+compartidas por el navegador, el worker de la compu y el servidor) son las del Kalah: se siembra en sentido contrario a las agujas
+del reloj salteando el depósito del rival, la última semilla en el propio depósito da **turno extra**, la que cae en un hoyo propio
+vacío **captura** el de enfrente y, cuando a un lado no le quedan semillas, el otro se guarda las suyas. Se puede jugar con 3, 4 (el
+clásico) o 6 semillas por hoyo. La compu (`shared/engine.js`) es un alfa-beta con profundización iterativa y tabla de transposición
+que ordena primero los turnos extra y las capturas; piensa en un worker (`ai.js`) con 5 niveles cuyos bajos eligen con ruido, y los
+niveles están comprobados entre sí (cada uno le gana al anterior). La siembra se anima semilla por semilla con una mano que reparte,
+con destello en la captura y en el turno extra; al mantener o pasar el dedo por un hoyo se ve dónde caería la última semilla (verde
+si es el depósito). Hay pista, deshacer contra la compu y de a dos, partida guardada para **Continuar** y repaso jugada por jugada
+al terminar. **Online** (`server/games/mancala.js`): el servidor valida cada jugada con las mismas reglas y lleva el reloj con
+incremento (2+0 a 15+10), la primera jugada de cada lado tiene 40 s o se anula, hay rendición, revancha con los lados cambiados,
+partida rápida por salas públicas y reconexión con la partida en curso.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego

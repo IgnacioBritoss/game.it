@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Mancala · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="game" id="game">
+      <div class="pbar top" id="bar-top">
+        <i class="disc" id="disc-top"></i>
+        <div class="who"><b class="nm" id="nm-top"></b><small class="st" id="st-top"></small></div>
+        <div class="clk" id="clk-top" hidden>0:00</div>
+        <div class="score" id="sc-top">2</div>
+      </div>
+
+      <div class="board-box" id="board-box">
+        <div class="board" id="board" role="grid" aria-label="Mancala"></div>
+        <div class="hand" id="hand" hidden></div>
+        <div class="busy" id="busy" hidden><i></i><i></i><i></i></div>
+      </div>
+
+      <div class="pbar bot" id="bar-bot">
+        <i class="disc" id="disc-bot"></i>
+        <div class="who"><b class="nm" id="nm-bot"></b><small class="st" id="st-bot"></small></div>
+        <div class="clk" id="clk-bot" hidden>0:00</div>
+        <div class="score" id="sc-bot">2</div>
+      </div>
+
+      <div class="actions" id="actions"></div>
+
+      <div class="toast" id="toast" hidden></div>
+
+      <aside class="moves" id="moves">
+        <div class="mhead"><b data-t="moves"></b><small id="mcount"></small></div>
+        <ol class="mlist" id="mlist"></ol>
+      </aside>
+    </main>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="panel home">
+        <div class="logo" id="logo" aria-hidden="true"></div>
+        <h1 data-t="title"></h1>
+        <p class="sub" data-t="tagline"></p>
+        <button class="btn cont" id="b-continue" hidden><span id="cont-t"></span><small id="cont-s"></small></button>
+        <button class="btn sun" id="b-cpu"><span data-t="vsCpu"></span><small data-t="vsCpuSub"></small></button>
+        <button class="btn mint" id="b-local"><span data-t="local"></span><small data-t="localSub"></small></button>
+        <button class="btn coral" id="b-online"><span data-t="online"></span><small data-t="onlineSub"></small></button>
+        <button class="link" id="b-rules" data-t="rulesTitle"></button>
+      </div>
+    </section>
+
+    <!-- contra la compu -->
+    <section class="screen" id="s-cpu">
+      <div class="panel">
+        <h2 data-t="vsCpu"></h2>
+        <div class="opt col"><span class="lbl" data-t="level"></span><div class="seg five" id="o-level"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button></div><p class="help" id="o-level-help"></p></div>
+        <div class="opt col"><span class="lbl" data-t="first"></span><div class="seg" id="o-first"><button data-v="0" data-t="meFirst"></button><button data-v="1" data-t="cpuFirst"></button><button data-v="2" data-t="random"></button></div></div>
+        <div class="opt col"><span class="lbl" data-t="seeds"></span><div class="seg" id="o-seeds"><button data-v="3">3</button><button data-v="4">4</button><button data-v="6">6</button></div><p class="help" data-t="seedsHelp"></p></div>
+        <button class="btn sun" id="b-cpu-go"><span data-t="go"></span></button>
+        <button class="link" id="b-cpu-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- de a dos en la misma pantalla -->
+    <section class="screen" id="s-local">
+      <div class="panel">
+        <h2 data-t="local"></h2>
+        <div class="opt col"><span class="lbl" data-t="seeds"></span><div class="seg" id="l-seeds"><button data-v="3">3</button><button data-v="4">4</button><button data-v="6">6</button></div><p class="help" data-t="seedsHelp"></p></div>
+        <button class="btn mint" id="b-local-go"><span data-t="go"></span></button>
+        <button class="link" id="b-local-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- online -->
+    <section class="screen" id="s-online">
+      <div class="panel">
+        <h2 data-t="online"></h2>
+        <p class="sub small" data-t="onlineLong"></p>
+        <input class="field" id="on-name" maxlength="16" autocomplete="off" spellcheck="false" />
+        <button class="btn sun" id="on-quick"><span data-t="quick"></span><small data-t="quickSub"></small></button>
+        <button class="btn blue" id="on-create"><span data-t="create"></span><small data-t="createSub"></small></button>
+        <div class="join">
+          <input class="field code" id="on-code" maxlength="5" autocomplete="off" spellcheck="false" placeholder="ABCDE" aria-label="código" />
+          <button class="btn mint" id="on-join"><span data-t="join"></span></button>
+        </div>
+        <p class="status" id="on-status"></p>
+        <button class="link" id="on-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- sala -->
+    <section class="screen" id="s-lobby">
+      <div class="panel">
+        <p class="kicker" data-t="room"></p>
+        <button class="code-big" id="lobby-code">-----</button>
+        <p class="hint2" data-t="tapToCopy"></p>
+        <ul class="plist" id="lobby-players"></ul>
+        <div class="host" id="lobby-host">
+          <div class="opt col"><span class="lbl" data-t="clock"></span><div class="seg five" id="k-tc" data-k="tc"><button data-v="2+0">2+0</button><button data-v="3+2">3+2</button><button data-v="5+0">5+0</button><button data-v="10+0">10+0</button><button data-v="15+10">15+10</button></div></div>
+          <div class="opt col"><span class="lbl" data-t="seeds"></span><div class="seg" id="k-seeds" data-k="seeds"><button data-v="3">3</button><button data-v="4">4</button><button data-v="6">6</button></div></div>
+          <div class="opt"><span class="lbl" data-t="publicRoom"></span><div class="seg" id="k-public" data-k="public"><button data-v="1" data-t="yes"></button><button data-v="0" data-t="no"></button></div></div>
+        </div>
+        <button class="btn sun" id="lobby-start"><span data-t="start"></span></button>
+        <p class="status" id="lobby-status"></p>
+        <button class="link" id="lobby-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <!-- cómo se juega -->
+    <section class="screen dim" id="s-rules">
+      <div class="panel wide">
+        <h2 data-t="rulesTitle"></h2>
+        <div class="rules" id="rules-body"></div>
+        <button class="btn sun" id="b-rules-ok"><span data-t="gotIt"></span></button>
+      </div>
+    </section>
+
+    <!-- pausa -->
+    <section class="screen dim" id="s-pause">
+      <div class="panel">
+        <h2 data-t="paused"></h2>
+        <div class="opt"><span class="lbl" data-t="showMoves"></span><div class="seg" id="p-hints"><button data-v="1" data-t="yes"></button><button data-v="0" data-t="no"></button></div></div>
+        <button class="btn sun" id="b-resume"><span data-t="resume"></span></button>
+        <button class="btn ghost" id="b-p-rules"><span data-t="rulesTitle"></span></button>
+        <button class="link" id="b-quit" data-t="quit"></button>
+      </div>
+    </section>
+
+    <!-- terminó -->
+    <section class="screen dim" id="s-over">
+      <div class="panel">
+        <p class="kicker" id="over-kicker"></p>
+        <h2 id="over-title"></h2>
+        <div class="final" id="over-final"></div>
+        <p class="sub" id="over-sub"></p>
+        <div class="stats" id="over-stats" hidden></div>
+        <button class="btn sun" id="over-again"><span id="over-again-t"></span></button>
+        <button class="btn ghost" id="over-review"><span data-t="review"></span></button>
+        <button class="link" id="over-menu" data-t="menu"></button>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

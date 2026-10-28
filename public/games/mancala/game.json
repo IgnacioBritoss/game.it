@@ -1,0 +1,19 @@
+{
+  "id": "mancala",
+  "title": { "es": "Mancala", "en": "Mancala" },
+  "description": {
+    "es": "Mancala (Kalah) con semillas que se siembran una por una: contra la compu en cinco niveles con pistas y deshacer, de a dos en la misma pantalla u online con reloj y revancha. Turnos extra, capturas y vista previa de dónde cae la última semilla.",
+    "en": "Mancala (Kalah) with seeds sown one by one: against the computer on five levels with hints and undo, two players on one screen or online with a clock and rematch. Extra turns, captures and a preview of where the last seed lands."
+  },
+  "categories": ["estrategia", "clasicos", "online", "multijugador", "casual"],
+  "tags": ["mancala", "kalah", "oware", "semillas", "seeds", "tablero", "board", "siembra", "sowing", "reloj", "clock", "2 jugadores", "ia"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "dom + web worker + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["mouse", "touch", "keyboard"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 2, "localPlayers": 2, "cpu": true, "story": false },
+  "order": 59
+}

@@ -1,0 +1,20 @@
+{
+  "id": "sudoku",
+  "title": { "es": "Sudoku", "en": "Sudoku" },
+  "description": {
+    "es": "El sudoku de siempre con puzzles de una sola solución y dificultad medida por las técnicas que hacen falta: notas, deshacer, pistas que explican el próximo paso, el sudoku del día y una carrera online donde todos resuelven el mismo puzzle.",
+    "en": "Classic sudoku with single-solution puzzles whose difficulty is measured by the techniques they need: notes, undo, hints that explain the next step, a daily sudoku and an online race where everyone solves the same puzzle."
+  },
+  "categories": ["puzzle", "clasicos", "casual", "online", "multijugador", "diarios"],
+  "tags": ["sudoku", "números", "numbers", "lógica", "logic", "grilla", "grid", "9x9", "pistas", "hints", "diario", "daily", "carrera", "race"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "dom + svg + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["keyboard", "mouse", "touch", "gamepad"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 6, "cpu": false, "story": false, "daily": true },
+  "daily": { "epoch": "2026-10-27" },
+  "order": 54
+}

@@ -648,6 +648,25 @@ fácil 97 de 100 y al normal 70 de 100) y la "Pista" usa esa misma cabeza. Modos
 4, **online de 2 a 4** (`server/games/escoba.js`: el servidor reparte, entre rondas sigue en cuanto todos tocan "Siguiente" y si
 alguien se desconecta juega la compu por él) y la **escoba del día**, una ronda contra Don Mate con las mismas cartas para todos.
 
+### Sudoku
+
+El sudoku de siempre sobre una hoja de cuaderno (`public/games/sudoku/`). Todo el juego depende de un motor sin DOM
+(`shared/engine.js`) que se usa igual en el navegador, el servidor y las pruebas: un resolvedor con backtracking que **cuenta
+soluciones** (así cada puzzle tiene exactamente una), un resolvedor "a lo humano" por técnicas (único desnudo, único oculto,
+candidatos bloqueados, pares y tríos, X-Wing) y el generador, que con la misma semilla da siempre el mismo puzzle. La
+**dificultad se mide por la técnica que hace falta**, no por cuántos números hay: fácil se resuelve solo con únicos (36 dados),
+medio pide candidatos bloqueados, difícil pares o tríos y experto lógica más avanzada; el generador saca casilleros mientras
+quede una sola solución y alcance con las técnicas del nivel, y se frena cuando hace falta una del nivel (cada puzzle sale
+en menos de 300 ms). En la partida: notas (también por teclado con Shift o N), **Auto** que llena todos los candidatos,
+deshacer y rehacer sin límite, números que ya se completaron atenuados, resaltado de fila, columna, caja y dígitos iguales, y
+**Pista** que explica el paso ("en la caja 5 el 1 solo puede ir en esta casilla"), avisa si algo está mal puesto y, cuando hace
+falta lógica avanzada, nombra la técnica. Se puede jugar con errores contados (tres y se pierde), solo mostrados o sin
+avisos, y la partida se guarda sola para **Continuar**. El **sudoku del día** es el mismo para todos y sube durante la semana
+(lunes y martes fácil, miércoles y jueves medio, viernes y sábado difícil, domingo experto). La **carrera online**
+(`server/games/sudoku.js`, sobre la base de las carreras `_race.js`) arma el mismo puzzle en todos los navegadores con la semilla
+del servidor, muestra el avance de cada uno y gana quien termina primero: el servidor guarda la solución (nunca viaja), solo acepta
+la grilla exacta y acota el tiempo a lo posible.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego
@@ -688,6 +707,7 @@ cada carpeta de datos tiene su `LEEME.txt` con las fuentes y licencias. Para sum
 | Generala | Once turnos de generala solo, con los mismos dados para todos (cada dado sale de la fecha aunque se guarden otros); cuenta el puntaje. | Los valores salen de la semilla del día (`daily.js`) en `generala/game.js`; la mesa es la misma que la de las partidas normales. |
 | Truco | Una partida a 15 contra Don Mate con las mismas cartas para todos (cada mano sale de la fecha); cuenta si ganaste y por cuánto. | El mazo de cada mano y la suerte de la compu salen de la semilla del día (`daily.js`) en `truco/game.js`; la mesa es la misma que la de las partidas normales. |
 | Escoba | Una ronda de escoba contra Don Mate con las mismas cartas para todos (la baraja sale de la fecha); cuenta si ganaste y por cuánto. | El mazo de la ronda y la suerte de la compu salen de la semilla del día (`daily.js`) en `escoba/game.js`; la mesa es la misma que la de las partidas normales. |
+| Sudoku | Un puzzle por día, igual para todos (fácil lunes y martes, medio miércoles y jueves, difícil viernes y sábado, experto el domingo); cuenta el tiempo. | La semilla es la fecha (`sudoku:daily:AAAA-MM-DD`) y el generador de `sudoku/shared/engine.js` da siempre el mismo puzzle; el resultado y la racha se guardan con `daily.js`. |
 
 El texto para compartir de cada uno es `game.it · <Juego> #N …` con cuadraditos de colores y el link; en modo práctica no se
 suma nada a las estadísticas. Las listas de respuestas y de puzzles se pueden ampliar sin tocar el código (los desafíos

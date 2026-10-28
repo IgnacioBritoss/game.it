@@ -781,6 +781,22 @@ reglas y lleva el reloj con incremento (2+0 a 15+10; cerrar una caja deja el rel
 jugada de cada lado tiene 40 s o se anula, hay rendición, revancha con quien empieza alternado, partida rápida por salas públicas y
 reconexión con la partida en curso.
 
+### 5 en línea (Gomoku)
+
+Gomoku en tableros de 9×9, 13×13 y 15×15 (`public/games/gomoku/`): las negras empiezan, se pone una piedra por turno y gana quien arma
+cinco o más seguidas (juego libre); si se llena el tablero, empate. Las reglas (`shared/rules.js`, sin DOM, compartidas por el
+navegador, el worker de la compu y el servidor) devuelven la fila ganadora para resaltarla. La compu (`shared/engine.js`) mira el
+tablero por "ventanas" de 5 cruces (cada una vale según cuántas piedras de un solo color tiene, y se actualiza de a una piedra) y
+corre un alfa-beta con profundización iterativa que solo mira jugadas cerca de las piedras, ordenadas por lo que atacan y lo que
+tapan; siempre juega la victoria inmediata o tapa el cuatro del rival, y si el rival tiene dos jugadas ganadoras da la partida por
+perdida. Sus cinco niveles (de jugar a ojo a profundizar hasta donde da el tiempo) están comprobados en partidas con aperturas
+al azar y colores alternados (cada nivel le gana al anterior). Se juega con un clic con el mouse y, en pantallas táctiles, tocando la
+cruz (aparece la piedra con un anillo) y confirmando con un segundo toque o con el botón "Colocar", para no poner piedras por
+error en tableros chicos. Hay pista, deshacer, partida guardada para **Continuar** y repaso jugada por jugada. **Online**
+(`server/games/gomoku.js`): el servidor valida cada jugada y lleva el reloj con incremento (2+0 a 15+10), la primera jugada de
+cada lado tiene 40 s o se anula, hay rendición, revancha con los colores cambiados, partida rápida por salas públicas y
+reconexión con la partida en curso.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego

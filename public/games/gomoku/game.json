@@ -1,0 +1,19 @@
+{
+  "id": "gomoku",
+  "title": { "es": "5 en línea", "en": "Gomoku" },
+  "description": {
+    "es": "Armá una fila de cinco piedras antes que tu rival en un tablero de 9×9, 13×13 o 15×15. Contra la compu en cinco niveles con pistas y deshacer, de a dos en la misma pantalla u online con reloj y revancha. Con el dedo se toca la cruz y se confirma.",
+    "en": "Get five stones in a row before your rival on a 9×9, 13×13 or 15×15 board. Against the computer on five levels with hints and undo, two players on one screen or online with a clock and rematch. On touch you tap a point and confirm."
+  },
+  "categories": ["estrategia", "clasicos", "online", "multijugador", "casual"],
+  "tags": ["gomoku", "5 en linea", "cinco en linea", "five in a row", "gobang", "piedras", "stones", "tablero", "board", "go", "reloj", "clock", "2 jugadores", "ia"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "svg + web worker + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["mouse", "touch", "keyboard"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 2, "localPlayers": 2, "cpu": true, "story": false },
+  "order": 62
+}

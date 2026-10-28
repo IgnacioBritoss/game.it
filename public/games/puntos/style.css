@@ -325,8 +325,8 @@ body.playing .game {
 .busy {
   position: absolute;
   left: 50%;
-  bottom: -6px;
-  translate: -50% 100%;
+  top: 8px;
+  translate: -50% 0;
   display: flex;
   gap: 5px;
   padding: 5px 10px;

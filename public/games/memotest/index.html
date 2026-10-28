@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Memotest · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="game" id="game">
+      <div class="hud" id="hud"></div>
+      <div class="stage" id="stage">
+        <div class="board" id="board" role="group" aria-label="Memotest"></div>
+      </div>
+      <div class="actions" id="actions"></div>
+    </main>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="panel home">
+        <div class="logo" id="logo" aria-hidden="true"></div>
+        <h1 data-t="title"></h1>
+        <p class="sub" data-t="tagline"></p>
+        <button class="btn sun" id="b-solo"><span data-t="solo"></span><small id="solo-s"></small></button>
+        <button class="btn mint" id="b-daily"><span data-t="daily"></span><small id="daily-s"></small></button>
+        <button class="btn blue" id="b-cpu"><span data-t="vsCpu"></span><small data-t="vsCpuSub"></small></button>
+        <button class="btn violet" id="b-local"><span data-t="local"></span><small data-t="localSub"></small></button>
+        <button class="btn coral" id="b-online"><span data-t="online"></span><small data-t="onlineSub"></small></button>
+        <button class="link" id="b-rules" data-t="rulesTitle"></button>
+      </div>
+    </section>
+
+    <!-- ajustes de una partida (solo, contra la compu, de a varios) -->
+    <section class="screen" id="s-setup">
+      <div class="panel">
+        <h2 id="setup-title"></h2>
+        <div class="opt col" data-for="cpu"><span class="lbl" data-t="level"></span><div class="seg" id="o-level"><button data-v="1"></button><button data-v="2"></button><button data-v="3"></button></div><p class="help" id="o-level-help"></p></div>
+        <div class="opt col" data-for="local"><span class="lbl" data-t="players"></span><div class="seg" id="o-players"><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div></div>
+        <div class="opt col"><span class="lbl" data-t="size"></span><div class="seg five" id="o-size"><button data-v="s">12</button><button data-v="m">16</button><button data-v="l">24</button><button data-v="xl">30</button><button data-v="xxl">36</button></div><p class="help" id="o-size-help"></p></div>
+        <div class="opt col"><span class="lbl" data-t="theme"></span><div class="themes" id="o-theme"><button data-v="fruits"></button><button data-v="animals"></button><button data-v="food"></button><button data-v="things"></button><button data-v="mix"></button></div></div>
+        <button class="btn sun" id="b-setup-go"><span data-t="go"></span></button>
+        <button class="link" id="b-setup-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- online -->
+    <section class="screen" id="s-online">
+      <div class="panel">
+        <h2 data-t="online"></h2>
+        <p class="sub" data-t="onlineLong"></p>
+        <input class="field" id="on-name" maxlength="16" autocomplete="off" spellcheck="false" />
+        <button class="btn sun" id="on-quick"><span data-t="quick"></span><small data-t="quickSub"></small></button>
+        <button class="btn blue" id="on-create"><span data-t="create"></span><small data-t="createSub"></small></button>
+        <div class="join">
+          <input class="field code" id="on-code" maxlength="5" autocomplete="off" spellcheck="false" placeholder="ABCDE" aria-label="código" />
+          <button class="btn mint" id="on-join"><span data-t="join"></span></button>
+        </div>
+        <p class="status" id="on-status"></p>
+        <button class="link" id="on-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- sala -->
+    <section class="screen" id="s-lobby">
+      <div class="panel">
+        <p class="kicker" data-t="room"></p>
+        <button class="code-big" id="lobby-code">-----</button>
+        <p class="hint2" data-t="tapToCopy"></p>
+        <ul class="plist" id="lobby-players"></ul>
+        <div class="host" id="lobby-host">
+          <div class="opt col"><span class="lbl" data-t="size"></span><div class="seg five" id="k-size" data-k="size"><button data-v="s">12</button><button data-v="m">16</button><button data-v="l">24</button><button data-v="xl">30</button><button data-v="xxl">36</button></div></div>
+          <div class="opt col"><span class="lbl" data-t="theme"></span><div class="themes" id="k-theme" data-k="theme"><button data-v="fruits"></button><button data-v="animals"></button><button data-v="food"></button><button data-v="things"></button><button data-v="mix"></button></div></div>
+          <div class="opt"><span class="lbl" data-t="publicRoom"></span><div class="seg" id="k-public" data-k="public"><button data-v="1" data-t="yes"></button><button data-v="0" data-t="no"></button></div></div>
+        </div>
+        <button class="btn sun" id="lobby-start"><span data-t="start"></span></button>
+        <p class="status" id="lobby-status"></p>
+        <button class="link" id="lobby-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <!-- cómo se juega -->
+    <section class="screen dim" id="s-rules">
+      <div class="panel wide">
+        <h2 data-t="rulesTitle"></h2>
+        <div class="rules" id="rules-body"></div>
+        <button class="btn sun" id="b-rules-ok"><span data-t="gotIt"></span></button>
+      </div>
+    </section>
+
+    <!-- pausa -->
+    <section class="screen dim" id="s-pause">
+      <div class="panel">
+        <h2 data-t="paused"></h2>
+        <button class="btn sun" id="b-resume"><span data-t="resume"></span></button>
+        <button class="btn ghost" id="b-restart"><span data-t="restart"></span></button>
+        <button class="btn ghost" id="b-p-rules"><span data-t="rulesTitle"></span></button>
+        <button class="link" id="b-quit" data-t="quit"></button>
+      </div>
+    </section>
+
+    <!-- terminó -->
+    <section class="screen dim" id="s-over">
+      <div class="panel">
+        <p class="kicker" id="over-kicker"></p>
+        <h2 id="over-title"></h2>
+        <div class="stars" id="over-stars" hidden></div>
+        <div class="final" id="over-final"></div>
+        <p class="sub" id="over-sub"></p>
+        <div class="stats" id="over-stats" hidden></div>
+        <p class="next" id="over-next" hidden><span data-t="nextDaily"></span> <b id="over-clock">--:--:--</b></p>
+        <button class="btn mint" id="over-share" hidden><span data-t="share"></span></button>
+        <button class="btn sun" id="over-again"><span id="over-again-t"></span></button>
+        <button class="link" id="over-menu" data-t="menu"></button>
+      </div>
+    </section>
+
+    <div class="toast" id="toast" hidden></div>
+    <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

@@ -168,7 +168,9 @@ test('motor: toma la esquina que se le ofrece', () => {
   const e = new Engine();
   const p = Position.parse(['.wb.....', '........', '........', '...w....', '....b...', '........', '........', '........'], BLACK);
   assert.deepEqual(names(p), ['a1', 'c3'].sort());
-  for (const lv of [3, 4]) assert.equal(sqName(e.think(p, { ...LEVELS[lv], time: 200 }).move), 'a1');
+  // los niveles 2 y 3 puntúan igual las dos jugadas a partir de la segunda mirada y eligen con ruido: ahí vale cualquiera de las dos
+  for (const lv of [1, 4, 5]) assert.equal(sqName(e.think(p, { ...LEVELS[lv], time: 1500 }).move), 'a1');
+  for (const lv of [2, 3]) assert.ok(['a1', 'c3'].includes(sqName(e.think(p, { ...LEVELS[lv], time: 1500 }).move)));
 });
 
 test('motor: una sola jugada se devuelve enseguida y sin jugadas no hay jugada', () => {

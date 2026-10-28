@@ -1,0 +1,20 @@
+{
+  "id": "memotest",
+  "title": { "es": "Memotest", "en": "Memory" },
+  "description": {
+    "es": "Dale vuelta a las cartas y encontrá las parejas: solo con intentos, tiempo y récord, memotest del día con las mismas cartas para todos, contra la compu con tres niveles de memoria, de a varios en la misma pantalla u online de 2 a 4 con turnos de 25 segundos.",
+    "en": "Flip the cards and find the pairs: solo with tries, time and a best score, a daily memory game with the same cards for everyone, against the computer on three memory levels, pass and play on one screen or online for 2 to 4 players with 25-second turns."
+  },
+  "categories": ["puzzle", "casual", "clasicos", "online", "multijugador", "diarios"],
+  "tags": ["memotest", "memoria", "memory", "pares", "pairs", "cartas", "cards", "parejas", "concentracion", "match", "diario", "daily", "2 a 4 jugadores", "familia", "family"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "dom + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["mouse", "touch", "keyboard"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 4, "localPlayers": 4, "cpu": true, "story": false, "daily": true },
+  "daily": { "epoch": "2026-10-28" },
+  "order": 60
+}

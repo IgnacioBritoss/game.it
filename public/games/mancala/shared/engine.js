@@ -113,7 +113,8 @@ export class Engine {
     const moves = pos.moves();
     if (!moves.length) return { move: -1, score: 0, depth: 0, nodes: 0 };
     if (moves.length === 1) return { move: moves[0], score: 0, depth: 0, nodes: 0, forced: true };
-    this.deadline = performance.now() + (opts.time || 500);
+    const real = performance.now() + (opts.time || 500);
+    this.deadline = real;
     this.nodes = 0;
     this.stop = false;
     const turn = pos.turn;
@@ -126,6 +127,8 @@ export class Engine {
     };
     const maxDepth = Math.max(1, opts.depth || 6);
     if (noise > 0) {
+      // profundidad fija y corta: no se corta por tiempo (si se cortara, las jugadas que quedan sin evaluar torcerían la elección)
+      this.deadline = Infinity;
       let pick = moves[0];
       let pickScore = -Infinity;
       let bestRaw = -INF;
@@ -145,6 +148,7 @@ export class Engine {
     let doneDepth = 0;
     let order = this.order(pos, moves.slice(), -1);
     for (let depth = 1; depth <= maxDepth; depth++) {
+      this.deadline = depth === 1 ? Infinity : real; // la primera pasada es mínima y siempre se completa
       let alpha = -INF;
       let iterBest = null;
       let iterScore = -INF;
@@ -164,7 +168,7 @@ export class Engine {
       }
       if (this.stop) break;
       order = [iterBest, ...order.filter((m) => m !== iterBest)];
-      if (performance.now() > this.deadline) break;
+      if (performance.now() > real) break;
     }
     return { move: best, score: bestScore, depth: doneDepth, nodes: this.nodes };
   }

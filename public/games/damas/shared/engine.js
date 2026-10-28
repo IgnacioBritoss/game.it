@@ -237,7 +237,8 @@ export class Engine {
     const maxDepth = Math.max(1, opts.depth || 8);
     const noise = opts.noise || 0;
     this.salt = opts.salt ?? this.salt;
-    this.deadline = performance.now() + (opts.time || 500);
+    const real = performance.now() + (opts.time || 500);
+    this.deadline = real;
     this.nodes = 0;
     this.stop = false;
     this.hist.fill(0);
@@ -248,7 +249,8 @@ export class Engine {
     this.path[0] = root.h1;
 
     if (noise > 0) {
-      // niveles bajos: se puntúa cada jugada a profundidad fija y se elige con ruido
+      // niveles bajos: se puntúa cada jugada a profundidad fija y se elige con ruido (corta: no se corta por tiempo, si no las jugadas sin evaluar torcerían la elección)
+      this.deadline = Infinity;
       const rand = opts.rand || Math.random;
       let pick = null;
       let pickScore = -Infinity;
@@ -272,6 +274,7 @@ export class Engine {
     let doneDepth = 0;
     let order = this.order(moves, -1, 0);
     for (let depth = 1; depth <= maxDepth; depth++) {
+      this.deadline = depth === 1 ? Infinity : real; // la primera pasada es mínima y siempre se completa
       let alpha = -INF;
       let iterBest = null;
       let iterScore = -INF;
@@ -306,7 +309,7 @@ export class Engine {
       // la mejor primero en la próxima vuelta
       order = [iterBest, ...order.filter((m) => m !== iterBest)];
       if (Math.abs(bestScore) > WIN - 100) break; // ya hay mate: no hace falta seguir
-      if (performance.now() + 0 > this.deadline) break;
+      if (performance.now() > real) break;
     }
     return { move: best, score: bestScore, depth: doneDepth, nodes: this.nodes };
   }

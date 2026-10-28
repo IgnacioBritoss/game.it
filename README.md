@@ -748,6 +748,22 @@ al terminar. **Online** (`server/games/mancala.js`): el servidor valida cada jug
 incremento (2+0 a 15+10), la primera jugada de cada lado tiene 40 s o se anula, hay rendición, revancha con los lados cambiados,
 partida rápida por salas públicas y reconexión con la partida en curso.
 
+### Memotest (memoria)
+
+Memotest de cartas que se dan vuelta (`public/games/memotest/`) con seis modos: **solo** (de 12 a 36 cartas; cuenta intentos y tiempo, da hasta tres estrellas según
+los intentos por par y guarda el récord por tamaño), **del día** (las mismas 24 cartas para todos, un solo intento, con la partida
+guardada si se recarga a mitad), **contra la compu**, **de a varios** en la misma pantalla (2 a 4) y **online** de 2 a 4. El mazo
+(`shared/deck.js`, sin DOM y compartido con el servidor) son 72 caras en cuatro temas de 18 (frutas, animales, comida y cosas) más una
+mezcla, y reparte con una semilla: la del día sale de la fecha (`memotest-daily-AAAA-MM-DD`). La compu (`shared/brain.js`) no ve las
+cartas tapadas: solo se acuerda, con cierta chance, de las que vio dar vuelta (las suyas y las del jugador) y se olvida de algunas
+cada turno; sus tres niveles (Despistado, Atento y Memorión) necesitan, en simulaciones, unos 3, 2 y 1,7 intentos por par, y las pruebas comprueban que cada nivel necesita menos que el anterior. Las cartas se dan
+vuelta en 3D, las llevadas quedan con el color de quien se las llevó, y en solo no hace falta esperar a que se tapen las dos que
+erraste. **Online** (`server/games/memotest.js`): el servidor guarda el reparto y a los jugadores solo les manda la cara de las cartas
+que se dan vuelta (nadie puede espiar el mazo), resuelve cada par (900 ms si acierta, 1,5 s si falla, para que todos lo vean), da 25 s
+por turno (con la barra de tiempo en la tarjeta del jugador; si se vence dos veces seguidas el jugador queda afuera y sigue mirando),
+corta con victoria si quedan menos de dos en juego, deja la revancha al anfitrión, arma partidas rápidas por salas públicas y
+reconecta con el tablero tal cual estaba.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego
@@ -791,6 +807,7 @@ cada carpeta de datos tiene su `LEEME.txt` con las fuentes y licencias. Para sum
 | Sudoku | Un puzzle por día, igual para todos (fácil lunes y martes, medio miércoles y jueves, difícil viernes y sábado, experto el domingo); cuenta el tiempo. | La semilla es la fecha (`sudoku:daily:AAAA-MM-DD`) y el generador de `sudoku/shared/engine.js` da siempre el mismo puzzle; el resultado y la racha se guardan con `daily.js`. |
 | Bloques | Una partida de bloques con las mismas piezas para todos (cada mano sale de la fecha y no depende de cómo juegues) y un solo intento; cuenta el puntaje. | La semilla es la fecha (`bloques-daily-AAAA-MM-DD`) y `bloques/shared/engine.js` da siempre las mismas manos; el resultado y la racha se guardan con `daily.js`. |
 | Fusión | Una partida de 2048 de 4×4 con las mismas fichas nuevas para todos y un solo intento; cuenta el puntaje y la ficha más alta. | La semilla es la fecha (`fusion-daily-AAAA-MM-DD`) y `fusion/shared/engine.js` saca las fichas nuevas siempre iguales; el resultado y la racha se guardan con `daily.js`. |
+| Memotest | 24 cartas (12 pares de la mezcla de temas) con el mismo reparto para todos y un solo intento; cuenta los intentos (estrellas) y el tiempo. | La semilla es la fecha (`memotest-daily-AAAA-MM-DD`) y `memotest/shared/deck.js` reparte siempre igual; el resultado y la racha se guardan con `daily.js`, y la partida en curso queda guardada si se recarga. |
 
 El texto para compartir de cada uno es `game.it · <Juego> #N …` con cuadraditos de colores y el link; en modo práctica no se
 suma nada a las estadísticas. Las listas de respuestas y de puzzles se pueden ampliar sin tocar el código (los desafíos

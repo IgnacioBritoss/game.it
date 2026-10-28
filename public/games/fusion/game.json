@@ -1,0 +1,20 @@
+{
+  "id": "fusion",
+  "title": { "es": "Fusión", "en": "Merge" },
+  "description": {
+    "es": "Deslizá las fichas y fusioná las iguales hasta llegar al 2048: tableros de 3×3, 4×4 y 5×5 con récord, deshacer y partida guardada, fusión del día con las mismas fichas para todos y carrera online donde el servidor comprueba tu puntaje.",
+    "en": "Slide the tiles and merge equal ones up to 2048: 3×3, 4×4 and 5×5 boards with best score, undo and saved game, a daily merge with the same tiles for everyone and an online race where the server verifies your score."
+  },
+  "categories": ["puzzle", "casual", "online", "multijugador", "diarios"],
+  "tags": ["fusion", "merge", "2048", "puzzle", "fichas", "tiles", "deslizar", "swipe", "numeros", "numbers", "diario", "daily", "carrera", "race"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "dom + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["mouse", "touch", "keyboard", "gamepad"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 6, "cpu": false, "story": false, "daily": true },
+  "daily": { "epoch": "2026-10-28" },
+  "order": 58
+}

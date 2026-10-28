@@ -719,6 +719,20 @@ servidor **rehace la partida** con el mismo motor: el puntaje que cuenta es el q
 tiempo que pasó. El **diario** guarda un solo intento por día y el resultado se comparte como
 `game.it · Bloques #N · puntos`.
 
+### Fusión (2048)
+
+Deslizar y fusionar fichas (`public/games/fusion/`): todas las fichas corren hasta donde pueden, las iguales se fusionan y suman el
+valor nuevo, y después de cada movimiento que cambia algo entra una ficha (un 2 el 90 % de las veces, un 4 el resto). El motor
+(`shared/engine.js`, sin DOM y compartido con el servidor) guarda exponentes y saca las fichas nuevas de un generador con semilla
+que avanza una vez por ficha: con la misma semilla y los mismos movimientos la partida es idéntica en cualquier lado. Se desliza con el dedo
+o el mouse (se anima cada ficha, la fusión hace un golpe y el puntaje sube con un texto flotante), con flechas o WASD y con el mando;
+un movimiento durante la animación queda en cola. El **clásico** tiene tableros de 3×3, 4×4 y 5×5 con récord por tablero, 3
+deshacer por partida y la partida guardada para **Continuar**; al llegar al 2048 aparece un aviso y se puede seguir. La **carrera
+online** (`server/games/fusion.js`, sobre las carreras `_race.js`) da las mismas fichas a hasta 6 jugadores por 1:30, 3:00 o 5:00 y
+gana quien más puntos junta; cada jugador entrega sus movimientos (un carácter cada uno: L R U D) y el servidor **rehace la
+partida** con el mismo motor: el puntaje que cuenta sale de ahí y se rechaza lo que no cabe en el tiempo que pasó. El **diario** tiene
+un solo intento por día con las mismas fichas para todos y se comparte como `game.it · Fusión #N · ficha más alta`.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego
@@ -761,6 +775,7 @@ cada carpeta de datos tiene su `LEEME.txt` con las fuentes y licencias. Para sum
 | Escoba | Una ronda de escoba contra Don Mate con las mismas cartas para todos (la baraja sale de la fecha); cuenta si ganaste y por cuánto. | El mazo de la ronda y la suerte de la compu salen de la semilla del día (`daily.js`) en `escoba/game.js`; la mesa es la misma que la de las partidas normales. |
 | Sudoku | Un puzzle por día, igual para todos (fácil lunes y martes, medio miércoles y jueves, difícil viernes y sábado, experto el domingo); cuenta el tiempo. | La semilla es la fecha (`sudoku:daily:AAAA-MM-DD`) y el generador de `sudoku/shared/engine.js` da siempre el mismo puzzle; el resultado y la racha se guardan con `daily.js`. |
 | Bloques | Una partida de bloques con las mismas piezas para todos (cada mano sale de la fecha y no depende de cómo juegues) y un solo intento; cuenta el puntaje. | La semilla es la fecha (`bloques-daily-AAAA-MM-DD`) y `bloques/shared/engine.js` da siempre las mismas manos; el resultado y la racha se guardan con `daily.js`. |
+| Fusión | Una partida de 2048 de 4×4 con las mismas fichas nuevas para todos y un solo intento; cuenta el puntaje y la ficha más alta. | La semilla es la fecha (`fusion-daily-AAAA-MM-DD`) y `fusion/shared/engine.js` saca las fichas nuevas siempre iguales; el resultado y la racha se guardan con `daily.js`. |
 
 El texto para compartir de cada uno es `game.it · <Juego> #N …` con cuadraditos de colores y el link; en modo práctica no se
 suma nada a las estadísticas. Las listas de respuestas y de puzzles se pueden ampliar sin tocar el código (los desafíos

@@ -1,0 +1,19 @@
+{
+  "id": "damas",
+  "title": { "es": "Damas", "en": "Checkers" },
+  "description": {
+    "es": "Damas con tres reglamentos (clásicas, españolas e inglesas): contra la compu en cinco niveles con pistas y deshacer, de a dos en la misma pantalla u online con reloj, tablas y revancha. Captura obligatoria, damas voladoras y repaso de la partida.",
+    "en": "Checkers with three rulesets (Classic, Spanish and English): against the computer on five levels with hints and undo, two players on one screen or online with a clock, draws and rematch. Mandatory captures, flying kings and game review."
+  },
+  "categories": ["estrategia", "clasicos", "online", "multijugador", "casual"],
+  "tags": ["damas", "checkers", "draughts", "tablero", "board", "ficha", "diagonal", "dama", "king", "reloj", "clock", "2 jugadores", "ia"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "dom + web worker + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["mouse", "touch", "keyboard"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 2, "localPlayers": 2, "cpu": true, "story": false },
+  "order": 55
+}

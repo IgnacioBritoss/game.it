@@ -667,6 +667,26 @@ avisos, y la partida se guarda sola para **Continuar**. El **sudoku del día** e
 del servidor, muestra el avance de cada uno y gana quien termina primero: el servidor guarda la solución (nunca viaja), solo acepta
 la grilla exacta y acota el tiempo a lo posible.
 
+### Damas
+
+Damas en madera sobre una mesa pizarra (`public/games/damas/`) con **tres reglamentos**: *clásicas* (brasileñas: dama voladora,
+los peones comen también para atrás y hay que comer la mayor cantidad), *españolas* (peones solo hacia adelante) e *inglesas*
+(dama de un paso y se elige qué comer). Las reglas están en `shared/rules.js`, sin DOM, y las usan igual el navegador, el
+worker de la compu y el servidor: la captura es obligatoria, una jugada es la cadena entera de saltos (las piezas comidas
+estorban hasta el final y no se saltan dos veces), coronación al terminar o, en las clásicas, solo si se termina en el fondo,
+y tablas por acuerdo, triple repetición, 20 jugadas de cada uno sin captura ni avance de peón y dama contra dama. El generador
+de jugadas está verificado con perft contra los números de las damas inglesas (7, 49, 302, 1469, 7361, 36768, 179740, 845931).
+La compu (`shared/engine.js`) es un alfa-beta con profundización iterativa, búsqueda de quietud sobre las capturas
+obligatorias, tabla de transposición, killers e historia; piensa en un worker (`ai.js`) con 5 niveles (los bajos eligen con
+ruido para equivocarse como una persona), convierte tres damas contra una y la "Pista" usa la misma búsqueda. Se juega tocando la ficha y
+la casilla: si la captura tiene caminos distintos se va eligiendo salto por salto, las fichas que deben comer se marcan y las
+comidas se apagan hasta cerrar la jugada. Contra la compu hay deshacer, pista, tablas (la compu acepta si no se ve ganando) y
+la partida se guarda sola para **Continuar**; de a dos en la misma pantalla puede girar el tablero en cada turno; al terminar
+se puede **repasar** jugada por jugada. **Online** (`server/games/damas.js`): el servidor valida cada jugada con las mismas reglas
+y lleva el reloj con incremento (3+2, 5+0, 10+0, 15+10, 30+0), la primera jugada de cada lado tiene 40 s o se anula, hay oferta
+y aceptación de tablas, rendición, revancha con los colores cambiados, partida rápida por salas públicas y reconexión con la
+partida en curso.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego

@@ -1,0 +1,19 @@
+{
+  "id": "penales",
+  "title": { "es": "Penales", "en": "Penalty Shootout" },
+  "description": {
+    "es": "Una tanda de penales en 3D: apuntá, cargá la fuerza y metela (más fuerza, menos puntería), o elegí a ciegas hacia dónde tirarte cuando ataja. Contra la compu en tres niveles (la difícil aprende tus costumbres) u online 1 contra 1 con revancha.",
+    "en": "A 3D penalty shootout: aim, charge the power and score (more power, less accuracy), or pick blind where to dive when you keep. Against the computer on three levels (the hard one learns your habits) or online 1 vs 1 with a rematch."
+  },
+  "categories": ["deporte", "casual", "online", "multijugador"],
+  "tags": ["penales", "penal", "penalty", "futbol", "fútbol", "soccer", "football", "tanda", "shootout", "arquero", "goalkeeper", "gol", "goal", "3d", "1 contra 1", "1v1"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "three.js + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["mouse", "touch", "keyboard"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 2, "cpu": true, "story": false },
+  "order": 64
+}

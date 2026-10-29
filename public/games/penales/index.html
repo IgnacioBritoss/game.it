@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Penales · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="game" id="game">
+      <canvas id="cv" aria-label="cancha"></canvas>
+
+      <div class="hud" id="hud" hidden>
+        <div class="sb" id="sb"></div>
+        <button class="pause" id="b-pause" aria-label="pausa"><i></i><i></i></button>
+        <div class="clock" id="clock" hidden><b id="clock-t"></b></div>
+      </div>
+
+      <div class="banner" id="banner"><b id="banner-t"></b><small id="banner-s"></small></div>
+      <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+      <!-- la mira y el círculo de error -->
+      <div class="reticle" id="reticle" hidden><i class="err" id="reticle-err"></i><i class="cross"></i></div>
+      <!-- las seis zonas del arquero -->
+      <div class="zones" id="zones" hidden>
+        <button data-c="-1" data-r="1" aria-label="arriba a la izquierda"></button>
+        <button data-c="0" data-r="1" aria-label="arriba al medio"></button>
+        <button data-c="1" data-r="1" aria-label="arriba a la derecha"></button>
+        <button data-c="-1" data-r="0" aria-label="abajo a la izquierda"></button>
+        <button data-c="0" data-r="0" aria-label="abajo al medio"></button>
+        <button data-c="1" data-r="0" aria-label="abajo a la derecha"></button>
+      </div>
+
+      <div class="controls" id="controls" hidden>
+        <p class="tip" id="tip"></p>
+        <div class="power" id="power" hidden><i id="power-fill"></i><span class="tick"></span></div>
+        <button class="shoot" id="b-shoot" hidden><span data-t="shoot"></span></button>
+        <button class="shoot dive" id="b-dive" hidden><span data-t="dive"></span></button>
+      </div>
+    </main>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="panel home">
+        <div class="logo" id="logo" aria-hidden="true"><span class="goal"></span><span class="ball"></span></div>
+        <h1 data-t="title"></h1>
+        <p class="sub" data-t="tagline"></p>
+        <button class="btn sun" id="b-cpu"><span data-t="vsCpu"></span><small data-t="vsCpuSub"></small></button>
+        <button class="btn coral" id="b-online"><span data-t="online"></span><small data-t="onlineSub"></small></button>
+        <button class="link" id="b-rules" data-t="rulesTitle"></button>
+      </div>
+    </section>
+
+    <!-- contra la compu -->
+    <section class="screen" id="s-cpu">
+      <div class="panel">
+        <h2 data-t="vsCpu"></h2>
+        <div class="opt"><span class="lbl" data-t="level"></span><div class="seg" id="o-level"><button data-v="1" data-t="lv1"></button><button data-v="2" data-t="lv2"></button><button data-v="3" data-t="lv3"></button></div></div>
+        <p class="sub small" id="o-level-help"></p>
+        <div class="opt"><span class="lbl" data-t="kicks"></span><div class="seg" id="o-kicks"><button data-v="3">3</button><button data-v="5">5</button></div></div>
+        <div class="opt"><span class="lbl" data-t="first"></span><div class="seg" id="o-first"><button data-v="0" data-t="firstMe"></button><button data-v="1" data-t="firstCpu"></button><button data-v="2" data-t="firstRand"></button></div></div>
+        <button class="btn sun" id="b-cpu-go"><span data-t="go"></span></button>
+        <button class="link" id="b-cpu-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- online -->
+    <section class="screen" id="s-online">
+      <div class="panel">
+        <h2 data-t="online"></h2>
+        <p class="sub small" data-t="onlineLong"></p>
+        <input class="field" id="on-name" maxlength="16" autocomplete="off" spellcheck="false" />
+        <button class="btn sun" id="on-create"><span data-t="create"></span><small data-t="createSub"></small></button>
+        <div class="join">
+          <input class="field code" id="on-code" maxlength="5" autocomplete="off" spellcheck="false" placeholder="ABCDE" aria-label="código" />
+          <button class="btn mint" id="on-join"><span data-t="join"></span></button>
+        </div>
+        <p class="status" id="on-status"></p>
+        <button class="link" id="on-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- sala -->
+    <section class="screen" id="s-lobby">
+      <div class="panel">
+        <p class="kicker" data-t="room"></p>
+        <button class="code-big" id="lobby-code">-----</button>
+        <p class="hint2" data-t="tapToCopy"></p>
+        <ul class="plist" id="lobby-players"></ul>
+        <button class="btn sun" id="lobby-start"><span data-t="start"></span></button>
+        <p class="status" id="lobby-status"></p>
+        <button class="link" id="lobby-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <!-- cómo se juega -->
+    <section class="screen" id="s-rules">
+      <div class="panel wide">
+        <h2 data-t="rulesTitle"></h2>
+        <div class="rules" id="rules-body"></div>
+        <button class="btn sun" id="b-rules-ok"><span data-t="gotIt"></span></button>
+      </div>
+    </section>
+
+    <!-- pausa -->
+    <section class="screen dim" id="s-pause">
+      <div class="panel">
+        <h2 data-t="paused"></h2>
+        <button class="btn sun" id="b-resume"><span data-t="resume"></span></button>
+        <button class="btn ghost" id="b-p-rules"><span data-t="rulesTitle"></span></button>
+        <button class="link" id="b-quit" data-t="quit"></button>
+      </div>
+    </section>
+
+    <!-- fin -->
+    <section class="screen dim" id="s-over">
+      <div class="panel">
+        <p class="kicker" id="over-kicker"></p>
+        <h2 id="over-title"></h2>
+        <div class="final" id="over-final"></div>
+        <div class="shots" id="over-shots"></div>
+        <p class="status" id="over-status"></p>
+        <button class="btn sun" id="b-again"><span id="b-again-t"></span></button>
+        <button class="link" id="b-over-menu" data-t="menu"></button>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

@@ -818,6 +818,24 @@ de a 4, **online de 2 a 4** (`server/games/domino.js`: el servidor reparte y val
 "Siguiente" y si alguien se desconecta o se le acaba el tiempo dos veces juega la compu por él) y el **dominó del día**, una ronda
 contra Don Mate con las mismas fichas para todos.
 
+### Penales (tanda de penales en 3D)
+
+Una tanda de penales (`public/games/penales/`) en three.js sobre una cancha con pasto a rayas, arco con red que se infla, carteles y tribuna
+(todo dibujado con texturas de canvas, sin imágenes): cada lado patea 5 veces alternando (3 o 5 a elección contra la compu), gana el que más
+goles hace, termina antes si el otro ya no alcanza y si empatan sigue la muerte súbita. Cuando **pateás** tocás el arco para poner la mira
+y mantenés "Patear": la barra de fuerza sube y baja y al soltar sale el remate; más fuerza deja menos tiempo al arquero pero abre la
+puntería (el círculo punteado de la mira es el error posible), así que un ángulo a todo lo que da puede irse afuera, por arriba o al palo.
+Cuando **atajás** elegís a ciegas entre seis zonas (izquierda, centro y derecha, arriba y abajo) y recién después se ve el remate: el
+arquero alcanza lo que está cerca de su zona y menos si el tiro viene fuerte. Las reglas (`shared/rules.js`: puntería con error normal,
+alcance del arquero, palo/afuera/por arriba) y la tanda (`shared/match.js`) son puras y las usan el navegador y el servidor; la cancha
+(`scene.js`) solo anima un remate ya resuelto (carrera, patada, vuelo, red, atajada o palo, festejo) y avisa cada momento para los sonidos
+y carteles. La compu (`shared/cpu.js`) tiene tres niveles: el fácil patea y se tira al azar, el normal patea a los ángulos sin repetirse y
+a veces se tira al lado que más usaste, y el **difícil** anota a dónde pateás y a dónde te tirás (con más peso a lo último) y elige, con
+tablas de chances de gol calculadas con semilla fija, el tiro o la zona que mejor le sale contra tus costumbres (le gana al normal 65 de
+100 y al fácil 87). **Online 1 contra 1** (`server/games/penales.js`): los dos mandan lo suyo a la vez y a ciegas, el servidor sortea el
+error de puntería y la suerte del arquero, resuelve con las mismas reglas y manda el resultado para que los dos lo animen igual; si se
+acaba el tiempo (18 s) elige por el que falta, hay revancha (patea primero el otro) y reconexión con la tanda en curso.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego

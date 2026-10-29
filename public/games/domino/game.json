@@ -1,0 +1,20 @@
+{
+  "id": "domino",
+  "title": { "es": "Dominó", "en": "Dominoes" },
+  "description": {
+    "es": "El doble seis de toda la vida: pegá tus fichas por los números iguales, robá del pozo y quedate sin fichas para hacer dominó. Contra la compu en tres niveles (la difícil adivina qué fichas te quedan), de a dos, tres o en parejas, online de 2 a 4 y un dominó del día con las mismas fichas para todos.",
+    "en": "The classic double-six game: match the open ends, draw from the boneyard and go out first for a domino. Against the computer on three levels (the hard one works out which tiles you are holding), 2, 3 or in pairs, online for 2 to 4 and a daily game with the same tiles for everyone."
+  },
+  "categories": ["clasicos", "casual", "online", "multijugador", "diarios"],
+  "tags": ["domino", "dominó", "fichas", "tiles", "dominoes", "doble seis", "double six", "tranque", "pozo", "parejas", "mesa", "board", "bar", "cafe", "diario", "daily", "2 a 4 jugadores"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "dom + svg + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["keyboard", "mouse", "touch", "gamepad"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 4, "cpu": true, "story": false, "daily": true },
+  "daily": { "epoch": "2026-10-29" },
+  "order": 63
+}

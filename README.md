@@ -797,6 +797,27 @@ error en tableros chicos. Hay pista, deshacer, partida guardada para **Continuar
 cada lado tiene 40 s o se anula, hay rendición, revancha con los colores cambiados, partida rápida por salas públicas y
 reconexión con la partida en curso.
 
+### Dominó (doble seis)
+
+El dominó de las 28 fichas (`public/games/domino/`) sobre un paño verde con borde de madera: las fichas son de marfil con los puntos de
+colores (cada número tiene el suyo, para leer la mesa de un vistazo) y la mano queda parada en un atril. Cada uno recibe 7; se juega por
+las dos puntas de la cadena, los dobles van cruzados, y si no hay con qué jugar se **roba del pozo** (de a 2 y de a 3, o se juega "sin
+robar" y se pasa) o se pasa. La primera ronda abre el doble más alto con ese doble, después sale el que ganó. La ronda la gana quien se
+queda sin fichas (dominó) o, si se **tranca** el juego, quien tiene menos puntos en la mano (en parejas se suman los dos compañeros), y
+se lleva lo que suman las fichas rivales, hasta 50, 100 o 150. Las reglas (`shared/rules.js`) son puras; la mesa (`shared/table.js`:
+reparto, robo, pasadas automáticas, tranque, puntos, tiempo por jugada, ausentes) corre igual en el navegador y en el servidor, que le
+manda a cada jugador solo sus fichas. El tablero (`shared/layout.js`) acomoda la cadena en "serpiente": cada brazo corre derecho hasta
+el borde y vuelve por la fila de al lado (el derecho baja y el izquierdo sube, así nunca se pisan), con el borde elegido para que las
+fichas queden lo más grandes posible en la pantalla que haya y todo se desliza al achicarse. Se juega tocando una ficha (se marcan los
+lugares donde entra: el número de la punta) y tocando de nuevo la ficha, el lugar o el botón; con teclado, flechas, `L`/`R` para el
+lado, `Enter`, `D` para robar y `H` para la pista. La compu (`shared/bot.js`) tiene tres niveles: el fácil juega cualquier ficha, el
+normal se saca de encima las pesadas y las que le cortan el juego, y el **difícil** reparte al azar las fichas que no ve entre los
+demás (respetando los números que cada uno ya mostró que no tiene al pasar) y juega cada ronda hasta el final con 90 repartos para
+elegir la jugada que mejor le sale en promedio (le gana al normal entre 76 y 95 de 100). Modos: contra la compu de a 2, 3 o en parejas
+de a 4, **online de 2 a 4** (`server/games/domino.js`: el servidor reparte y valida, entre rondas sigue en cuanto todos tocan
+"Siguiente" y si alguien se desconecta o se le acaba el tiempo dos veces juega la compu por él) y el **dominó del día**, una ronda
+contra Don Mate con las mismas fichas para todos.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego
@@ -841,6 +862,7 @@ cada carpeta de datos tiene su `LEEME.txt` con las fuentes y licencias. Para sum
 | Bloques | Una partida de bloques con las mismas piezas para todos (cada mano sale de la fecha y no depende de cómo juegues) y un solo intento; cuenta el puntaje. | La semilla es la fecha (`bloques-daily-AAAA-MM-DD`) y `bloques/shared/engine.js` da siempre las mismas manos; el resultado y la racha se guardan con `daily.js`. |
 | Fusión | Una partida de 2048 de 4×4 con las mismas fichas nuevas para todos y un solo intento; cuenta el puntaje y la ficha más alta. | La semilla es la fecha (`fusion-daily-AAAA-MM-DD`) y `fusion/shared/engine.js` saca las fichas nuevas siempre iguales; el resultado y la racha se guardan con `daily.js`. |
 | Memotest | 24 cartas (12 pares de la mezcla de temas) con el mismo reparto para todos y un solo intento; cuenta los intentos (estrellas) y el tiempo. | La semilla es la fecha (`memotest-daily-AAAA-MM-DD`) y `memotest/shared/deck.js` reparte siempre igual; el resultado y la racha se guardan con `daily.js`, y la partida en curso queda guardada si se recarga. |
+| Dominó | Una ronda de dominó de a dos contra Don Mate (nivel difícil) con las mismas fichas para todos (el reparto sale de la fecha); cuenta si ganaste y por cuánto. | El reparto de la ronda y la suerte de la compu salen de la semilla del día (`daily.js`) en `domino/game.js`; la mesa es la misma que la de las partidas normales. |
 
 El texto para compartir de cada uno es `game.it · <Juego> #N …` con cuadraditos de colores y el link; en modo práctica no se
 suma nada a las estadísticas. Las listas de respuestas y de puzzles se pueden ampliar sin tocar el código (los desafíos

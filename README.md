@@ -836,6 +836,91 @@ tablas de chances de gol calculadas con semilla fija, el tiro o la zona que mejo
 error de puntería y la suerte del arquero, resuelve con las mismas reglas y manda el resultado para que los dos lo animen igual; si se
 acaba el tiempo (18 s) elige por el que falta, hay revancha (patea primero el otro) y reconexión con la tanda en curso.
 
+### Chorrito (tubos de colores)
+
+Un clásico de ordenar líquidos (`public/games/chorrito/`) dibujado en un canvas 2D: tubos de vidrio con capas de colores (entran 4 como mucho),
+tocás uno para levantarlo y otro para **trasvasar la tanda de arriba** (todas las capas seguidas del mismo color) si el destino está vacío o
+tiene ese color arriba, hasta donde haya lugar; gana quien deja cada tubo vacío o lleno de un solo color. Al verter, el tubo viaja hasta la
+boca del otro y se inclina justo lo que hace falta para que el líquido llegue al borde (el ángulo sale de calcular el área del interior del
+tubo bajo la superficie horizontal, así el nivel queda siempre parejo y la superficie baja de verdad mientras sale el chorro). El motor
+(`shared/engine.js`) es puro: reglas, generador y un **resolvedor** A* con peso (los niveles se arman con una semilla y solo se aceptan si el
+resolvedor los resuelve, así que todos tienen solución; el largo de esa solución es el "par" de las estrellas y sirve de pista, que muestra
+el próximo trasvase). Los niveles suben de 3 a 12 colores (uno más cada dos niveles, con dos tubos vacíos y, de a ratos desde el 25, solo
+uno), con deshacer, reiniciar y un tubo extra por nivel; hay símbolos en los colores para quien no los distingue bien y el progreso guarda
+las estrellas por nivel. El **chorrito del día** es el mismo para todos (10 colores, semilla `chorrito-daily-AAAA-MM-DD`), cuenta los
+trasvases (estrellas contra el par), guarda la partida en curso y se comparte como los demás. **Online** (`server/games/chorrito.js`, de 1 a 6
+con la base de carreras): todos reciben el mismo nivel (semilla y cantidad de colores de 6, 8, 10 o 12 las pone el servidor), van mandando
+cuánto llevan ordenado (`engine.settled`: de cada color, su tanda más larga desde el fondo) y el primero que lo resuelve gana. Para dar por
+terminado a alguien el servidor **rehace uno por uno los trasvases** que mandó sobre el mismo nivel y exige que lo dejen resuelto; el tiempo
+lo mide el servidor (con un piso de 0,3 s por trasvase) y no se acepta nada antes de la largada. Si el último que falta pierde la conexión
+(recarga la página) se lo espera 20 s (`rejoinMs` de `_race.js`, apagado por defecto) antes de cerrar la carrera.
+
+### Cocina (base común): Pizzería, Heladería y Hamburguesería
+
+Juegos de atender un local con estaciones, todos sobre un armazón común (`public/shared/cocina/`). `core.js` (puro) tiene los 48
+vecinos con su cara armada con semilla, quién viene cada día (los nuevos se suman de a uno o dos y los habituales vuelven), la espera
+razonable de cada pedido, la propina (crece con el puntaje y suma un extra con 100), la experiencia y los rangos, y el guardado.
+`kit.js` tiene las mediciones que comparten las estaciones: una grilla que se pinta para medir cobertura y derrame, lo parejo que
+quedó algo repartido, cuánto se parece una pila al pedido (subsecuencia común más larga) y el punto de cocción. `shell.js` pone lo
+común: el salón donde los clientes entran, hacen fila, piden en el mostrador y esperan sentados; las comandas colgadas arriba; las
+pestañas de las estaciones (con un globito cuando algo está listo); el reloj del día; la entrega con el puntaje de cada estación más
+la espera, la propina y la cara del cliente; el resumen del día, el rango nuevo con lo que se abre, la **tienda** (comunes a los tres:
+sillas para que esperen más tranquilos, frasco de propinas y cartel que trae un cliente más; y mejoras propias de cada local), la
+**libreta de clientes** con el favorito de cada uno, la pausa y el guardado. Se adapta a pantallas horizontales y verticales, y el
+primer día un tutorial va marcando cada paso.
+
+- **Pizzería** (`public/games/pizzeria/`): en el **armado** la salsa y el queso se pintan arrastrando el dedo (cuenta cuánto cubren
+  y cuánto se pasa al borde) y cada ingrediente (12, que se abren por rango) va entero, por mitades o por cuartos, en la cantidad de
+  la comanda y bien repartido; el **horno** tiene un dial por pizza (pasado el punto se quema) y en el **corte** se arrastran cortes
+  que tienen que pasar por el centro y dejar porciones parejas (4, 6 u 8). Mejoras: horno más grande, timbre del horno, cortador
+  con guía y cucharón grande.
+- **Heladería** (`public/games/heladeria/`): se elige el vaso, se ponen las mezclas (10, de frutillas a bocaditos de dulce de leche)
+  y se mantiene apretado el jarabe hasta la línea; en el **licuado** cada vaso tiene su medidor de grueso, normal o suave (pasado el
+  punto se aguachenta); en el **decorado** la crema se mantiene hasta la altura pedida, las salsas se trazan con el dedo, las granas
+  se espolvorean y lo de arriba (cereza, oblea…) va a la izquierda, al medio o a la derecha. Mejoras: licuadora extra, timbre de
+  licuadora, bomba con freno y plantilla de decorado.
+- **Hamburguesería** (`public/games/hamburgueseria/`): en la **parrilla** los medallones se ponen, se dan vuelta tocándolos y se
+  llevan a la bandeja; cada lado se cocina por su cuenta y se puntúa contra el punto pedido (jugosa, a punto o bien cocida). En el
+  **armado** los ingredientes (14) caen desde arriba y se apilan: cuenta el orden de la pila contra la comanda y que cada capa quede
+  centrada sobre el pan. Mejoras: parrilla grande, termómetro con alarma y espátula guía.
+
+Las reglas de cada local están en su `shared/rules.js` (puras) y las pruebas (`tests/cocina.test.mjs` y una por local) comprueban el
+puntaje de cada estación con productos perfectos, flojos y quemados, que los pedidos solo usen lo abierto en el rango y que el plan
+del día traiga solo clientes ya abiertos, en orden y sin repetir.
+
+### Fuego y Agua (plataformas de a dos)
+
+Plataformas cooperativo en un templo (`public/games/fuegoyagua/`): Llama y Gota tienen que llegar cada uno a su puerta. La lava apaga a
+Gota, el agua apaga a Llama y el barro verde, a los dos; hay gemas de cada color, botones que se mantienen apretados, palancas,
+plataformas y compuertas que se mueven y cajas para empujar. La simulación (`shared/sim.js`, pura y de paso fijo 1/120 s) usa
+baldosas con rampas a 45° y es determinista: los 10 niveles (`shared/levels.js`, generados con `tools/fuegoyagua-niveles.py`) tienen
+una solución escrita en `shared/solutions.js` que un piloto automático (`shared/pilot.js`) ejecuta en las pruebas para comprobar que
+cada uno se gana con todas las gemas y dentro del tiempo; el mismo piloto juega la demo de la pantalla de inicio. Cada nivel da una
+nota (A con todas las gemas y a tiempo, B con una de las dos, C sin ninguna) y se guarda la mejor. Con teclado se juega **de a dos**
+en la misma compu (flechas y WASD) y con mandos uno cada uno; en pantallas táctiles hay modo **de a uno** (botón para cambiar de
+personaje) y **de a dos** en el mismo celular o tablet, con los controles de cada uno en su lado. La cámara muestra el nivel entero si
+entra a buen tamaño y, si no, sigue a los dos (o al que se está moviendo).
+
+### Gemas (tres en línea)
+
+Un juego de combinar gemas (`public/games/gemas/`) en un canvas 2D: se intercambian dos vecinas (tocando una y otra, o deslizando) y vale
+si arma una línea de tres o más del mismo color; lo que cae puede armar más líneas (cascadas, cada paso multiplica los puntos). Cuatro en
+línea hacen un **rayo** (borra su fila o su columna), una L o una T una **bomba** (3 × 3) y cinco un **prisma** que, cambiado por una gema,
+se lleva todas las de ese color; dos especiales cambiadas entre sí se combinan (cruz, tres filas y columnas, 5 × 5, todo un color convertido
+en rayos o bombas, todo el tablero). Cada color tiene su forma (rubí hexagonal, ámbar cuadrado, citrino rombo, esmeralda octogonal, zafiro
+redondo y amatista triangular), dibujada con facetas que se iluminan según hacia dónde miran. El motor (`shared/engine.js`) es puro y todo
+el azar sale de una semilla: cada jugada devuelve la lista de lo que pasó (intercambio, limpiezas con sus efectos, caídas, mezcla si no
+quedan jugadas) para animarlo, y una lista de jugadas en texto rehace exactamente la misma partida. La compu (`bestMove`) prueba cada
+jugada sobre una copia **a ciegas** (sin espiar lo que va a caer); da las pistas (sola a los 6 s quieto, o con `H`) y calibra los niveles
+(`shared/levels.js`): hay tres objetivos que se turnan (llegar a un puntaje, **juntar** gemas de dos o tres colores, **romper el hielo** de
+una o dos capas con dibujos simétricos) y las metas, las jugadas y las estrellas salen de jugar cada nivel con la compu cinco veces con
+otras gemas cayendo (percentiles, más exigentes a medida que se avanza; los dibujos de hielo que le cuestan demasiado se alivianan). Al
+cumplir con jugadas de sobra, cada una se vuelve un rayo que explota ("lluvia de rayos"). También hay **contrarreloj** de 90 segundos con
+récord, las **gemas del día** (25 jugadas con las mismas gemas para todos, la partida en curso se guarda y se rehace al volver) y un
+**duelo online** de 1 a 6 (`server/games/gemas.js`, con la base de carreras): mismas gemas y mismas jugadas (20, 30 o 40) para todos, gana
+el que más puntos junta; al terminar cada uno manda sus jugadas y el servidor rehace la partida para contar los puntos (rechaza jugadas
+inválidas, de más o de menos, y partidas imposiblemente rápidas). Si alguien recarga la página en medio del duelo, sigue donde estaba.
+
 ### Julay’s Donas (local de donas)
 
 Atendés el local de donas de Julay (`public/games/julays-donas/`), todo dibujado con canvas 2D (personas, donas, local y texturas, sin
@@ -898,6 +983,8 @@ cada carpeta de datos tiene su `LEEME.txt` con las fuentes y licencias. Para sum
 | Fusión | Una partida de 2048 de 4×4 con las mismas fichas nuevas para todos y un solo intento; cuenta el puntaje y la ficha más alta. | La semilla es la fecha (`fusion-daily-AAAA-MM-DD`) y `fusion/shared/engine.js` saca las fichas nuevas siempre iguales; el resultado y la racha se guardan con `daily.js`. |
 | Memotest | 24 cartas (12 pares de la mezcla de temas) con el mismo reparto para todos y un solo intento; cuenta los intentos (estrellas) y el tiempo. | La semilla es la fecha (`memotest-daily-AAAA-MM-DD`) y `memotest/shared/deck.js` reparte siempre igual; el resultado y la racha se guardan con `daily.js`, y la partida en curso queda guardada si se recarga. |
 | Dominó | Una ronda de dominó de a dos contra Don Mate (nivel difícil) con las mismas fichas para todos (el reparto sale de la fecha); cuenta si ganaste y por cuánto. | El reparto de la ronda y la suerte de la compu salen de la semilla del día (`daily.js`) en `domino/game.js`; la mesa es la misma que la de las partidas normales. |
+| Chorrito | Un nivel de 10 colores con los mismos tubos para todos; cuenta los trasvases (estrellas contra lo que encuentra el resolvedor). | La semilla es la fecha (`chorrito-daily-AAAA-MM-DD`) y `chorrito/shared/engine.js` arma siempre el mismo nivel y comprueba que tiene solución; el resultado y la racha se guardan con `daily.js`, y la partida en curso queda guardada si se recarga. |
+| Gemas | 25 jugadas con las mismas gemas para todos (las que caen salen de la fecha y de las jugadas); cuenta el puntaje y las estrellas según lo que consigue la compu con ese mismo tablero. | La semilla es la fecha (`gemas-daily-AAAA-MM-DD`) y `gemas/shared/engine.js` rehace la partida guardada si se recarga; el resultado y la racha se guardan con `daily.js`. |
 
 El texto para compartir de cada uno es `game.it · <Juego> #N …` con cuadraditos de colores y el link; en modo práctica no se
 suma nada a las estadísticas. Las listas de respuestas y de puzzles se pueden ampliar sin tocar el código (los desafíos

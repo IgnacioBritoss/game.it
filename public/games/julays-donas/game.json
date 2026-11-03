@@ -15,5 +15,5 @@
   "orientation": "landscape",
   "input": ["mouse", "touch", "keyboard"],
   "features": { "online": false, "multiplayer": false, "story": true, "save": true },
-  "order": 65
+  "order": 71
 }

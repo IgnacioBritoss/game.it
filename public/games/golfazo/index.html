@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Golfazo · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+
+    <!-- HUD de juego -->
+    <div class="hud" id="hud" hidden>
+      <div class="hud-top">
+        <div class="pill hole-pill"><b id="h-num">1</b><div><span id="h-name"></span><small id="h-par"></small></div></div>
+        <div class="pill stroke-pill"><small data-t="strokes"></small><b id="h-strokes">0</b></div>
+        <div class="pill timer-pill" id="h-timer" hidden><small data-t="time"></small><b id="h-time">0</b></div>
+        <button class="round" id="b-pause" aria-label="pausa"><i></i><i></i></button>
+      </div>
+      <div class="players" id="h-players"></div>
+      <div class="turn" id="h-turn"></div>
+      <div class="cam-btns" id="cam-btns">
+        <button class="round sm" id="b-rotl" aria-label="rotar izquierda">⟲</button>
+        <button class="round sm" id="b-rotr" aria-label="rotar derecha">⟳</button>
+        <button class="round sm" id="b-over" aria-label="vista general"><svg viewBox="0 0 24 24"><path d="M4 7l5-2 6 2 5-2v12l-5 2-6-2-5 2z M9 5v12 M15 7v12" /></svg></button>
+        <button class="round sm" id="b-center" aria-label="centrar cámara"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5" /><path d="M12 3v4M12 17v4M3 12h4M17 12h4" /></svg></button>
+      </div>
+      <div class="power" id="power"><div class="tube"><i id="power-fill"></i></div><b id="power-v">0</b></div>
+      <div class="hint" id="hint"></div>
+      <div class="banner" id="banner"><b></b><small></small></div>
+      <div class="count" id="count"></div>
+    </div>
+
+    <!-- pantallas -->
+    <div class="screens" id="screens">
+      <section class="screen on" id="s-home">
+        <div class="card home">
+          <div class="logo" aria-label="Golfazo">
+            <span style="--c:#ff5a5f">G</span><span style="--c:#ffc93c">o</span><span style="--c:#7bd389">l</span><span style="--c:#3ec1ff">f</span><span style="--c:#c77dff">a</span><span style="--c:#ff9f43">z</span><span style="--c:#f15bb5">o</span>
+          </div>
+          <p class="sub" data-t="tagline"></p>
+          <button class="btn sun" id="h-solo"><b data-t="solo"></b><small data-t="soloSub"></small></button>
+          <button class="btn mint" id="h-local"><b data-t="local"></b><small data-t="localSub"></small></button>
+          <button class="btn coral" id="h-online"><b data-t="online"></b><small data-t="onlineSub"></small></button>
+          <div class="row">
+            <button class="link" id="h-how" data-t="how"></button>
+            <button class="link" id="h-opts" data-t="options"></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-worlds">
+        <div class="card wide">
+          <button class="back" data-go="home" aria-label="volver">←</button>
+          <h2 data-t="pickWorld"></h2>
+          <div class="worlds" id="worlds"></div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-holes">
+        <div class="card wide">
+          <button class="back" data-go="worlds" aria-label="volver">←</button>
+          <h2 id="holes-title"></h2>
+          <p class="sub" id="holes-blurb"></p>
+          <button class="btn sun" id="holes-play"><b data-t="playCourse"></b><small id="holes-play-sub"></small></button>
+          <p class="lbl" data-t="orOneHole"></p>
+          <div class="hole-grid" id="hole-grid"></div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-local">
+        <div class="card">
+          <button class="back" data-go="home" aria-label="volver">←</button>
+          <h2 data-t="local"></h2>
+          <p class="lbl" data-t="players"></p>
+          <div class="seg" id="seg-count"><button data-v="2" class="on">2</button><button data-v="3">3</button><button data-v="4">4</button></div>
+          <div class="names" id="local-names"></div>
+          <p class="lbl" data-t="course"></p>
+          <div class="chips" id="local-course"></div>
+          <button class="btn sun" id="local-start"><b data-t="play"></b></button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-online">
+        <div class="card">
+          <button class="back" data-go="home" aria-label="volver">←</button>
+          <h2 data-t="online"></h2>
+          <p class="sub" data-t="onlineLong"></p>
+          <label class="lbl" for="on-name" data-t="yourName"></label>
+          <input class="field" id="on-name" maxlength="16" autocomplete="off" spellcheck="false" />
+          <button class="btn sun" id="on-quick"><b data-t="quick"></b><small data-t="quickSub"></small></button>
+          <button class="btn coral" id="on-create"><b data-t="create"></b><small data-t="createSub"></small></button>
+          <div class="join">
+            <input class="field code" id="on-code" maxlength="5" autocomplete="off" spellcheck="false" placeholder="ABCDE" aria-label="código" />
+            <button class="btn mint" id="on-join"><b data-t="join"></b></button>
+          </div>
+          <p class="status" id="on-status"></p>
+        </div>
+      </section>
+
+      <section class="screen" id="s-lobby">
+        <div class="card">
+          <p class="kicker" data-t="room"></p>
+          <button class="code-big" id="lobby-code">-----</button>
+          <p class="hint2" data-t="tapToCopy"></p>
+          <ul class="plist" id="lobby-players"></ul>
+          <div id="lobby-host">
+            <p class="lbl" data-t="course"></p>
+            <div class="chips" id="lobby-course"></div>
+            <p class="lbl" data-t="holeTime"></p>
+            <div class="seg" id="lobby-time"><button data-v="60">60 s</button><button data-v="90" class="on">90 s</button><button data-v="120">120 s</button></div>
+            <label class="check"><input type="checkbox" id="lobby-public" /><span data-t="publicRoom"></span></label>
+            <button class="btn sun" id="lobby-start"><b data-t="start"></b></button>
+          </div>
+          <p class="status" id="lobby-wait" data-t="waitHost"></p>
+          <button class="link" id="lobby-leave" data-t="leave"></button>
+        </div>
+      </section>
+
+      <section class="screen dim" id="s-result">
+        <div class="card">
+          <p class="kicker" id="res-kicker"></p>
+          <h2 id="res-title"></h2>
+          <div class="big" id="res-big"></div>
+          <div class="stars" id="res-stars"></div>
+          <ol class="rank" id="res-rank"></ol>
+          <button class="btn sun" id="res-next"><b data-t="next"></b></button>
+          <p class="status" id="res-wait"></p>
+        </div>
+      </section>
+
+      <section class="screen dim" id="s-final">
+        <div class="card wide">
+          <p class="kicker" id="fin-kicker"></p>
+          <h2 id="fin-title"></h2>
+          <div class="podium" id="fin-podium"></div>
+          <div class="table-wrap"><table class="score" id="fin-table"></table></div>
+          <button class="btn sun" id="fin-again"><b data-t="again"></b></button>
+          <button class="btn ghost" id="fin-menu"><b data-t="menu"></b></button>
+        </div>
+      </section>
+
+      <section class="screen dim" id="s-pause">
+        <div class="card">
+          <h2 data-t="paused"></h2>
+          <button class="btn sun" id="p-resume"><b data-t="resume"></b></button>
+          <button class="btn mint" id="p-restart"><b data-t="restart"></b><small data-t="restartSub"></small></button>
+          <button class="btn ghost" id="p-card"><b data-t="scorecard"></b></button>
+          <div class="opts">
+            <p class="lbl" data-t="guide"></p>
+            <div class="seg" id="seg-guide"><button data-v="0" data-t="gOff"></button><button data-v="1" data-t="gShort"></button><button data-v="2" data-t="gLong"></button></div>
+          </div>
+          <button class="link" id="p-quit" data-t="quit"></button>
+        </div>
+      </section>
+
+      <section class="screen dim" id="s-how">
+        <div class="card">
+          <h2 data-t="how"></h2>
+          <ol class="how" id="how"></ol>
+          <button class="btn sun" id="how-ok"><b data-t="gotIt"></b></button>
+        </div>
+      </section>
+
+      <section class="screen dim" id="s-opts">
+        <div class="card">
+          <h2 data-t="options"></h2>
+          <p class="lbl" data-t="guide"></p>
+          <div class="seg" id="opt-guide"><button data-v="0" data-t="gOff"></button><button data-v="1" data-t="gShort"></button><button data-v="2" data-t="gLong"></button></div>
+          <p class="lbl" data-t="quality"></p>
+          <div class="seg" id="opt-quality"><button data-v="low" data-t="qLow"></button><button data-v="medium" data-t="qMid"></button><button data-v="high" data-t="qHigh"></button></div>
+          <button class="btn sun" id="opts-ok"><b data-t="gotIt"></b></button>
+        </div>
+      </section>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

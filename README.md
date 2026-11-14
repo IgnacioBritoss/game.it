@@ -33,7 +33,7 @@ Hay una plantilla lista en [`templates/juego-base/`](templates/juego-base/) y `n
 
 **Publicado en Render** (cada push a `main` se despliega solo):
 - Web: https://game-it-63r9.onrender.com (sitio estático: `npm ci && npm run build` → `dist/`)
-- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral, Cruce, Micelio, Bolos y Vuelo): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
+- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral, Cruce, Micelio, Bolos, Vuelo y Golfazo): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
   Variables: `ALLOWED_ORIGINS` (orígenes permitidos, separados por coma). La IP de cada cliente (para los límites por IP) se detecta sola cuando hay un proxy delante (solo se confía en los encabezados si quien se conecta por TCP es una dirección interna); se puede fijar con `CLIENT_IP_HEADER` (p. ej. `cf-connecting-ip`) o `TRUST_PROXY_HOPS` (cuántos proxies agregan una entrada a `X-Forwarded-For`, contando desde la derecha). `MAX_RT_ROOMS` (4 por defecto) es el tope de salas en tiempo real a la vez (Ameba, Serpentina, Clashball, Pádel y las arenas nuevas): el servidor gratis de Render tiene 0,1 CPU; al llegar al tope, crear otra devuelve `server_full_rt`. `/health` informa `rt: { rooms, max, avgTickMs }`. Límites ajustables en `server/index.js` (`CFG`).
 - En desarrollo: `npm run server` levanta el servidor local en `ws://localhost:8787`, que los juegos online usan automáticamente.
 
@@ -938,6 +938,35 @@ animada (`pelicula.js`), hay tres dificultades (fácil, medio y difícil) y mús
 el mostrador, los retratos y las donas ya hechas) se dibuja una vez y se guarda, para mantener 60 fps; la partida se guarda en
 `localStorage` al terminar cada día.
 
+### Golfazo (mini golf 3D estilo cartoon)
+
+Mini golf en three.js (`public/games/golfazo/`) con **4 mundos de 6 hoyos** —Pradera, Bahía Coral, Glaciar y Volcán— llenos de obstáculos: molinos,
+martillos, barras giratorias, compuertas, cangrejos, balsas que llevan la pelota, cintas, platos giratorios, aceleradores, resortes, tubos y cañones,
+rulos, lomas, rampas con salto, hielo, arena, agua y lava (que suman un golpe y te devuelven atrás). Se arrastra hacia atrás (honda) y se suelta; dos
+dedos o clic derecho giran la cámara, pellizco o rueda hacen zoom, y con teclado ← → apuntan, ↑ ↓ dan fuerza, espacio pega y Q E giran. Hay guía de
+trayectoria (apagada, corta o larga), vista general del hoyo y estrellas por hoyo (par o mejor = 2, birdie = 3, hasta par + 2 = 1).
+
+- **Física** (`shared/physics.js`): paso fijo de 1/120 s con subpasos, solo `+ − × ÷ √` y la trigonometría propia de `shared/dmath.js` (polinomios), así que
+  es **determinista bit a bit** en cualquier navegador y en Node. La pelota choca con triángulos de piso (normales suaves en lomas y rulos), cajas
+  orientadas (barandas en cadena con normales que giran en las juntas), cilindros y aristas de cornisa; los obstáculos que se mueven son una función pura del
+  tiempo del hoyo (`pose(m, t)`), la pelota que se apoya en uno viaja con él, y el hoyo se resuelve de forma analítica (borde, pared y fondo).
+- **Hoyos** (`shared/build.js` + `shared/holes.js`): cada hoyo es una receta de una "tortuga" (`lane`, `arc`, `disc`, `loop`, `gap`, `windmill`, `slider`,
+  `portal`…); las barandas se generan solas en todo el contorno y se abren donde la cancha continúa. `tools/golfazo-solve.mjs` busca golpes que embocan
+  cada hoyo (muestreo con semilla + haz de los mejores estados) y guarda las soluciones de prueba en `shared/solutions.js`.
+- **Escena** (`scene.js`, `models.js`, `geo.js`, `themes.js`): toon shading con color por vértice, piso con texturas pintadas en canvas, sombras, cielo, mar o lava
+  animados, adornos de cada mundo, partículas, cámara que sigue el camino del hoyo y vuela por él al empezar. Los obstáculos se dibujan con las mismas cajas
+  que usa la física, así que lo que se ve es lo que choca.
+- **Modos**: *Un jugador* (los 4 mundos, la *Gira* de 8 hoyos o los 24 seguidos; récord y estrellas en `gameit:golfazo:*`), *Con amigos* (de 2 a 4 por turnos
+  en el mismo aparato, empieza el que mejor anotó el hoyo anterior) y **Online de 1 a 8 a la vez** (`server/games/golfazo.js`).
+- **Online**: como en Golf It, todos juegan al mismo tiempo, cada uno con su pelota, y se ven las de los demás. El cliente simula al instante y manda solo el
+  golpe `{ a: ángulo 0..65535, p: fuerza 1..1000, k: tick del reloj del hoyo }`; el servidor lo repite con la misma física, decide los golpes y si embocó
+  (rechaza ticks del futuro, pelota en movimiento o golpes de más con `reject`) y manda a todos la lista de golpes de cada jugador, que los demás repiten para
+  animar su pelota. El reloj del hoyo arranca a la vez para todos (`startAt`); hay tiempo por hoyo (60, 90 o 120 s), cuando el primero emboca a los demás
+  les quedan 25 s, quien no termina suma 10 golpes y gana el que menos suma (desempata el tick en que embocó). Salas públicas (Partida rápida) o privadas con
+  código, link para compartir, revancha y reconexión (al volver se repiten los golpes y se pone al día).
+
+Pruebas en `tests/golfazo.test.mjs` (física, los 24 hoyos con su solución, reglas, partida online contra el servidor y una partida completa de 6 hoyos con reloj falso).
+
 ### Terco (plataformas de trampas)
 
 Plataformas de trampas de un solo golpe (`public/games/terco/`), de una sola jugadora: una mulita sube el cerro, patea piedritas y
@@ -962,6 +991,7 @@ adelantado y vence a cada jefe; `node tools/terco/walk.mjs` los junta en un reco
 zanahorias, que se guarda en `tests/fixtures/terco-walk.json` y que `npm test` reproduce paso a paso (`node tools/terco/check-rooms.mjs`
 revisa además que las salidas de cada pantalla coincidan con las de la de al lado). Si se cambia una pantalla o un jefe hay que volver
 a armar el recorrido.
+
 
 ## Juegos diarios
 

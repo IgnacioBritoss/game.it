@@ -816,6 +816,10 @@ window.__terco = {
   S,
   game: () => G,
   begin,
+  step(inp) {
+    stepGame(G, inp);
+    handle();
+  },
   tp(room, spawn = 'start') {
     import('./shared/world.js').then((w) => {
       w.enter(G, room, spawn);

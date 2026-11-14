@@ -88,6 +88,12 @@ export function createRace(opts) {
   });
   R.order = R.karts.slice();
   rank(R);
+  if (opts.noCount) {
+    // sin cuenta regresiva: ya están corriendo (la carrera de fondo del menú)
+    R.t = 0;
+    R.started = true;
+    for (const k of R.karts) k.frozen = false;
+  }
   return R;
 }
 
@@ -353,6 +359,11 @@ export function stepRace(R, inputs = []) {
     R.endT += dt;
     if (ks.every((k) => k.finished) || R.endT > (R.mode === 'trial' ? 0.1 : 9)) close(R);
   }
+}
+
+/** Termina la carrera ya mismo (cuando los jugadores llegaron y no se espera más a los demás). */
+export function endRace(R) {
+  if (!R.over) close(R);
 }
 
 /** Puntos de copa por puesto. */

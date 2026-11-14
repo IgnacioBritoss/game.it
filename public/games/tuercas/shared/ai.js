@@ -31,11 +31,16 @@ export function makeBrain(rand, skill = 0.8) {
   };
 }
 
+/** Hasta dónde se puede ir a cada lado de la muestra i (con más aire donde el borde es un vacío). */
+function room(T, i) {
+  return [-(T.hw[i] - (T.eR[i] === 1 ? 3.7 : 1.7)), T.hw[i] - (T.eL[i] === 1 ? 3.7 : 1.7)];
+}
+
 /** Rumbo hacia un punto de la pista `look` metros adelante con desvío `d`. Devuelve el error de rumbo (+ = izquierda). */
 function aim(k, T, look, d) {
   const i = (k.ti + Math.max(1, Math.round(look / T.step))) % T.n;
-  const lim = T.hw[i] - 1.7;
-  const dd = clamp(d, -lim, lim);
+  const [lo, hi] = room(T, i);
+  const dd = clamp(d, lo, hi);
   const tx = T.x[i] + T.nx[i] * dd;
   const tz = T.z[i] + T.nz[i] * dd;
   return wrapAngle(Math.atan2(tx - k.x, tz - k.z) - k.yaw);
@@ -132,10 +137,10 @@ export function think(k, T, R, out) {
     hazD = e._d;
     hazR = e.r;
   }
+  const [rLo, rHi] = room(T, iL);
   if (k.invT <= 0 && hazS < 1e9 && Math.abs(hazD - want) < hazR + 1.9) {
-    const room = hw - 1.7;
     let side = want >= hazD ? 1 : -1;
-    if (hazD + side * (hazR + 2.1) > room || hazD + side * (hazR + 2.1) < -room) side = -side;
+    if (hazD + side * (hazR + 2.1) > rHi || hazD + side * (hazR + 2.1) < rLo) side = -side;
     want = hazD + side * (hazR + 2.1);
   }
   // el de adelante va más lento: lo paso por el costado con más lugar
@@ -147,8 +152,7 @@ export function think(k, T, R, out) {
       break;
     }
   }
-  const lim = hw - 1.7;
-  want = clamp(want, -lim, lim);
+  want = clamp(want, rLo, rHi);
   B.want += (want - B.want) * Math.min(1, dt * 3.5);
   const err = aim(k, T, look, B.want);
 

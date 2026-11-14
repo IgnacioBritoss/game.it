@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Tuercas · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="gl"></canvas>
+    <div id="hud" class="hud"></div>
+    <div id="count" class="count" aria-live="assertive"></div>
+    <div id="flash" class="flash"></div>
+    <div id="vign" class="vign"></div>
+    <button id="b-pause" class="pause-btn" aria-label="pausa" hidden><i></i><i></i></button>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="home">
+        <div class="logo">
+          <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l24 13.5v29L32 60 8 46.5v-29z" fill="#ffc93a" stroke="#2b1b3d" stroke-width="4" stroke-linejoin="round"/><circle cx="32" cy="32" r="10" fill="#7a4a28" stroke="#2b1b3d" stroke-width="4"/><path d="M14 22l6 3M50 22l-6 3" stroke="#fff3c4" stroke-width="3" stroke-linecap="round"/></svg>
+          <h1><span>T</span><span>U</span><span>E</span><span>R</span><span>C</span><span>A</span><span>S</span></h1>
+        </div>
+        <p class="tag" data-t="tagline"></p>
+        <div class="menu">
+          <button class="btn sun" id="m-cup"><span data-t="mCup"></span><small data-t="mCupSub"></small></button>
+          <div class="row2">
+            <button class="btn ice" id="m-free"><span data-t="mFree"></span><small data-t="mFreeSub"></small></button>
+            <button class="btn lime" id="m-trial"><span data-t="mTrial"></span><small data-t="mTrialSub"></small></button>
+          </div>
+          <div class="row2">
+            <button class="btn grape" id="m-garage"><span data-t="mGarage"></span><small data-t="mGarageSub"></small></button>
+            <button class="btn berry" id="m-two"><span data-t="mTwo"></span><small data-t="mTwoSub"></small></button>
+          </div>
+          <button class="link" id="m-help" data-t="help"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- elegir copa o pista -->
+    <section class="screen" id="s-select">
+      <div class="panel wide">
+        <p class="kicker" id="sel-kicker"></p>
+        <h2 id="sel-title"></h2>
+        <div class="cards" id="sel-cards"></div>
+        <div class="info" id="sel-info"></div>
+        <div class="opt-row">
+          <div class="opt-group" id="sel-cls-g"><span class="lbl" data-t="cls"></span><div class="seg" id="sel-cls"></div></div>
+          <div class="opt-group" id="sel-laps-g"><span class="lbl" data-t="laps"></span><div class="seg" id="sel-laps"></div></div>
+        </div>
+        <button class="btn sun go" id="sel-go"><span data-t="go"></span></button>
+        <button class="link" id="sel-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- taller -->
+    <section class="screen garage" id="s-garage">
+      <div class="g-view" id="g-view"><div class="g-hint" data-t="dragHint"></div></div>
+      <div class="g-panel">
+        <div class="g-top">
+          <div class="g-players" id="g-players" hidden><button data-p="0" class="on"><span data-t="player1"></span></button><button data-p="1"><span data-t="player2"></span></button></div>
+          <div class="g-tabs" id="g-tabs"></div>
+          <div class="opts" id="g-opts"></div>
+          <div class="g-desc" id="g-desc"></div>
+        </div>
+        <div class="g-bottom">
+          <div class="g-stats" id="g-stats"></div>
+          <div class="g-btns">
+            <button class="btn ghost small" id="g-random"><span data-t="random"></span></button>
+            <button class="btn ghost small" id="g-reset"><span data-t="resetTune"></span></button>
+            <button class="btn sun" id="g-done"><span data-t="done"></span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- cómo se juega -->
+    <section class="screen" id="s-help">
+      <div class="panel wide help">
+        <h2 data-t="help"></h2>
+        <div class="help-grid" id="help-body"></div>
+        <button class="btn sun" id="help-ok"><span data-t="gotIt"></span></button>
+      </div>
+    </section>
+
+    <!-- pausa -->
+    <section class="screen dim" id="s-pause">
+      <div class="panel">
+        <h2 data-t="paused"></h2>
+        <button class="btn sun" id="p-resume"><span data-t="resume"></span></button>
+        <button class="btn ice" id="p-restart"><span data-t="restart"></span></button>
+        <button class="btn ghost" id="p-help"><span data-t="help"></span></button>
+        <button class="link" id="p-quit" data-t="quit"></button>
+      </div>
+    </section>
+
+    <!-- resultados -->
+    <section class="screen" id="s-results">
+      <div class="panel wide">
+        <p class="kicker" id="res-kicker"></p>
+        <h2 id="res-title"></h2>
+        <div class="podium" id="res-podium" hidden></div>
+        <ol class="table" id="res-table"></ol>
+        <p class="note" id="res-note"></p>
+        <div class="btns" id="res-btns"></div>
+      </div>
+    </section>
+
+    <!-- sin WebGL -->
+    <section class="screen" id="s-nogl">
+      <div class="panel"><h2 data-t="noGlTitle"></h2><p class="note" data-t="noGl"></p><button class="btn sun" id="nogl-exit"><span data-t="back"></span></button></div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

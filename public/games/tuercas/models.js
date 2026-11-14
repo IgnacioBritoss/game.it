@@ -24,7 +24,7 @@ const vec3 = (a, d = 0) => (Array.isArray(a) ? a : a === undefined ? [d, d, d] :
 /** Caja con bordes redondeados y normales suaves. `round` = 1 (chaflán) o 2 (más redonda). */
 export function rboxGeo(w, h, d, r, round = 1) {
   r = Math.min(r, w / 2 - 1e-3, h / 2 - 1e-3, d / 2 - 1e-3);
-  const seg = round > 1 ? 6 : 4;
+  const seg = round > 1 ? 5 : 4;
   const g = new THREE.BoxGeometry(2, 2, 2, seg, seg, seg);
   const pos = g.attributes.position;
   const nor = g.attributes.normal;
@@ -33,7 +33,7 @@ export function rboxGeo(w, h, d, r, round = 1) {
   const map = (t, hf) => {
     const a = Math.abs(t);
     const sg = Math.sign(t);
-    if (round > 1) return sg * (a > 0.9 ? hf : a > 0.6 ? hf - r * 0.5 : a > 0.3 ? hf - r : 0);
+    if (round > 1) return sg * (a > 0.9 ? hf : a > 0.5 ? hf - r * 0.45 : hf - r);
     return sg * (a > 0.75 ? hf : a > 0.25 ? hf - r : 0);
   };
   for (let i = 0; i < pos.count; i++) {
@@ -148,11 +148,11 @@ export class Builder {
     return this.add(rboxGeo(w, h, d, r, o.round || 1), color, o);
   }
   sphere(r, color, o = {}) {
-    return this.add(new THREE.SphereGeometry(r, o.seg || 12, o.rings || 8), color, o);
+    return this.add(new THREE.SphereGeometry(r, o.seg || 10, o.rings || 6), color, o);
   }
   /** Media esfera (la de arriba). */
   dome(r, color, o = {}) {
-    return this.add(new THREE.SphereGeometry(r, o.seg || 12, o.rings || 5, 0, Math.PI * 2, 0, Math.PI / 2), color, o);
+    return this.add(new THREE.SphereGeometry(r, o.seg || 10, o.rings || 4, 0, Math.PI * 2, 0, Math.PI / 2), color, o);
   }
   cyl(rTop, rBot, h, color, o = {}) {
     return this.add(new THREE.CylinderGeometry(rTop, rBot, h, o.seg || 12, 1, !!o.open), color, o);
@@ -161,7 +161,7 @@ export class Builder {
     return this.add(new THREE.ConeGeometry(r, h, o.seg || 10, 1), color, o);
   }
   capsule(r, len, color, o = {}) {
-    return this.add(new THREE.CapsuleGeometry(r, len, 3, o.seg || 10), color, o);
+    return this.add(new THREE.CapsuleGeometry(r, len, 2, o.seg || 8), color, o);
   }
   torus(R, r, color, o = {}) {
     return this.add(new THREE.TorusGeometry(R, r, o.tube || 6, o.seg || 14, o.arc || Math.PI * 2), color, o);
@@ -223,6 +223,18 @@ export class Builder {
 }
 
 // ---------------------------------------------------------------- materiales
+/** Le da a una geometría con aristas vivas (una caja) normales de contorno radiales, para que el borde no se abra. */
+export function radialOutline(geo) {
+  const p = geo.attributes.position;
+  const on = new Float32Array(p.count * 3);
+  for (let i = 0; i < p.count; i++) {
+    _v.fromBufferAttribute(p, i).normalize();
+    on.set([_v.x, _v.y, _v.z], i * 3);
+  }
+  geo.setAttribute('onormal', new THREE.BufferAttribute(on, 3));
+  return geo;
+}
+
 let gradient = null;
 function gradientMap() {
   if (gradient) return gradient;

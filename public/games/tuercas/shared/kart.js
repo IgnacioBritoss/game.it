@@ -44,7 +44,7 @@ export function makeKart(index, cfg, P) {
     // empujes
     boostT: 0, boostK: 1, boostHard: false, boostKind: '', padT: 0, draft: false, draftT: 0, pace: 1, top: 0, wheelie: false, wheelT: 0,
     // percances
-    spinT: 0, tumbleT: 0, safeT: 0, fallT: 0, stallT: 0, wallT: 0, frozen: false,
+    spinT: 0, spinMax: 1, tumbleT: 0, safeT: 0, fallT: 0, stallT: 0, wallT: 0, frozen: false,
     // ítems
     item: null, itemN: 0, rollT: 0, rollItem: null, shieldT: 0, invT: 0, towT: 0, towTarget: -1, autoT: 0, itemPrev: false,
     nuts: 0,
@@ -136,6 +136,7 @@ export function hitKart(k, kind, ev, by = -1) {
     k.spinT = 1.15;
     k.v *= 0.45;
   }
+  k.spinMax = k.spinT;
   const lost = Math.min(k.nuts, kind === 'big' ? 3 : kind === 'slip' ? 1 : 2);
   k.nuts -= lost;
   k.safeT = (kind === 'big' ? 1.5 : k.spinT) + 1.1;

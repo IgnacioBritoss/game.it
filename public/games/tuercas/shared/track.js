@@ -399,7 +399,7 @@ export function groundAt(T, i, a, d = 0) {
 }
 
 /** Punto del mundo en la posición `s` de la vuelta con desvío lateral `d`. */
-export function pointAt(T, s, d = 0) {
+export function pointAt(T, s, d = 0, withRamp = true) {
   const n = T.n;
   s = mod(s, T.len);
   const fi = s / T.step;
@@ -414,7 +414,7 @@ export function pointAt(T, s, d = 0) {
   return {
     x: lerp(T.x[i], T.x[j], f) + nx * d,
     z: lerp(T.z[i], T.z[j], f) + nz * d,
-    y: lerp(T.y[i], T.y[j], f) + (T.ramps.length && Math.abs(d) <= T.hw[i] + 0.2 ? rampAt(T, s) : 0),
+    y: lerp(T.y[i], T.y[j], f) + (withRamp && T.ramps.length && Math.abs(d) <= T.hw[i] + 0.2 ? rampAt(T, s) : 0),
     yaw: T.yaw[i] + dy * f,
     i,
   };

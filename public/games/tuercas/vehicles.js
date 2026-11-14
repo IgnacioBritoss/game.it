@@ -236,22 +236,22 @@ function wheelGeo(kind, r, w, c) {
   const hw = w / 2;
   const tire = kind === 'rulemanes' ? METAL : kind === 'tacos' ? '#3b2f2a' : TIRE;
   if (kind === 'globo') {
-    b.torus(r * 0.66, r * 0.36, tire, { r: [0, Math.PI / 2, 0], tube: 8, seg: 16, s: [1, 1, hw / (r * 0.36)] });
+    b.torus(r * 0.66, r * 0.36, tire, { r: [0, Math.PI / 2, 0], tube: 6, seg: 14, s: [1, 1, hw / (r * 0.36)] });
   } else {
-    b.lathe([[r * 0.55, -hw], [r * 0.93, -hw], [r, -hw * 0.6], [r, hw * 0.6], [r * 0.93, hw], [r * 0.55, hw]], tire, { r: [0, 0, Math.PI / 2], seg: 16 });
+    b.lathe([[r * 0.55, -hw], [r * 0.93, -hw], [r, -hw * 0.6], [r, hw * 0.6], [r * 0.93, hw], [r * 0.55, hw]], tire, { r: [0, 0, Math.PI / 2], seg: 14 });
   }
-  if (kind === 'tacos') for (let i = 0; i < 10; i++) b.group({ r: [(i / 10) * Math.PI * 2, 0, 0] }, () => b.box(w * 0.9, r * 0.14, r * 0.2, '#2a211e', { p: [0, r, 0] }));
+  if (kind === 'tacos') for (let i = 0; i < 8; i++) b.group({ r: [(i / 8) * Math.PI * 2, 0, 0] }, () => b.box(w * 0.9, r * 0.14, r * 0.2, '#2a211e', { p: [0, r, 0] }));
   const hubR = kind === 'lisas' ? r * 0.72 : kind === 'globo' ? r * 0.44 : r * 0.6;
   const hub = kind === 'rulemanes' ? DARK : kind === 'lisas' ? METAL : c.accent;
-  b.cyl(hubR, hubR, w * 0.86, hub, { r: [0, 0, Math.PI / 2], seg: 12 });
-  if (kind === 'lisas') b.cyl(hubR * 0.62, hubR * 0.62, w * 0.9, c.paint, { r: [0, 0, Math.PI / 2], seg: 10 });
-  // bulones: se ven girar
+  b.cyl(hubR, hubR, w * 0.86, hub, { r: [0, 0, Math.PI / 2], seg: 10 });
+  if (kind === 'lisas') b.cyl(hubR * 0.62, hubR * 0.62, w * 0.9, c.paint, { r: [0, 0, Math.PI / 2], seg: 8 });
+  // bulones: tres por lado, se ven girar
   const bolt = kind === 'rulemanes' ? METAL : kind === 'lisas' ? WHITE : DARK;
-  for (let i = 0; i < 5; i++) {
-    const a = (i / 5) * Math.PI * 2;
-    b.mirror((s) => b.sphere(r * 0.09, bolt, { p: [s * hw * 0.88, Math.cos(a) * hubR * 0.6, Math.sin(a) * hubR * 0.6], seg: 6, rings: 4 }));
+  for (let i = 0; i < 3; i++) {
+    const a = (i / 3) * Math.PI * 2 + 0.5;
+    b.mirror((s) => b.sphere(r * 0.1, bolt, { p: [s * hw * 0.88, Math.cos(a) * hubR * 0.6, Math.sin(a) * hubR * 0.6], seg: 5, rings: 3 }));
   }
-  b.mirror((s) => b.sphere(r * 0.16, bolt, { p: [s * hw * 0.84, 0, 0], seg: 8, rings: 5, s: [0.6, 1, 1] }));
+  b.mirror((s) => b.sphere(r * 0.16, bolt, { p: [s * hw * 0.84, 0, 0], seg: 6, rings: 4, s: [0.6, 1, 1] }));
   return b.build();
 }
 
@@ -302,11 +302,11 @@ const EXTRA = {
 // ---------------------------------------------------------------- pilotos
 /** Ojo: blanco, pupila mirando al frente y, si se pide, un párpado del color de la piel. */
 function eye(b, x, y, z, r, o = {}) {
-  b.sphere(r, o.white || WHITE, { p: [x, y, z], seg: 10, rings: 7 });
-  b.sphere(r * 0.58, o.iris || BLACK, { p: [x * (o.cross ?? 0.96), y + (o.dy || 0), z + r * 0.62], seg: 8, rings: 6 });
-  if (o.iris) b.sphere(r * 0.3, BLACK, { p: [x * 0.96, y + (o.dy || 0), z + r * 1.0], seg: 6, rings: 4 });
-  b.sphere(r * 0.2, WHITE, { p: [x * 0.96 + r * 0.25, y + r * 0.3, z + r * 1.05], seg: 6, rings: 4 });
-  if (o.lid) b.dome(r * 1.12, o.lid, { p: [x, y + r * 0.1, z], r: [o.tilt ?? -0.5, 0, (x > 0 ? 1 : -1) * (o.slant || 0)], seg: 10, rings: 4 });
+  b.sphere(r, o.white || WHITE, { p: [x, y, z], seg: 8, rings: 6 });
+  b.sphere(r * 0.58, o.iris || BLACK, { p: [x * (o.cross ?? 0.96), y + (o.dy || 0), z + r * 0.62], seg: 6, rings: 4 });
+  if (o.iris) b.sphere(r * 0.3, BLACK, { p: [x * 0.96, y + (o.dy || 0), z + r * 1.0], seg: 5, rings: 3 });
+  b.sphere(r * 0.2, WHITE, { p: [x * 0.96 + r * 0.25, y + r * 0.3, z + r * 1.05], seg: 5, rings: 3 });
+  if (o.lid) b.dome(r * 1.12, o.lid, { p: [x, y + r * 0.1, z], r: [o.tilt ?? -0.5, 0, (x > 0 ? 1 : -1) * (o.slant || 0)], seg: 8, rings: 3 });
 }
 
 /* Cada piloto: colores del cuerpo y dos funciones, `head(b)` (centrada en la cabeza, mirando a +z) y, si tiene algo
@@ -341,7 +341,7 @@ const DRIVER = {
     belly: '#e8f59b',
     head(b) {
       const g = '#4fc65a';
-      b.sphere(0.36, g, { s: [1, 0.74, 0.9], seg: 14, rings: 10 });
+      b.sphere(0.36, g, { s: [1, 0.74, 0.9], seg: 12, rings: 8 });
       b.sphere(0.3, '#e8f59b', { p: [0, -0.1, 0.1], s: [1, 0.55, 0.9] });
       b.rbox(0.42, 0.028, 0.05, 0.012, '#256b2e', { p: [0, -0.07, 0.31] });
       b.mirror((s) => {
@@ -358,7 +358,7 @@ const DRIVER = {
     hand: '#5b6b8a',
     belly: '#fff6e0',
     head(b) {
-      b.sphere(0.3, '#23232b', { seg: 14, rings: 10 });
+      b.sphere(0.3, '#23232b', { seg: 12, rings: 8 });
       b.sphere(0.25, '#fff6e0', { p: [0, -0.07, 0.12], s: [0.95, 0.9, 0.8] });
       const curve = (v) => (v.y -= 0.55 * Math.max(0, v.z) ** 2);
       b.sphere(0.36, '#ff9a1f', { p: [0, -0.01, 0.3], s: [0.36, 0.42, 1], deform: curve, seg: 10, rings: 10 });
@@ -378,7 +378,7 @@ const DRIVER = {
     belly: '#fff3e2',
     head(b) {
       const o = '#ff7a3c';
-      b.sphere(0.32, o, { s: [1, 0.9, 0.94], seg: 14, rings: 10 });
+      b.sphere(0.32, o, { s: [1, 0.9, 0.94], seg: 12, rings: 8 });
       b.cone(0.17, 0.32, '#fff3e2', { p: [0, -0.08, 0.34], r: [Math.PI / 2, 0, 0], seg: 10 });
       b.sphere(0.055, BLACK, { p: [0, -0.07, 0.5] });
       b.mirror((s) => {
@@ -401,7 +401,7 @@ const DRIVER = {
     head(b) {
       const w = '#f4e7cf';
       b.tube([0, -0.42, -0.04], [0, -0.12, 0], 0.13, w);
-      b.sphere(0.26, w, { s: [0.9, 0.9, 1.1], seg: 12, rings: 9 });
+      b.sphere(0.26, w, { s: [0.9, 0.9, 1.1], seg: 10, rings: 7 });
       b.sphere(0.16, '#fffaf0', { p: [0, -0.06, 0.25], s: [1, 0.85, 0.9] });
       b.sphere(0.03, '#5a4334', { p: [0, -0.02, 0.4], s: [1.6, 0.8, 1] });
       b.rbox(0.02, 0.07, 0.02, 0.008, '#5a4334', { p: [0, -0.08, 0.39] });
@@ -426,7 +426,7 @@ const DRIVER = {
     belly: '#f6e4c4',
     head(b) {
       const t = '#d9a760';
-      b.sphere(0.33, t, { s: [1, 0.88, 0.94], seg: 14, rings: 10 });
+      b.sphere(0.33, t, { s: [1, 0.88, 0.94], seg: 12, rings: 8 });
       b.sphere(0.07, '#e06a7a', { p: [0, -0.02, 0.33], s: [1.1, 0.7, 0.7] });
       b.sphere(0.1, '#fff6e6', { p: [0, -0.16, 0.24], s: [1, 0.7, 0.8] });
       b.mirror((s) => {
@@ -449,7 +449,7 @@ const DRIVER = {
     hand: '#7c6b56',
     head(b) {
       const g = '#b3a089';
-      b.sphere(0.25, g, { s: [0.92, 0.9, 1.05], seg: 12, rings: 9 });
+      b.sphere(0.25, g, { s: [0.92, 0.9, 1.05], seg: 10, rings: 7 });
       b.cone(0.13, 0.38, '#c9b8a2', { p: [0, -0.07, 0.34], r: [1.72, 0, 0], seg: 10 });
       b.sphere(0.045, '#4a3a30', { p: [0, -0.1, 0.52] });
       b.sphere(0.22, '#8c7a63', { p: [0, 0.13, -0.02], s: [0.9, 0.42, 0.95], seg: 10, rings: 6 });
@@ -460,7 +460,7 @@ const DRIVER = {
       });
     },
     torso(b) {
-      b.sphere(0.33, '#8c7a63', { p: [0, 0.24, -0.14], s: [1, 1.05, 0.85], seg: 12, rings: 9 });
+      b.sphere(0.33, '#8c7a63', { p: [0, 0.24, -0.14], s: [1, 1.05, 0.85], seg: 10, rings: 7 });
       for (let i = 0; i < 3; i++) b.torus(0.31 - i * 0.012, 0.03, '#a8957c', { p: [0, 0.14 + i * 0.13, -0.14], r: [Math.PI / 2, 0, 0], s: [1, 0.85, 1], seg: 14 });
       b.cone(0.07, 0.3, '#b3a089', { p: [0, 0.08, -0.46], r: [-1.9, 0, 0], seg: 6 });
     },
@@ -574,6 +574,7 @@ export function makeVehicle(config, { thick = 0.03, outline = true } = {}) {
       pivot.add(spin);
       if (outline) {
         const line = new THREE.Mesh(geo, outlineMat(thick));
+        line.userData.outline = true;
         spin.add(line);
       }
       lean.add(pivot);

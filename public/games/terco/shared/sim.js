@@ -333,6 +333,7 @@ export function load(R, ctx = {}, spawn = 'start') {
     if (d.k === K.SAW && (d.orbit || d.hop)) sawPos(S, d, e);
   });
   for (const i of R.solids) blinkNow(S, i);
+  if (R.boss >= 0 && S.e[R.boss].off) S.sig |= R.ents[R.boss].bit; // jefe ya vencido: aparece lo que dejaba
   const p = Array.isArray(spawn) ? spawn : R.spawns[spawn] || R.spawns.start || Object.values(R.spawns)[0];
   if (!p) throw new Error(`pantalla ${R.id}: no hay punto de entrada "${spawn}"`);
   S.h.x = p[0];
@@ -389,6 +390,9 @@ function setTile(S, i, v) {
   S.tiles[i] = v;
 }
 const fx = (S, k, x, y, a) => S.fx && S.fx.push({ k, x, y, a });
+
+/** Para los jefes: agrega un efecto (sonido y chispas del cliente). */
+export const addFx = fx;
 
 export function kill(S, cause) {
   const h = S.h;

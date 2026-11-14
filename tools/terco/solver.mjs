@@ -94,7 +94,8 @@ export function goal(S, g) {
       const y = g.exit === 'up' ? 0 : RH - 1;
       for (let x = 0; x < RW; x++) if (ok(x + 0.5) && !isSolid(S.tiles[y * RW + x])) cells.push([x, y]);
     }
-    return { fn: (s) => s.exit === g.exit && (!g.to || exitTo(s) === g.to), cells };
+    const pts = cells.map(([cx, cy]) => (g.exit === 'right' ? [RW + 0.4, cy + 0.9] : g.exit === 'left' ? [-0.4, cy + 0.9] : g.exit === 'up' ? [cx + 0.5, -0.8] : [cx + 0.5, RH + 0.8]));
+    return { fn: (s) => s.exit === g.exit && (!g.to || exitTo(s) === g.to), cells, pts };
   }
   const find = (k, pred) => {
     const i = R.ents.findIndex((d) => d.k === k && pred(d));
@@ -104,12 +105,12 @@ export function goal(S, g) {
   if (g.cp != null) {
     const i = find(KIND.CP, (d) => d.id === g.cp);
     const d = R.ents[i];
-    return { fn: (s) => s.cpOn === i, cells: [[Math.floor(d.x), Math.floor(d.y - 0.5)]] };
+    return { fn: (s) => s.cpOn === i && s.h.gr, cells: [[Math.floor(d.x), Math.floor(d.y - 0.5)]] };
   }
   if (g.carrot) {
     const i = find(KIND.CARROT, (d) => d.id === g.carrot);
     const d = R.ents[i];
-    return { fn: (s) => s.e[i].got === 1, cells: [[Math.floor(d.x), Math.floor(d.y - 0.5)]] };
+    return { fn: (s) => s.e[i].got === 1 && s.h.gr, cells: [[Math.floor(d.x), Math.floor(d.y - 0.5)]] };
   }
   if (g.stone) {
     const i = find(KIND.STONE, () => true);
@@ -123,7 +124,7 @@ export function goal(S, g) {
   }
   if (g.sig) {
     const b = R.sigs[g.sig];
-    return { fn: (s) => (s.sig & b) !== 0, cells: g.cells || [] };
+    return { fn: (s) => (s.sig & b) !== 0 && s.h.gr, cells: g.cells || [] };
   }
   if (g.at) return { fn: (s) => !s.h.dead && s.h.gr && Math.abs(s.h.x - g.at[0]) < (g.tol || 0.5) && Math.abs(s.h.y - g.at[1]) < 0.3, cells: [[Math.floor(g.at[0]), Math.floor(g.at[1] - 0.5)]] };
   throw new Error(`meta desconocida: ${JSON.stringify(g)}`);
@@ -185,8 +186,10 @@ export function solve(S0, g, opts = {}) {
   const shoot = !!opts.shoot;
   const q = opts.q || { x: 8, y: 8, v: 25 };
   const maxNodes = opts.maxNodes || 400000;
-  const { fn, cells } = g.fn ? g : goal(S0, g);
+  const gg = g.fn ? g : goal(S0, g);
+  const { fn, cells } = gg;
   const D = cells.length ? distMap(S0, cells) : null;
+  const pts = gg.pts || cells.map(([cx, cy]) => [cx + 0.5, cy + 0.9]);
   const sup = supports(S0);
   const nStatic = sup.length;
   for (const [x, y] of cells) sup.push([x, x + 1, y + 1]); // la meta también es "un lugar donde caer"
@@ -195,7 +198,7 @@ export function solve(S0, g, opts = {}) {
     if (d.py < 0) sup.push([d.x, d.x + d.w, d.y + d.h]);
   }
   const boxes = [];
-  const PEN = opts.pen ?? 45, PEN2 = opts.pen2 ?? 6;
+  const PEN = opts.pen ?? 45, PEN2 = opts.pen2 ?? 0;
   const dist = (x, y) => (x < 0 || y < 0 || x >= RW || y >= RH ? Infinity : D[y * RW + x]);
   /** Distancia a la meta; deja en S.ls el lugar donde está parada (o del que saltó). */
   const hOf = (S) => {
@@ -212,6 +215,15 @@ export function solve(S0, g, opts = {}) {
         const m = Math.min(r, l, dn, up);
         if (m < d) d -= m === r ? px - x : m === l ? 1 - (px - x) : m === dn ? py - y : 1 - (py - y);
       }
+    }
+    if (pts.length) {
+      // gradiente fino dentro de la celda de la meta (y hacia afuera de la pantalla en las salidas)
+      let fine = Infinity;
+      for (let i = 0; i < pts.length; i++) {
+        const dd = Math.hypot(h.x - pts[i][0], h.y - 0.35 - pts[i][1]);
+        if (dd < fine) fine = dd;
+      }
+      d += 0.05 * fine;
     }
     if (h.gr) {
       if (h.ride >= 0) S.ls = 1000 + h.ride;
@@ -252,10 +264,15 @@ export function solve(S0, g, opts = {}) {
   const open = new Heap();
   open.push(hOf(start), 0);
   let best = null;
+  let dbgAt = 0;
   while (open.size) {
     const n = open.pop();
     const S = states[n];
     states[n] = null;
+    if (opts.debug && states.length > dbgAt) {
+      dbgAt += opts.debug;
+      console.log(`  [${states.length}] abiertos ${open.size}  expande x=${S.h.x.toFixed(2)} y=${S.h.y.toFixed(2)} t=${S.t} gr=${S.h.gr} h=${hOf(S).toFixed(2)}`);
+    }
     for (let ai = 0; ai < acts.length; ai++) {
       const a = acts[ai];
       const C = clone(S);
@@ -326,7 +343,7 @@ export function solvePath(S0, goals, opts = {}) {
   const inputs = [];
   let nodes = 0, pass = 0;
   for (const g of goals) {
-    const r = solveAny(S, g, { ...opts, ...(g.opts || {}) });
+    const r = solveAny(S, g, { ...opts, ...(g.shoot ? { shoot: true } : {}), ...(g.opts || {}) });
     nodes += r.nodes;
     if (r.fail) return { fail: true, nodes, at: g };
     inputs.push(...r.inputs);

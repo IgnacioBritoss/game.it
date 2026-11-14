@@ -508,8 +508,11 @@ export function apacheta(g, x, y, n) {
     g.lineWidth = 0.045;
     g.stroke();
   });
-  const cols = { quebrada: '#f25c05', mina: '#7a3fd0', salar: '#2ec4b6', volcan: '#e83f6f' };
-  (Array.isArray(n) ? n : []).forEach((id, i) => stoneArt(g, x - 0.6 + i * 0.4, y - 1.55 - (i % 2) * 0.12, cols[id] || '#ffd23f', 0.8));
+  pileStones(g, x, y, Array.isArray(n) ? n : []);
+}
+/** Las piedras de jefe que ya se dejaron arriba de la apacheta. */
+export function pileStones(g, x, y, ids) {
+  ids.forEach((id, i) => stoneArt(g, x - 0.6 + i * 0.4, y - 1.55 - (i % 2) * 0.12, STONE_COL[id] || '#ffd23f', 0.8));
 }
 const STONE_COL = { quebrada: '#f25c05', mina: '#7a3fd0', salar: '#2ec4b6', volcan: '#e83f6f', cumbre: '#ffd23f' };
 export function stoneArt(g, x, y, col, s = 1) {
@@ -1315,6 +1318,9 @@ export function drawRoom(g, S, o) {
           g.fillRect(d.x - 1.2, d.y - 1.6, 2.4, 2.4);
           stoneArt(g, d.x, d.y - 0.1 + by, STONE_COL[d.zone] || '#ffd23f', 1.3);
         }
+        break;
+      case K.DECO:
+        if (d.kind === 'apacheta') pileStones(g, d.x, d.y, o.stoneIds || []);
         break;
       case K.WALKER:
         if (!e.dead) walker(g, d, e, t, still);

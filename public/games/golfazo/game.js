@@ -125,6 +125,7 @@ function resetPlayer(p, w) {
   p.moving = false;
   p.done = false;
   p.doneK = null;
+  p.srvDoneK = null;
   p.shots = [];
   p.applied = 0;
   p.score = null;
@@ -147,7 +148,7 @@ function loadHole(i) {
   sc.loadHole(w, themeOf(id));
   for (const p of st.players) resetPlayer(p, w);
   const showNames = st.mode !== 'solo';
-  sc.setBalls(st.players.map((p) => ({ id: p.id, name: p.name, color: p.color, ghost: st.mode === 'online' && !p.me, hideName: !showNames || (st.mode === 'local') })));
+  sc.setBalls(st.players.map((p) => ({ id: p.id, name: p.name, color: p.color, ghost: st.mode === 'online' && !p.me, hideName: !showNames })));
   st.holeT = st.mode === 'online' ? -1 : 0;
   st.phase = 'play';
   st.paused = false;
@@ -676,7 +677,7 @@ addEventListener('keydown', (e) => {
     const d = G?.dir?.(e);
     if (d === 'left' || d === 'right') {
       kb.on = true;
-      kb.rel += (d === 'left' ? 1 : -1) * (e.shiftKey ? 0.004 : 0.03) * -1;
+      kb.rel += (d === 'left' ? 1 : -1) * (e.shiftKey ? 0.004 : 0.03);
     } else if (d === 'up' || d === 'down') {
       kb.on = true;
       kb.q = clamp(kb.q + (d === 'up' ? 0.03 : -0.03), 0.05, 1);

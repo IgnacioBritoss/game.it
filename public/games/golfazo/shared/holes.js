@@ -67,7 +67,7 @@ export const HOLE_LIST = [
   }),
 
   // ───────────────────────────── 2 · BAHÍA CORAL ─────────────────────────────
-  H('bahia-1', 'El Muelle', 'The Pier', 2, (b) => {
+  H('bahia-1', 'El Muelle', 'The Pier', 3, (b) => {
     b.sea(-1.5, 'water');
     b.tee({ f: 1.5 });
     b.rect(4, 3.4, { surf: 'sand' });
@@ -192,6 +192,7 @@ export const HOLE_LIST = [
 
   // ───────────────────────────── 4 · VOLCÁN ─────────────────────────────
   H('volcan-1', 'La Boca', 'The Crater', 3, (b) => {
+    b.sea(-1.5, 'lava');
     b.width(3);
     b.tee({ f: 1.2 });
     b.pool('lava', { f: 6, l: -0.9, r: 1.0 });
@@ -200,6 +201,7 @@ export const HOLE_LIST = [
     b.cup({ f: -2 });
   }),
   H('volcan-2', 'Compuertas', 'Gates', 3, (b) => {
+    b.sea(-1.5, 'lava');
     b.width(3);
     b.tee({ f: 1.2 });
     b.gate({ f: 6, period: 3.4, phase: 0, open: 0.45 });
@@ -243,16 +245,19 @@ export const HOLE_LIST = [
     b.at(0, 0, 0, 0);
     b.portal({ f: 3.6, l: 0, r: 0.5 }, { f: 6.4, l: 0, rot: 0, pitch: 50, vmin: 13, vmax: 13, time: 0.45 });
   }),
-  H('volcan-6', 'Magma', 'Magma', 5, (b) => {
+  H('volcan-6', 'Magma', 'Magma', 4, (b) => {
     b.sea(-1.5, 'lava');
     b.tee({ f: 1.2 });
     b.lane(5);
     b.boost({ f: -1.6, w: 1.4, d: 1.6, speed: 12.5 });
     b.lane(3, { dy: 0.9, ease: 'in', walls: { E: 'none' } });
     b.gap(5, { dy: -0.4 });
+    b.pool('lava', { f: 2.2, l: 1.1, r: 1.0 });
+    b.pool('lava', { f: 5.6, l: -1.1, r: 1.0 });
     b.rect(8, 4.2);
     b.spinner({ f: -4, len: 3.4, arms: 2, speed: 0.2 });
     b.lane(2, { w: 2.4 });
+    b.gate({ f: 1.5, w: 2.4, period: 3, phase: 0.2, open: 0.45 });
     b.lane(4);
     b.disc(2.8, { height: bowl(0.35) });
     b.cup();

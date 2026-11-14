@@ -50,8 +50,8 @@ const RIM_POP = 2.2; // lo máximo que la hace saltar el borde del hoyo
 /** Superficies: mu (freno constante = mu·g), drag (freno proporcional a la velocidad) y rest (rebote). */
 export const SURF = { grass: 0, sand: 1, ice: 2, wood: 3, rough: 4, rubber: 5, stone: 6, wall: 7, metal: 8, bumper: 9, belt: 10, plat: 11, rim: 12 };
 export const SURF_NAMES = Object.keys(SURF);
-const S_MU = [0.045, 0.33, 0.006, 0.04, 0.12, 0.05, 0.04, 0.03, 0.03, 0.02, 0.25, 0.5, 0.03];
-const S_DRAG = [0.55, 3.2, 0.07, 0.5, 1.5, 0.5, 0.45, 0, 0, 0, 6, 6, 0];
+const S_MU = [0.045, 0.33, 0.012, 0.04, 0.12, 0.05, 0.04, 0.03, 0.03, 0.02, 0.25, 0.5, 0.03];
+const S_DRAG = [0.55, 3.2, 0.12, 0.5, 1.5, 0.5, 0.45, 0, 0, 0, 6, 6, 0];
 const S_REST = [0.38, 0.1, 0.3, 0.42, 0.22, 0.88, 0.45, 0.72, 0.6, 0.9, 0.3, 0.25, 0];
 
 // ------------------------------------------------------------------ contactos (memoria fija: no se crea basura)

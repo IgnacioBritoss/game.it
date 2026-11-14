@@ -782,7 +782,7 @@ export class GolfScene {
   }
 
   buildZones(w, T, g, R) {
-    const poly = { polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 };
+    const poly = { polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4, side: THREE.DoubleSide };
     this.pools = [];
     for (const z of w.vis.zones) {
       if (z.type === 'patch') {

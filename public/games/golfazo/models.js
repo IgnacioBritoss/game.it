@@ -252,11 +252,14 @@ export function moverMesh(mv, prop, T) {
   if (type === 'windmill') {
     for (const b of mv.boxes) {
       physBox(m, b, '#c9915a');
-      // la vela: tela de color sobre la cara de adelante, con un marco más claro
-      const sail = { ...b, cx: b.cx + b.zx * (b.hz + 0.004), cy: b.cy + b.zy * (b.hz + 0.004), cz: b.cz + b.zz * (b.hz + 0.004), hz: 0.004, hx: b.hx * 0.78, hy: b.hy * 0.94 };
-      physBox(m, sail, a0);
-      const mid = { ...sail, cx: sail.cx + b.zx * 0.004, cy: sail.cy + b.zy * 0.004, cz: sail.cz + b.zz * 0.004, hx: sail.hx * 0.3, hy: sail.hy * 0.96, hz: 0.004 };
-      physBox(m, mid, a3);
+      // la vela: tela de color sobre las dos caras, con una franja clara al medio
+      for (const sg of [-1, 1]) {
+        const off = sg * (b.hz + 0.004);
+        const sail = { ...b, cx: b.cx + b.zx * off, cy: b.cy + b.zy * off, cz: b.cz + b.zz * off, hz: 0.004, hx: b.hx * 0.78, hy: b.hy * 0.94 };
+        physBox(m, sail, a0);
+        const mid = { ...sail, cx: sail.cx + b.zx * sg * 0.004, cy: sail.cy + b.zy * sg * 0.004, cz: sail.cz + b.zz * sg * 0.004, hx: sail.hx * 0.3, hy: sail.hy * 0.96, hz: 0.004 };
+        physBox(m, mid, a3);
+      }
     }
     m.cyl(0.24, 0.24, 0.24, 0, -0.05, 0.0, '#8a5a33', 12, Math.PI / 2, 0);
     m.ball(0.2, 0.2, 0.2, 0, 0, 0.17, a1, 10, 8);

@@ -1,0 +1,19 @@
+{
+  "id": "golfazo",
+  "title": { "es": "Golfazo", "en": "Golfazo" },
+  "description": {
+    "es": "Mini golf 3D estilo cartoon con 4 mundos y 24 hoyos llenos de obstáculos: molinos, martillos, rulos, cañones, balsas y más. Solo, con amigos por turnos u online todos a la vez.",
+    "en": "Cartoon 3D mini golf with 4 worlds and 24 obstacle-packed holes: windmills, hammers, loops, cannons, rafts and more. Solo, hot-seat with friends or online all at once."
+  },
+  "categories": ["deporte", "casual", "online", "multijugador"],
+  "tags": ["golf", "minigolf", "mini golf", "golf it", "putt", "3d", "cartoon", "fisica", "physics", "obstaculos", "obstacles", "amigos", "friends", "salas", "rooms", "online"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "three.js + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["mouse", "touch", "keyboard"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 8, "localPlayers": 4, "story": false },
+  "order": 3
+}

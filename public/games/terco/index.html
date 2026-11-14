@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Terco · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+
+    <!-- marcador -->
+    <div class="hud" id="hud" hidden>
+      <div class="pill">
+        <span class="it" id="h-deaths" title="porrazos"><i class="ico x"></i><b>0</b></span>
+        <span class="it time" id="h-time">0:00</span>
+        <span class="it stones" id="h-stones"></span>
+        <span class="it" id="h-carrots"><i class="ico car"></i><b>0</b></span>
+      </div>
+      <button class="pause" id="b-pause" aria-label="pausa"><i></i><i></i></button>
+    </div>
+    <div class="room" id="room"></div>
+    <div class="quip" id="quip"></div>
+    <div class="toast" id="toast"></div>
+    <div class="sign" id="sign" hidden></div>
+    <div class="boss" id="boss" hidden><b id="boss-name"></b><div class="bar"><i id="boss-hp"></i></div></div>
+
+    <!-- controles táctiles -->
+    <div class="pad" id="pad" hidden>
+      <div class="dir" id="pad-dir"><span class="key" id="k-l">◀</span><span class="key" id="k-r">▶</span></div>
+      <div class="act">
+        <button class="key fire" id="k-f" aria-label="patear"><i></i></button>
+        <button class="key jump" id="k-j" aria-label="saltar">▲</button>
+      </div>
+    </div>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="card home">
+        <h1 class="logo">TERCO</h1>
+        <div class="aguayo"></div>
+        <p class="sub" data-t="tagline"></p>
+        <button class="btn main" id="b-cont" hidden><span data-t="cont"></span><small id="b-cont-sub"></small></button>
+        <button class="btn main" id="b-new"><span data-t="newGame"></span></button>
+        <button class="link" id="b-help" data-t="how"></button>
+        <p class="best" id="best"></p>
+      </div>
+    </section>
+
+    <!-- dificultad -->
+    <section class="screen" id="s-diff">
+      <div class="card wide">
+        <h2 data-t="diffTitle"></h2>
+        <div class="diffs" id="diffs"></div>
+        <p class="warn" id="diff-warn" data-t="overwrite" hidden></p>
+        <button class="link" data-go="home" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- cómo se juega -->
+    <section class="screen dim" id="s-help">
+      <div class="card wide">
+        <h2 data-t="how"></h2>
+        <ul class="how" id="how"></ul>
+        <button class="btn main" id="help-ok"><span data-t="gotIt"></span></button>
+      </div>
+    </section>
+
+    <!-- pausa -->
+    <section class="screen dim" id="s-pause">
+      <div class="card">
+        <h2 data-t="paused"></h2>
+        <p class="sub" id="p-where"></p>
+        <button class="btn main" id="p-resume"><span data-t="resume"></span></button>
+        <button class="btn" id="p-retry"><span data-t="retry"></span><kbd>R</kbd></button>
+        <button class="btn" id="p-help"><span data-t="how"></span></button>
+        <button class="btn" id="p-home"><span data-t="toTitle"></span></button>
+      </div>
+    </section>
+
+    <!-- piedra conseguida -->
+    <section class="screen dim" id="s-stone">
+      <div class="card">
+        <p class="kicker" id="st-kicker"></p>
+        <h2 id="st-title"></h2>
+        <canvas id="st-c" width="240" height="160"></canvas>
+        <p class="sub" id="st-sub"></p>
+        <button class="btn main" id="st-ok"><span data-t="onward"></span></button>
+      </div>
+    </section>
+
+    <!-- final -->
+    <section class="screen dim" id="s-end">
+      <div class="card wide">
+        <p class="kicker" data-t="endKicker"></p>
+        <h2 data-t="endTitle"></h2>
+        <div class="aguayo"></div>
+        <p class="sub" data-t="endText"></p>
+        <ul class="stats" id="e-stats"></ul>
+        <button class="btn main" id="e-again"><span data-t="playAgain"></span></button>
+        <button class="link" id="e-home" data-t="toTitle"></button>
+      </div>
+    </section>
+
+    <!-- aviso para girar el celular (el juego es apaisado) -->
+    <div class="rotate" id="rotate" hidden><i></i><b></b></div>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

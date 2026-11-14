@@ -15,5 +15,5 @@
   "orientation": "any",
   "input": ["keyboard", "touch", "gamepad"],
   "features": { "online": false, "multiplayer": true, "localPlayers": 2, "maxPlayers": 8, "cpu": true, "story": false },
-  "order": 72
+  "order": 74
 }

@@ -517,6 +517,7 @@ export class Builder {
     const { X, Y, Z } = this._axes(rot);
     const b = makeBox(p, X, Y, Z, [w / 2, (h + sink) / 2, d / 2], surf);
     if (o.kick) b.kick = o.kick;
+    if (o.vis !== false) b.prop = true;
     this.boxes.push(b);
     if (o.vis !== false) this.props.push({ type: o.type || 'block', x: p[0], y: this.c.y + (o.u || 0), z: p[2], w, d, h, yaw: this.c.h + rot, style: o.style || '' });
     return this;
@@ -524,7 +525,9 @@ export class Builder {
   post(o = {}) {
     const { r = 0.16, h = 0.5 } = o;
     const p = this.P(o.f || 0, o.l || 0);
-    this.cyls.push(makeCyl(p[0], p[2], r, p[1] - 0.2, p[1] + h, 'stone'));
+    const pc = makeCyl(p[0], p[2], r, p[1] - 0.2, p[1] + h, 'stone');
+    pc.prop = true;
+    this.cyls.push(pc);
     if (o.vis !== false) this.props.push({ type: o.type || 'post', x: p[0], y: p[1], z: p[2], r, h, style: o.style || '' });
     return this;
   }
@@ -532,7 +535,9 @@ export class Builder {
   bumper(o = {}) {
     const { r = 0.3, h = 0.34, kick = 7 } = o;
     const p = this.P(o.f || 0, o.l || 0);
-    this.cyls.push(makeCyl(p[0], p[2], r, p[1] - 0.2, p[1] + h, 'bumper', kick));
+    const bc = makeCyl(p[0], p[2], r, p[1] - 0.2, p[1] + h, 'bumper', kick);
+    bc.prop = true;
+    this.cyls.push(bc);
     this.props.push({ type: 'bumper', x: p[0], y: p[1], z: p[2], r, h, style: o.style || '' });
     return this;
   }
@@ -572,7 +577,9 @@ export class Builder {
       boxes.push(this._mbox([bx[0] * off, 0.03 + h / 2, bx[2] * off], bx, [0, 1, 0], bz, [half, h / 2, thick / 2]));
     }
     this._mover({ px: p[0], py: p[1], pz: p[2], rot: 1, w: TAU * speed, ph: TAU * phase, boxes }, { type: 'spinner', x: p[0], y: p[1], z: p[2], len: L, arms, thick, h, yaw: this.c.h, style: o.style || '' });
-    this.cyls.push(makeCyl(p[0], p[2], 0.17, p[1] - 0.2, p[1] + h + 0.1, 'stone'));
+    const hub = makeCyl(p[0], p[2], 0.17, p[1] - 0.2, p[1] + h + 0.1, 'stone');
+    hub.prop = true;
+    this.cyls.push(hub);
     return this;
   }
 

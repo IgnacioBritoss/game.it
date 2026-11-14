@@ -144,20 +144,22 @@ function translate() {
   const bd = [2, 1, 0].find((d) => best[d]);
   $('best').textContent = bd != null ? tr('bestLine', { t: fmtT(best[bd].time), n: best[bd].deaths, d: tr(`d${bd}`) }) : '';
   const how = $('how');
-  how.innerHTML = '';
+  how.replaceChildren();
   for (const k of ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']) {
     const li = document.createElement('li');
     li.textContent = tr(k);
     how.appendChild(li);
   }
   const ds = $('diffs');
-  ds.innerHTML = '';
+  ds.replaceChildren();
   for (let d = 0; d < 3; d++) {
     const b = document.createElement('button');
     b.className = 'diff';
-    b.innerHTML = '<b></b><span></span>';
-    b.querySelector('b').textContent = tr(`d${d}`);
-    b.querySelector('span').textContent = tr(`d${d}t`);
+    const name = document.createElement('b');
+    const text = document.createElement('span');
+    name.textContent = tr(`d${d}`);
+    text.textContent = tr(`d${d}t`);
+    b.append(name, text);
     b.onclick = () => begin(d);
     ds.appendChild(b);
   }
@@ -242,8 +244,7 @@ function onRoom() {
 let bannerTimer = 0;
 function banner(a, b) {
   const el = $('room');
-  el.innerHTML = '';
-  el.append(document.createTextNode(a));
+  el.replaceChildren(document.createTextNode(a));
   if (b) {
     const s = document.createElement('small');
     s.textContent = b;
@@ -298,12 +299,14 @@ function win() {
   if (!old || secs < old.time) best[G.diff] = { time: secs, deaths: G.deaths };
   lsSet('best', best);
   const st = $('e-stats');
-  st.innerHTML = '';
+  st.replaceChildren();
   const row = (a, b) => {
     const li = document.createElement('li');
-    li.innerHTML = '<span></span><b></b>';
-    li.firstChild.textContent = a;
-    li.lastChild.textContent = b;
+    const k = document.createElement('span');
+    const v = document.createElement('b');
+    k.textContent = a;
+    v.textContent = b;
+    li.append(k, v);
     st.appendChild(li);
   };
   row(tr('sTime'), fmtT(secs));
@@ -609,7 +612,7 @@ function hudUpdate(force) {
   $('h-carrots').lastChild.textContent = `${G.carrots.length}/${CARROTS.length}`;
   const st = $('h-stones');
   if (st.childElementCount !== STONES.length) {
-    st.innerHTML = '';
+    st.replaceChildren();
     for (const id of STONES) {
       const i = document.createElement('i');
       i.dataset.id = id;
@@ -660,7 +663,8 @@ function signUpdate() {
     el.textContent = txt;
   }
   el.hidden = false;
-  el.style.left = `${S.ox + best.x * S.px}px`;
+  const half = el.offsetWidth / 2 + 8;
+  el.style.left = `${clamp(S.ox + best.x * S.px, half, Wd - half)}px`;
   el.style.top = `${S.oy + (best.y - 1.05) * S.px}px`;
 }
 

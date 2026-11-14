@@ -938,6 +938,31 @@ animada (`pelicula.js`), hay tres dificultades (fácil, medio y difícil) y mús
 el mostrador, los retratos y las donas ya hechas) se dibuja una vez y se guarda, para mantener 60 fps; la partida se guarda en
 `localStorage` al terminar cada día.
 
+### Terco (plataformas de trampas)
+
+Plataformas de trampas de un solo golpe (`public/games/terco/`), de una sola jugadora: una mulita sube el cerro, patea piedritas y
+vuelve al último fogón cada vez que algo filoso, un bicho o una trampa la agarra. Son **33 pantallas** de 32×16 baldosas en seis zonas —el
+Puesto (tutorial y apacheta), la Quebrada, la Mina (a oscuras, solo se ve cerca de la mula, de los fogones y de los faroles), el Salar,
+el Volcán (con una subida de lava) y la Cumbre—, un **jefe por zona** (el Cóndor, el Topo, el Flamenco, la Culebra y la Tormenta, cada uno
+con tres fases y un aviso antes de cada ataque), **zanahorias secretas** (algunas detrás de bloques escondidos o paredes de mentira) y
+las trampas del género: pinchos que aparecen o caen del techo, pisos de mentira y flojos, bloques que se dejan ver con un cabezazo,
+plataformas que llevan, caen o aplastan, sierras en riel o en órbita, cerbatanas, rocas que ruedan, géiseres, ráfagas, bloques que
+parpadean, cintas y lava que sube. Las piedritas (X, Z o K) rompen ladrillos, tocan cencerros que abren portones, prenden fogones y
+bajan bichos. Se corre a velocidad fija, el salto se corta al soltar el botón y se tiene un salto más en el aire; con `R` se vuelve al
+fogón. Hay tres dificultades (normal, bravo y terco: cada una le saca fogones a la anterior), se guarda sola en `localStorage`
+(`gameit:terco:save`) en cada fogón, zanahoria y piedra, hay mejor tiempo por dificultad, música y efectos sintetizados y controles de
+teclado (flechas o WASD según las preferencias del portal), toque y mando.
+
+La simulación (`shared/sim.js`) es pura y determinista a 60 pasos por segundo: ningún azar, todo sale del reloj de la pantalla. Las
+pantallas (`shared/rooms.js`) las genera `tools/terco-niveles.py` (`python3 tools/terco-niveles.py`: mapas ASCII más objetos, con la
+leyenda en el encabezado del script), `shared/world.js` junta pantallas, fogones, piedras y zanahorias y `shared/bosses.js` tiene los
+cinco jefes. **Se puede terminar, y se prueba:** `tools/terco/solver.mjs` es un buscador de soluciones sobre la simulación real (un A*
+voraz con margen en los peligros, para que nada dependa de un píxel) y `tools/terco/boss-bot.mjs` un piloto que prueba jugadas por
+adelantado y vence a cada jefe; `node tools/terco/walk.mjs` los junta en un recorrido sin morir por todo el juego, con todas las
+zanahorias, que se guarda en `tests/fixtures/terco-walk.json` y que `npm test` reproduce paso a paso (`node tools/terco/check-rooms.mjs`
+revisa además que las salidas de cada pantalla coincidan con las de la de al lado). Si se cambia una pantalla o un jefe hay que volver
+a armar el recorrido.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego

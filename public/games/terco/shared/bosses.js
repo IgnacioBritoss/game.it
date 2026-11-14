@@ -274,7 +274,7 @@ define('topo', {
 // Se mece en un costado: dispara salvas de sal apuntadas, manda olas de sal a ras del piso y, de a poco, hace
 // llover cristales. La cabeza sube y baja: hay que pegarle desde las plataformas, cuando pasa a la altura justa.
 define('flamenco', {
-  hp: 24,
+  hp: 20,
   init: () => ({ hx: 23, hy: 8, drops: [], since: 0 }),
   idle(S, b) {
     b.x = 25.5;
@@ -394,7 +394,7 @@ define('culebra', {
 // abanico y, ya enojada, cae por dos lados a la vez. Hay que subirse a las cornisas (o a las corrientes de aire)
 // para pegarle cuando baja.
 define('tormenta', {
-  hp: 22,
+  hp: 26,
   init: () => ({ bolts: [] }),
   idle(S, b) {
     b.x = 16;

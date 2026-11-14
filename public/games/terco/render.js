@@ -1334,10 +1334,13 @@ export function drawRoom(g, S, o) {
   // balas enemigas
   for (const b of S.bullets) {
     const fire = b.skin === 'fuego' || (!b.skin && R.zone === 'volcan');
-    g.fillStyle = fire ? '#ff7a1a' : b.skin === 'pluma' ? '#2b2b33' : b.skin === 'hielo' ? '#cfeaff' : b.skin === 'roca' ? '#8d8380' : '#3c2018';
+    g.fillStyle = fire ? '#ff7a1a' : b.skin === 'pluma' ? '#2b2b33' : b.skin === 'hielo' ? '#cfeaff' : b.skin === 'sal' ? '#eef8ff' : b.skin === 'roca' ? '#8d8380' : '#3c2018';
     g.beginPath();
     g.arc(b.x, b.y, b.r, 0, 7);
     g.fill();
+    g.strokeStyle = fire ? '#7a2a0a' : 'rgba(36,18,24,.75)';
+    g.lineWidth = 0.05;
+    g.stroke();
     g.fillStyle = fire ? '#ffe07a' : 'rgba(255,255,255,.55)';
     g.beginPath();
     g.arc(b.x - b.r * 0.25, b.y - b.r * 0.25, b.r * 0.42, 0, 7);
@@ -1361,24 +1364,33 @@ export function drawRoom(g, S, o) {
 }
 
 /** Oscuridad de la mina: solo se ve cerca de la mula, de los fogones y de los faroles. `dk` es un canvas aparte. */
+let LIGHT = null;
+/** El "agujero" de luz, dibujado una sola vez: opaco en el centro y transparente en el borde. */
+function lightSprite() {
+  if (LIGHT) return LIGHT;
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const x = c.getContext('2d');
+  const gr = x.createRadialGradient(32, 32, 8, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(0,0,0,1)');
+  gr.addColorStop(1, 'rgba(0,0,0,0)');
+  x.fillStyle = gr;
+  x.fillRect(0, 0, 64, 64);
+  return (LIGHT = c);
+}
 export function darkness(g, S, dk, t, still) {
   const R = S.R;
   const c = dk.getContext('2d');
   const sx = dk.width / RW, sy = dk.height / RH;
   c.setTransform(1, 0, 0, 1, 0, 0);
   c.globalCompositeOperation = 'source-over';
-  c.fillStyle = 'rgba(6,7,14,.93)';
+  c.fillStyle = 'rgba(6,7,14,.9)';
   c.fillRect(0, 0, dk.width, dk.height);
   c.globalCompositeOperation = 'destination-out';
-  const hole = (x, y, r) => {
-    const gr = c.createRadialGradient(x * sx, y * sy, r * sx * 0.25, x * sx, y * sy, r * sx);
-    gr.addColorStop(0, 'rgba(0,0,0,1)');
-    gr.addColorStop(1, 'rgba(0,0,0,0)');
-    c.fillStyle = gr;
-    c.fillRect((x - r) * sx, (y - r) * sy, r * 2 * sx, r * 2 * sy);
-  };
+  const spr = lightSprite();
+  const hole = (x, y, r) => c.drawImage(spr, (x - r) * sx, (y - r) * sy, r * 2 * sx, r * 2 * sy);
   const fl = still ? 0 : Math.sin(t * 9) * 0.12;
-  if (!S.h.dead) hole(S.h.x, S.h.y - 0.4, 4.3 + fl);
+  if (!S.h.dead) hole(S.h.x, S.h.y - 0.4, 5.6 + fl);
   R.ents.forEach((d, i) => {
     if (S.e[i]?.off) return;
     if (d.k === K.CP) hole(d.x, d.y - 0.4, S.cpOn === i ? 3.4 + fl : 1.6);

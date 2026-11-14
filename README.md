@@ -938,6 +938,41 @@ animada (`pelicula.js`), hay tres dificultades (fácil, medio y difícil) y mús
 el mostrador, los retratos y las donas ya hechas) se dibuja una vez y se guarda, para mantener 60 fps; la partida se guarda en
 `localStorage` al terminar cada día.
 
+### Tuercas (karts y motos en 3D)
+
+Carreras de karts y motos en 3D de dibujito (`public/games/tuercas/`, three.js, todo procedural: sin modelos ni imágenes). Los modelos se
+arman con geometrías fusionadas con colores por vértice, sombreado de dibujito de cuatro tonos, contorno grueso (casco invertido, también
+en instancias) y sombras de mancha; el decorado de cada pista usa mallas instanciadas y las texturas salen de un canvas. Se elige entre
+**ocho pilotos** y **siete vehículos** (cuatro autos y tres motos) y en el **taller** se arma cada uno: ruedas (cinco), accesorios
+(cinco), pintura (diez) y tres ajustes (relación, suspensión y lastre) que mueven seis estadísticas (velocidad, aceleración, manejo, peso,
+agarre y turbo) con ventajas y costos (`shared/parts.js`: `statsOf` y `params` pasan de las piezas a los números de la física). Hay **seis
+pistas** con tema propio (pradera, costa, ciudad, glaciar, caldera y taller) agrupadas en dos copas, tres clases de dificultad (los bots
+corren más rápido y mejor), **carrera libre**, **contrarreloj** (en solitario, con tres sifones, y la mejor vuelta de cada pista se
+guarda) y **2 jugadores en pantalla dividida**. En la carrera hay **cajas de ítems** (sifón, sifón triple, aceite, rulemán, tero, nube,
+burbuja, bocina, imán, ají y cañita, que salen de una ruleta que reparte mejor lo que ayuda más al que va atrás), **tuercas** que suman
+velocidad, **derrapes** con saltito y tres niveles de miniturbo (dos en las motos), estelas de aire, plataformas de impulso y **rampas**
+con piruetas. La física (`shared/kart.js`, paso fijo de 1/120 s) separa hacia dónde mira el vehículo de hacia dónde se mueve, y toda la
+carrera (`shared/race.js`) es determinista: con la misma semilla pasa siempre igual. Las pistas se generan con una "tortuga" (rectas y
+arcos; dos rectas se resuelven para cerrar el circuito), se suavizan, se muestrean cada ~2 m y se validan (cierre, espacio libre,
+curvatura y largada en recta); los bots (`shared/ai.js`) siguen una línea de carrera con margen a los bordes, esquivan estorbos y manchas,
+usan los ítems con algo de criterio y se acomodan al ritmo (elástico). La resolución se adapta a la velocidad de cuadros, los íconos del
+taller se renderizan con un contexto WebGL aparte y la música y los efectos se sintetizan. Se juega con teclado, mando o pantalla táctil.
+
+### Brinco (plataformas 2D)
+
+Plataformas de dibujito en un canvas 2D (`public/games/brinco/`): **doce niveles en cuatro mundos** (pradera, cueva, nieve y volcán), cada
+uno con sus obstáculos (tubos con plantas, púas, cintas transportadoras, hielo que patina, ventisca que empuja, plataformas que se mueven
+o se caen, bloques que se desmoronan, lava, cañones, aplastadores, barras de fuego, murciélagos, escarabajos con caparazón…) y un **jefe**
+al final de cada mundo (embestidor, saltador y volador; el Rey Tuerca aguanta más). Hay **ocho personajes** con una habilidad distinta
+cada uno: más vida, salto largo, planeo, velocidad, escupir semillas, salto de pared, armadura contra púas y pisotón. Cada nivel esconde
+**tres gemas**, tiene banderines donde se reaparece y premios (fruta, flor, ají y corazón dorado); el progreso, las medallas (nivel
+superado, las tres gemas, sin recibir daño) y los mejores tiempos se guardan. La simulación (`shared/sim.js`, pura y de paso fijo 1/60 s)
+usa baldosas, salto de altura variable con margen de coyote y de apretado anticipado, y es determinista. Los niveles se arman pegando
+tramos (`shared/builder.js`, que garantiza que cada borde calza con el siguiente) y un piloto automático (`shared/pilot.js`, que prueba
+movimientos sobre copias del mundo y elige el mejor) juega la demo de la pantalla de inicio y, en las pruebas, comprueba que los doce
+niveles se terminan, que cada personaje puede con niveles pensados para frenarlo y que cada gema se puede alcanzar. Se juega con teclado,
+mando o pantalla táctil.
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego

@@ -1,0 +1,19 @@
+{
+  "id": "brinco",
+  "title": { "es": "Brinco", "en": "Brinco" },
+  "description": {
+    "es": "Plataformas 2D de dibujito con ocho personajes, cada uno con su habilidad: salto largo, planeo, escupida, pisotón y más. Doce niveles en cuatro mundos (pradera, cueva, nieve y volcán) con tubos, hielo, cintas, lava, cañones, aplastadores, plataformas móviles y cuatro jefes. Tres gemas escondidas por nivel, banderines de control y mapa de progreso.",
+    "en": "Cartoon 2D platformer with eight characters, each with a special ability: long jump, glide, spit, ground pound and more. Twelve levels across four worlds (meadow, cave, snow and volcano) with pipes, ice, conveyors, lava, cannons, crushers, moving platforms and four bosses. Three hidden gems per level, checkpoints and a progress map."
+  },
+  "categories": ["aventura", "arcade", "accion", "casual"],
+  "tags": ["plataformas", "platformer", "saltar", "jump", "niveles", "levels", "jefes", "bosses", "monedas", "coins", "gemas", "gems", "enemigos", "enemies", "personajes", "characters", "2d", "cartoon", "aventura"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "canvas2d",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["keyboard", "touch", "gamepad"],
+  "features": { "online": false, "multiplayer": false, "cpu": false, "story": false },
+  "order": 73
+}

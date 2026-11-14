@@ -144,6 +144,9 @@ let nextT = 0;
 let beat = 0;
 
 const level = () => GI?.prefs?.volume?.music ?? 0.5;
+// el navegador no deja arrancar el audio sin un gesto: la música espera al primer toque o tecla
+let armed = false;
+for (const ev of ['pointerdown', 'keydown', 'touchstart']) addEventListener(ev, () => (armed = true), { passive: true, capture: true });
 
 function osc(ac, f, t, dur, type, vol) {
   const o = ac.createOscillator();
@@ -174,6 +177,7 @@ function schedule(ac, m, step, t, dur) {
   if (s % 4 === 2 && m.wave === 'square') osc(ac, freq(m, 0, 2), t, dur * 0.6, 'square', 0.06);
 }
 function tick() {
+  if (!armed) return;
   const ac = unlock();
   if (!ac || ac.state !== 'running' || !cur) return;
   if (!mbus) {

@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Bengala · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Barlow+Semi+Condensed:wght@600;700;800&display=swap" rel="stylesheet" />
+    <!-- SDK del portal: preferencias, pausa, idioma, anuncios -->
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- el juego: el cielo y, en el taller, el panel de compras (abajo, o a la derecha en pantallas anchas) -->
+    <div class="app home" id="app">
+      <div class="stage" id="stage">
+        <canvas id="sky"></canvas>
+
+        <!-- durante la función: reloj de mecha, chispas, meta, pedido y rivales -->
+        <div class="hud" id="hud">
+          <div class="fuse"><i><u id="h-fuse"></u><em id="h-spark"></em></i><b id="h-clock">0:40</b></div>
+          <div class="score">
+            <small id="h-round"></small>
+            <b id="h-score">0</b>
+            <div class="goal" id="h-goal"><i><u id="h-goal-bar"></u></i><span id="h-goal-t"></span></div>
+          </div>
+          <div class="side">
+            <button class="quit" id="b-quit"></button>
+            <span class="chip" id="h-job" hidden></span>
+            <div class="race" id="race" hidden>
+              <div class="rpos" id="r-pos"></div>
+              <div class="rivals" id="r-rivals"></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot" id="foot">
+          <div class="fuses" id="h-fuses"></div>
+          <button class="ov" id="b-ov"><i><u id="h-ovbar"></u></i><span id="h-ovt"></span><b id="h-ovx"></b></button>
+        </div>
+
+        <!-- en el taller: el cartel de la sede -->
+        <div class="sign" id="sign">
+          <b id="sg-venue"></b>
+          <small id="sg-rule"></small>
+          <div class="goal" id="sg-goal"><i><u id="sg-bar"></u></i><span id="sg-goal-t"></span></div>
+        </div>
+
+        <div class="toasts" id="toasts" aria-live="polite"></div>
+        <div class="count" id="count"></div>
+      </div>
+
+      <aside class="panel" id="panel">
+        <header class="wallet">
+          <span class="cur spark" id="w-ch"></span>
+          <span class="cur polv" id="w-polv" hidden></span>
+          <span class="cur star" id="w-star" hidden></span>
+          <span class="rank" id="w-rank" hidden></span>
+          <button class="icobtn" id="b-more"></button>
+        </header>
+        <nav class="tabs" id="tabs"></nav>
+        <div class="pane" id="pane"></div>
+        <footer class="gobar"><button class="btn go" id="b-go"><span id="go-t"></span><small id="go-sub"></small></button></footer>
+      </aside>
+    </div>
+
+    <!-- tutorial: un globo que señala una cosa por vez -->
+    <div class="coach" id="coach" hidden>
+      <p id="coach-t"></p>
+      <button class="btn sm" id="coach-ok" hidden></button>
+    </div>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-home">
+      <div class="card">
+        <h1 class="logo" data-t="title"></h1>
+        <p class="sub" data-t="tagline"></p>
+        <div class="reto" id="reto-card" hidden>
+          <b data-t="retoT"></b>
+          <span id="reto-body"></span>
+          <button class="btn c2" id="reto-go"><span data-t="retoGo"></span></button>
+        </div>
+        <button class="btn main" id="b-play"><span id="b-play-t"></span><small id="b-play-sub"></small></button>
+        <div class="row3">
+          <button class="btn c2" id="b-daily"><span data-t="daily"></span><small id="b-daily-sub"></small></button>
+          <button class="btn c3" id="b-sprint"><span data-t="sprint"></span><small data-t="sprintSub"></small></button>
+          <button class="btn c4" id="b-online"><span data-t="online"></span><small data-t="onlineSub"></small></button>
+        </div>
+        <p class="keys" data-t="keys"></p>
+      </div>
+    </section>
+
+    <!-- show del día -->
+    <section class="screen" id="s-daily">
+      <div class="card">
+        <h2 id="d-title"></h2>
+        <p class="sub" data-t="dailyHelp"></p>
+        <div class="box">
+          <b id="d-venue"></b>
+          <span id="d-rule"></span>
+          <div class="colors"><span data-t="dailyColors"></span><span id="d-colors"></span></div>
+        </div>
+        <p class="line strong" id="d-yours" hidden></p>
+        <p class="line" id="d-stats"></p>
+        <p class="line" id="d-next" hidden></p>
+        <button class="btn main" id="d-go"><span></span></button>
+        <button class="btn c2" id="d-share" hidden><span data-t="shareB"></span></button>
+        <p class="status" id="d-status"></p>
+        <button class="link" data-go="home" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- sprint -->
+    <section class="screen" id="s-sprint">
+      <div class="card">
+        <h2 data-t="sprintT"></h2>
+        <p class="sub" data-t="sprintHelp"></p>
+        <div class="seg" id="sp-time"><button data-v="3"></button><button data-v="5"></button><button data-v="10"></button></div>
+        <p class="line strong" id="sp-best"></p>
+        <ul class="medals" id="sp-medals"></ul>
+        <button class="btn main" id="sp-go"><span data-t="goNow"></span></button>
+        <button class="link" data-go="home" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- resultado de sprint, show del día o reto -->
+    <section class="screen" id="s-end">
+      <div class="card">
+        <p class="kicker" id="e-kicker"></p>
+        <h2 id="e-title"></h2>
+        <div class="big" id="e-score"></div>
+        <p class="line" id="e-chain"></p>
+        <p class="line strong" id="e-medal"></p>
+        <p class="line" id="e-extra"></p>
+        <div class="rounds" id="e-rounds"></div>
+        <button class="btn main" id="e-again"><span></span></button>
+        <button class="btn c2" id="e-share"><span></span></button>
+        <p class="status" id="e-status"></p>
+        <button class="link" data-go="home" data-t="menu"></button>
+      </div>
+    </section>
+
+    <!-- online: entrar -->
+    <section class="screen" id="s-online">
+      <div class="card">
+        <h2 data-t="online"></h2>
+        <p class="sub" data-t="onlineLong"></p>
+        <label class="lbl" for="on-name" data-t="yourName"></label>
+        <input class="field" id="on-name" maxlength="16" autocomplete="off" spellcheck="false" />
+        <button class="btn main" id="on-quick"><span data-t="quick"></span><small data-t="quickSub"></small></button>
+        <button class="btn c4" id="on-create"><span data-t="create"></span><small data-t="createSub"></small></button>
+        <div class="join">
+          <input class="field code" id="on-code" maxlength="5" autocomplete="off" spellcheck="false" placeholder="ABCDE" aria-label="código" />
+          <button class="btn c2" id="on-join"><span data-t="join"></span></button>
+        </div>
+        <p class="status" id="on-status"></p>
+        <button class="link" data-go="home" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- online: sala -->
+    <section class="screen" id="s-lobby">
+      <div class="card">
+        <p class="kicker" data-t="room"></p>
+        <button class="code-big" id="lobby-code">-----</button>
+        <p class="hint2" data-t="tapToCopy"></p>
+        <ul class="plist" id="lobby-players"></ul>
+        <div class="opt">
+          <span class="lbl" data-t="time"></span>
+          <div class="seg" id="seg-time"><button data-v="3"></button><button data-v="5"></button><button data-v="10"></button></div>
+        </div>
+        <div class="opt">
+          <span class="lbl" data-t="sabotage"></span>
+          <div class="seg" id="seg-sabotage"><button data-v="on" data-t="sabOn"></button><button data-v="off" data-t="sabOff"></button></div>
+        </div>
+        <p class="hint2" data-t="sabHelp"></p>
+        <button class="btn main" id="lobby-start"><span data-t="start"></span></button>
+        <p class="status" id="lobby-status"></p>
+        <button class="link" id="lobby-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <!-- online: resultados -->
+    <section class="screen" id="s-results">
+      <div class="card">
+        <h2 id="res-title"></h2>
+        <ol class="rank" id="res-rank"></ol>
+        <button class="btn main" id="res-again"><span></span></button>
+        <button class="link" id="res-leave" data-t="leave"></button>
+      </div>
+    </section>
+
+    <!-- cómo salió la función -->
+    <div class="overlay" id="m-run" hidden>
+      <div class="card result">
+        <p class="kicker" id="rn-kicker"></p>
+        <div class="big" id="rn-score">0</div>
+        <div class="stamp" id="rn-stamp" hidden></div>
+        <div class="chips"><span class="chip" id="rn-chain"></span><span class="chip rec" id="rn-rec" hidden></span></div>
+        <div class="goal wide" id="rn-goal"><i><u id="rn-bar"></u></i><span id="rn-goal-t"></span></div>
+        <button class="btn main" id="rn-ok"><span data-t="toShop"></span></button>
+        <button class="btn c2" id="rn-x2" hidden><span data-t="double"></span></button>
+      </div>
+    </div>
+
+    <!-- constelaciones -->
+    <div class="overlay" id="m-stars" hidden>
+      <div class="starsbox">
+        <header>
+          <h2 data-t="consBtn"></h2>
+          <span class="pill star" id="st-stars"></span>
+          <button class="x" id="st-close"></button>
+        </header>
+        <canvas id="st-cv"></canvas>
+        <div class="nodeinfo">
+          <b id="st-name"></b>
+          <span id="st-fx"></span>
+          <small id="st-power"></small>
+          <button class="btn main" id="st-buy"><span></span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ventana genérica: confirmaciones, "mientras no estabas", exportar e importar -->
+    <div class="overlay" id="modal" hidden>
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="m-title">
+        <h3 id="m-title"></h3>
+        <div id="m-body"></div>
+        <div class="m-btns" id="m-btns"></div>
+      </div>
+    </div>
+
+    <!-- rutas relativas (./): dentro del portal el juego vive en /games/bengala/ -->
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

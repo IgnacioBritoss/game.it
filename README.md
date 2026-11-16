@@ -33,8 +33,8 @@ Hay una plantilla lista en [`templates/juego-base/`](templates/juego-base/) y `n
 
 **Publicado en Render** (cada push a `main` se despliega solo):
 - Web: https://game-it-63r9.onrender.com (sitio estático: `npm ci && npm run build` → `dist/`)
-- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral, Cruce, Micelio, Bolos y Vuelo): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
-  Variables: `ALLOWED_ORIGINS` (orígenes permitidos, separados por coma). La IP de cada cliente (para los límites por IP) se detecta sola cuando hay un proxy delante (solo se confía en los encabezados si quien se conecta por TCP es una dirección interna); se puede fijar con `CLIENT_IP_HEADER` (p. ej. `cf-connecting-ip`) o `TRUST_PROXY_HOPS` (cuántos proxies agregan una entrada a `X-Forwarded-For`, contando desde la derecha). `MAX_RT_ROOMS` (4 por defecto) es el tope de salas en tiempo real a la vez (Ameba, Serpentina, Clashball, Pádel y las arenas nuevas): el servidor gratis de Render tiene 0,1 CPU; al llegar al tope, crear otra devuelve `server_full_rt`. `/health` informa `rt: { rooms, max, avgTickMs }`. Límites ajustables en `server/index.js` (`CFG`).
+- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral, Cruce, Micelio, Bolos, Vuelo y Disimulá): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
+  Variables: `ALLOWED_ORIGINS` (orígenes permitidos, separados por coma). La IP de cada cliente (para los límites por IP) se detecta sola cuando hay un proxy delante (solo se confía en los encabezados si quien se conecta por TCP es una dirección interna); se puede fijar con `CLIENT_IP_HEADER` (p. ej. `cf-connecting-ip`) o `TRUST_PROXY_HOPS` (cuántos proxies agregan una entrada a `X-Forwarded-For`, contando desde la derecha). `MAX_RT_ROOMS` (4 por defecto) es el tope de salas en tiempo real a la vez (Ameba, Serpentina, Clashball, Pádel, Disimulá y las arenas nuevas): el servidor gratis de Render tiene 0,1 CPU; al llegar al tope, crear otra devuelve `server_full_rt`. `/health` informa `rt: { rooms, max, avgTickMs }`. Límites ajustables en `server/index.js` (`CFG`).
 - En desarrollo: `npm run server` levanta el servidor local en `ws://localhost:8787`, que los juegos online usan automáticamente.
 
 ## Anuncios (Google AdSense)
@@ -937,6 +937,32 @@ peinados, prendas con estampados, calzado, delantal con una plaquita con el nomb
 animada (`pelicula.js`), hay tres dificultades (fácil, medio y difícil) y música tranquila sintetizada. Lo que no cambia (el fondo,
 el mostrador, los retratos y las donas ya hechas) se dibuja una vez y se guarda, para mantener 60 fps; la partida se guarda en
 `localStorage` al terminar cada día.
+
+### Disimulá (escondidas con pintura, online)
+
+Escondidas por equipos en 3D (three.js): los **Escondidos** se pintan el cuerpo para fundirse con el escenario y eligen una pose, y los
+**Buscadores** tienen que encontrarlos antes de que se acabe el tiempo. Todo lo pesado es procedural (el juego entero pesa ~300 KB): el
+personaje es un maniquí generado por código con ojos que parpadean y se sorprenden al ser atrapados, y los cuatro mapas (Mansión,
+Alcantarillas, Supermercado y Museo) son cajas con un patrón `color(u, v)` por superficie, del que el cliente arma texturas en canvas y el
+servidor saca el color de cualquier punto tirando rayos, sin WebGL. La **pintura** se aplica sobre una CanvasTexture del cuerpo (atlas de
+128×128): pincel con tamaños y dureza, selector HSV + hex, **pipeta** que copia el color base de una superficie del escenario (como el
+personaje recibe la misma luz fija, el color pega), goma, balde por región, pinceles de patrón (rayas, damero, puntos, ladrillo, ruido) y
+deshacer/rehacer. Las **poses** (parado, agachado, sentado, acostado, brazos abiertos, contra la pared, con articulaciones ajustables)
+cambian de verdad la silueta y la caja de captura. El **camuflaje** (`shared/camo.js`) compara en espacio Lab el color pintado con lo que
+se vería detrás y da un puntaje 0–100 (para la práctica, el premio al mejor camuflaje y los bots); nunca decide las capturas de los humanos.
+
+Todo corre en `public/games/disimula/shared/` (puro JS, sin DOM) y lo usan igual el navegador, el servidor y las pruebas:
+`body.js` (esqueleto, atlas, poses y raycast del cuerpo), `maps.js`, `paint.js` (pintura por operaciones chicas + códec paleta ≤ 64 + RLE),
+`camo.js`, `bots.js` y `logic.js` (la partida entera: fases de preparación y búsqueda, silbidos, capturas, puntos y resultados). El mismo
+`logic.js` corre en el servidor (`server/games/disimula.js`, `realtime: true`) para el online y en la página para los modos sin conexión.
+**Online** de 2 a 10: el servidor es la autoridad (valida movimientos a 15 Hz, pinturas, poses, silbidos, capturas con distancia ≤ 2,5 m y
+línea de visión contra la pose real, marcas y puntos; los clientes solo mandan intenciones). Durante la preparación los Buscadores no
+reciben nada de los Escondidos; al empezar la búsqueda se manda a todos el estado final de cada Escondido con la pintura comprimida (menos
+de 16 KB). Salas privadas con código, salas públicas, reconexión que recupera el lugar, y quien entra con la ronda empezada mira de
+espectador hasta la siguiente. Los **bots** (escondidos que se pintan por proyección y buscadores que reaccionan a silbidos y marcas, tres
+niveles) corren con el mismo `shared/` en el servidor y sin conexión. Modos: online con amigos, partidas públicas, contra bots y práctica
+(pintar y explorar sin tiempo, con el puntaje de camuflaje en vivo). Sonido con `/shared/sfx.js` (silbido 3D posicional) y música
+sintetizada que mete tensión en los últimos 30 segundos.
 
 ## Juegos diarios
 

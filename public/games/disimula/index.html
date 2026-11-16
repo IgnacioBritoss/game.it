@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Disimulá · game.it</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script src="/sdk/gameit.js"></script>
+  </head>
+  <body>
+    <canvas id="gl"></canvas>
+
+    <!-- ==================== HUD de juego ==================== -->
+    <div id="hud" hidden>
+      <div id="phase-timer"><b id="ph-clock">0:00</b><span id="ph-label"></span></div>
+      <div id="round-chip"></div>
+      <div id="team-list"></div>
+      <div id="crosshair" hidden><i></i><i></i><i></i><i></i></div>
+      <div id="toasts"></div>
+      <div id="big-msg" hidden></div>
+      <div id="stun-overlay" hidden></div>
+      <div id="whistle-box" hidden>
+        <small data-t="whistleIn"></small><b id="whistle-count">45</b>
+        <button id="b-whistle" class="pill" data-t="whistleNow"></button>
+      </div>
+      <div id="camo-box" hidden>
+        <small data-t="camoMeter"></small>
+        <div class="meter"><i id="camo-bar"></i></div><b id="camo-val">—</b>
+      </div>
+      <div id="seek-actions" hidden>
+        <button id="b-mark" class="act" title="E">📍</button>
+        <button id="b-zoom" class="act" title="F">🔍</button>
+      </div>
+      <div id="prep-actions" hidden>
+        <button id="b-paintmode" class="pill on" data-t="paintMode"></button>
+        <button id="b-movemode" class="pill" data-t="moveMode"></button>
+        <button id="b-seekerview" class="pill alt" data-t="seekerView"></button>
+      </div>
+      <div id="spect-bar" hidden>
+        <button id="sp-prev" class="pill"></button>
+        <span id="sp-name"></span>
+        <button id="sp-next" class="pill"></button>
+        <button id="sp-free" class="pill alt" data-t="specFree"></button>
+        <div id="react-bar"></div>
+      </div>
+      <div id="joystick" hidden><i></i></div>
+      <button id="b-pause" hidden>⏸</button>
+    </div>
+
+    <!-- ==================== panel de pintura ==================== -->
+    <div id="paint-ui" hidden></div>
+
+    <!-- ==================== pantallas ==================== -->
+    <div id="screens">
+      <section class="screen on" id="s-home">
+        <div class="card home">
+          <h1 id="home-title"></h1>
+          <p class="tag" data-t="tagline"></p>
+          <div class="stack">
+            <button class="big main" data-go="modes" data-t="play"></button>
+            <div class="row">
+              <button class="mid" data-go="help" data-t="help"></button>
+              <button class="mid" data-go="options" data-t="options"></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-modes">
+        <div class="card">
+          <h2 data-t="modes"></h2>
+          <div class="modes">
+            <button class="mode" data-mode="online"><b data-t="mOnline"></b><small data-t="mOnlineD"></small></button>
+            <button class="mode" data-mode="public"><b data-t="mPublic"></b><small data-t="mPublicD"></small></button>
+            <button class="mode" data-mode="bots"><b data-t="mBots"></b><small data-t="mBotsD"></small></button>
+            <button class="mode" data-mode="practice"><b data-t="mPractice"></b><small data-t="mPracticeD"></small></button>
+          </div>
+          <button class="linkish" data-back data-t="back"></button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-online">
+        <div class="card">
+          <h2 id="online-title" data-t="mOnline"></h2>
+          <label class="field"><span data-t="yourName"></span><input id="on-name" maxlength="16" /></label>
+          <div class="row" id="online-private">
+            <button class="mid main" id="on-create" data-t="create"></button>
+          </div>
+          <div class="row">
+            <input id="on-code" data-tph="codePh" maxlength="40" />
+            <button class="mid" id="on-join" data-t="join"></button>
+          </div>
+          <div id="public-zone" hidden>
+            <div class="row spread"><h3 data-t="publicRooms"></h3><button class="pill" id="on-refresh" data-t="refresh"></button></div>
+            <ul id="room-list" class="roomlist"></ul>
+            <button class="mid main" id="on-create-pub" data-t="createPub"></button>
+          </div>
+          <p class="status" id="on-status"></p>
+          <button class="linkish" data-back data-t="back"></button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-lobby">
+        <div class="card wide">
+          <div class="row spread">
+            <h2><span data-t="lobby"></span> <b id="lobby-code" class="code"></b></h2>
+            <button class="pill main" id="lobby-share" data-t="copyLink"></button>
+          </div>
+          <p class="hint" data-t="shareCode"></p>
+          <div class="lobby-grid">
+            <ul id="lobby-players"></ul>
+            <div id="lobby-settings"></div>
+          </div>
+          <p class="status" id="lobby-status"></p>
+          <div class="row">
+            <button class="big main" id="lobby-start" data-t="start"></button>
+          </div>
+          <button class="linkish" id="lobby-leave" data-t="leave"></button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-practice">
+        <div class="card">
+          <h2 data-t="practiceMap"></h2>
+          <div id="practice-maps" class="maps"></div>
+          <button class="linkish" data-back data-t="back"></button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-bots">
+        <div class="card">
+          <h2 data-t="botsSetup"></h2>
+          <div id="bots-settings"></div>
+          <div class="row"><button class="big main" id="bots-go" data-t="go"></button></div>
+          <button class="linkish" data-back data-t="back"></button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-help">
+        <div class="card wide">
+          <h2 data-t="help"></h2>
+          <div id="help-body" class="prose"></div>
+          <h2 data-t="controls"></h2>
+          <div id="ctrl-body" class="prose"></div>
+          <button class="linkish" data-back data-t="back"></button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-options">
+        <div class="card">
+          <h2 data-t="options"></h2>
+          <div id="options-body"></div>
+          <p class="hint" data-t="optFollows"></p>
+          <button class="linkish" data-back data-t="back"></button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-roundend">
+        <div class="card wide">
+          <h2 id="re-title"></h2>
+          <p id="re-sub" class="hint"></p>
+          <div id="re-gallery" class="gallery"></div>
+          <ul id="re-points" class="points"></ul>
+          <p class="status" id="re-next"></p>
+        </div>
+      </section>
+
+      <section class="screen" id="s-final">
+        <div class="card wide">
+          <h2 data-t="finalTitle"></h2>
+          <ul id="final-list" class="points big"></ul>
+          <div id="final-stats" class="statgrid"></div>
+          <div class="row">
+            <button class="mid main" id="f-again" data-t="playAgain"></button>
+            <button class="mid" id="f-lobby" data-t="toLobby"></button>
+            <button class="mid" id="f-menu" data-t="menu"></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-pause">
+        <div class="card">
+          <h2 data-t="paused"></h2>
+          <p class="hint" id="pause-hint"></p>
+          <div class="stack">
+            <button class="big main" id="p-resume" data-t="resume"></button>
+            <button class="mid" id="p-quit" data-t="quit"></button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

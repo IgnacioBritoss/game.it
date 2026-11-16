@@ -1,0 +1,20 @@
+{
+  "id": "disimula",
+  "title": { "es": "Disimulá", "en": "Blend In" },
+  "description": {
+    "es": "Escondidas con pintura: pintate el cuerpo para fundirte con el escenario antes de que los buscadores te encuentren. Online con amigos.",
+    "en": "Hide and seek with paint: paint your body to melt into the scenery before the seekers find you. Online with friends."
+  },
+  "categories": ["accion", "online", "multijugador", "casual"],
+  "tags": ["camuflaje", "camouflage", "escondidas", "hide and seek", "pintura", "paint", "3d", "online", "salas", "rooms", "amigos", "friends", "maniqui", "mannequin"],
+  "thumbnail": "thumb.svg",
+  "entry": "index.html",
+  "tech": "three.js",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "landscape",
+  "input": ["keyboard", "mouse", "touch"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 10, "pointerLock": true },
+  "hidden": true,
+  "order": 40
+}

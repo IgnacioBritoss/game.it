@@ -33,7 +33,7 @@ Hay una plantilla lista en [`templates/juego-base/`](templates/juego-base/) y `n
 
 **Publicado en Render** (cada push a `main` se despliega solo):
 - Web: https://game-it-63r9.onrender.com (sitio estático: `npm ci && npm run build` → `dist/`)
-- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral, Cruce, Micelio, Bolos, Vuelo y Disimulá): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
+- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral, Cruce, Micelio, Bolos, Vuelo, Golfazo y Disimulá): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
   Variables: `ALLOWED_ORIGINS` (orígenes permitidos, separados por coma). La IP de cada cliente (para los límites por IP) se detecta sola cuando hay un proxy delante (solo se confía en los encabezados si quien se conecta por TCP es una dirección interna); se puede fijar con `CLIENT_IP_HEADER` (p. ej. `cf-connecting-ip`) o `TRUST_PROXY_HOPS` (cuántos proxies agregan una entrada a `X-Forwarded-For`, contando desde la derecha). `MAX_RT_ROOMS` (4 por defecto) es el tope de salas en tiempo real a la vez (Ameba, Serpentina, Clashball, Pádel, Disimulá y las arenas nuevas): el servidor gratis de Render tiene 0,1 CPU; al llegar al tope, crear otra devuelve `server_full_rt`. `/health` informa `rt: { rooms, max, avgTickMs }`. Límites ajustables en `server/index.js` (`CFG`).
 - En desarrollo: `npm run server` levanta el servidor local en `ws://localhost:8787`, que los juegos online usan automáticamente.
 
@@ -963,6 +963,95 @@ espectador hasta la siguiente. Los **bots** (escondidos que se pintan por proyec
 niveles) corren con el mismo `shared/` en el servidor y sin conexión. Modos: online con amigos, partidas públicas, contra bots y práctica
 (pintar y explorar sin tiempo, con el puntaje de camuflaje en vivo). Sonido con `/shared/sfx.js` (silbido 3D posicional) y música
 sintetizada que mete tensión en los últimos 30 segundos.
+### Tuercas (karts y motos en 3D)
+
+Carreras de karts y motos en 3D de dibujito (`public/games/tuercas/`, three.js, todo procedural: sin modelos ni imágenes). Los modelos se
+arman con geometrías fusionadas con colores por vértice, sombreado de dibujito de cuatro tonos, contorno grueso (casco invertido, también
+en instancias) y sombras de mancha; el decorado de cada pista usa mallas instanciadas y las texturas salen de un canvas. Se elige entre
+**ocho pilotos** y **siete vehículos** (cuatro autos y tres motos) y en el **taller** se arma cada uno: ruedas (cinco), accesorios
+(cinco), pintura (diez) y tres ajustes (relación, suspensión y lastre) que mueven seis estadísticas (velocidad, aceleración, manejo, peso,
+agarre y turbo) con ventajas y costos (`shared/parts.js`: `statsOf` y `params` pasan de las piezas a los números de la física). Hay **seis
+pistas** con tema propio (pradera, costa, ciudad, glaciar, caldera y taller) agrupadas en dos copas, tres clases de dificultad (los bots
+corren más rápido y mejor), **carrera libre**, **contrarreloj** (en solitario, con tres sifones, y la mejor vuelta de cada pista se
+guarda) y **2 jugadores en pantalla dividida**. En la carrera hay **cajas de ítems** (sifón, sifón triple, aceite, rulemán, tero, nube,
+burbuja, bocina, imán, ají y cañita, que salen de una ruleta que reparte mejor lo que ayuda más al que va atrás), **tuercas** que suman
+velocidad, **derrapes** con saltito y tres niveles de miniturbo (dos en las motos), estelas de aire, plataformas de impulso y **rampas**
+con piruetas. La física (`shared/kart.js`, paso fijo de 1/120 s) separa hacia dónde mira el vehículo de hacia dónde se mueve, y toda la
+carrera (`shared/race.js`) es determinista: con la misma semilla pasa siempre igual. Las pistas se generan con una "tortuga" (rectas y
+arcos; dos rectas se resuelven para cerrar el circuito), se suavizan, se muestrean cada ~2 m y se validan (cierre, espacio libre,
+curvatura y largada en recta); los bots (`shared/ai.js`) siguen una línea de carrera con margen a los bordes, esquivan estorbos y manchas,
+usan los ítems con algo de criterio y se acomodan al ritmo (elástico). La resolución se adapta a la velocidad de cuadros, los íconos del
+taller se renderizan con un contexto WebGL aparte y la música y los efectos se sintetizan. Se juega con teclado, mando o pantalla táctil.
+
+### Brinco (plataformas 2D)
+
+Plataformas de dibujito en un canvas 2D (`public/games/brinco/`): **doce niveles en cuatro mundos** (pradera, cueva, nieve y volcán), cada
+uno con sus obstáculos (tubos con plantas, púas, cintas transportadoras, hielo que patina, ventisca que empuja, plataformas que se mueven
+o se caen, bloques que se desmoronan, lava, cañones, aplastadores, barras de fuego, murciélagos, escarabajos con caparazón…) y un **jefe**
+al final de cada mundo (embestidor, saltador y volador; el Rey Tuerca aguanta más). Hay **ocho personajes** con una habilidad distinta
+cada uno: más vida, salto largo, planeo, velocidad, escupir semillas, salto de pared, armadura contra púas y pisotón. Cada nivel esconde
+**tres gemas**, tiene banderines donde se reaparece y premios (fruta, flor, ají y corazón dorado); el progreso, las medallas (nivel
+superado, las tres gemas, sin recibir daño) y los mejores tiempos se guardan. La simulación (`shared/sim.js`, pura y de paso fijo 1/60 s)
+usa baldosas, salto de altura variable con margen de coyote y de apretado anticipado, y es determinista. Los niveles se arman pegando
+tramos (`shared/builder.js`, que garantiza que cada borde calza con el siguiente) y un piloto automático (`shared/pilot.js`, que prueba
+movimientos sobre copias del mundo y elige el mejor) juega la demo de la pantalla de inicio y, en las pruebas, comprueba que los doce
+niveles se terminan, que cada personaje puede con niveles pensados para frenarlo y que cada gema se puede alcanzar. Se juega con teclado,
+mando o pantalla táctil.
+
+### Golfazo (mini golf 3D estilo cartoon)
+
+Mini golf en three.js (`public/games/golfazo/`) con **4 mundos de 6 hoyos** —Pradera, Bahía Coral, Glaciar y Volcán— llenos de obstáculos: molinos,
+martillos, barras giratorias, compuertas, cangrejos, balsas que llevan la pelota, cintas, platos giratorios, aceleradores, resortes, tubos y cañones,
+rulos, lomas, rampas con salto, hielo, arena, agua y lava (que suman un golpe y te devuelven atrás). Se arrastra hacia atrás (honda) y se suelta; dos
+dedos o clic derecho giran la cámara, pellizco o rueda hacen zoom, y con teclado ← → apuntan, ↑ ↓ dan fuerza, espacio pega y Q E giran. Hay guía de
+trayectoria (apagada, corta o larga), vista general del hoyo y estrellas por hoyo (par o mejor = 2, birdie = 3, hasta par + 2 = 1).
+
+- **Física** (`shared/physics.js`): paso fijo de 1/120 s con subpasos, solo `+ − × ÷ √` y la trigonometría propia de `shared/dmath.js` (polinomios), así que
+  es **determinista bit a bit** en cualquier navegador y en Node. La pelota choca con triángulos de piso (normales suaves en lomas y rulos), cajas
+  orientadas (barandas en cadena con normales que giran en las juntas), cilindros y aristas de cornisa; los obstáculos que se mueven son una función pura del
+  tiempo del hoyo (`pose(m, t)`), la pelota que se apoya en uno viaja con él, y el hoyo se resuelve de forma analítica (borde, pared y fondo).
+- **Hoyos** (`shared/build.js` + `shared/holes.js`): cada hoyo es una receta de una "tortuga" (`lane`, `arc`, `disc`, `loop`, `gap`, `windmill`, `slider`,
+  `portal`…); las barandas se generan solas en todo el contorno y se abren donde la cancha continúa. `tools/golfazo-solve.mjs` busca golpes que embocan
+  cada hoyo (muestreo con semilla + haz de los mejores estados) y guarda las soluciones de prueba en `shared/solutions.js`.
+- **Escena** (`scene.js`, `models.js`, `geo.js`, `themes.js`): toon shading con color por vértice, piso con texturas pintadas en canvas, sombras, cielo, mar o lava
+  animados, adornos de cada mundo, partículas, cámara que sigue el camino del hoyo y vuela por él al empezar. Los obstáculos se dibujan con las mismas cajas
+  que usa la física, así que lo que se ve es lo que choca.
+- **Modos**: *Un jugador* (los 4 mundos, la *Gira* de 8 hoyos o los 24 seguidos; récord y estrellas en `gameit:golfazo:*`), *Con amigos* (de 2 a 4 por turnos
+  en el mismo aparato, empieza el que mejor anotó el hoyo anterior) y **Online de 1 a 8 a la vez** (`server/games/golfazo.js`).
+- **Online**: como en Golf It, todos juegan al mismo tiempo, cada uno con su pelota, y se ven las de los demás. El cliente simula al instante y manda solo el
+  golpe `{ a: ángulo 0..65535, p: fuerza 1..1000, k: tick del reloj del hoyo }`; el servidor lo repite con la misma física, decide los golpes y si embocó
+  (rechaza ticks del futuro, pelota en movimiento o golpes de más con `reject`) y manda a todos la lista de golpes de cada jugador, que los demás repiten para
+  animar su pelota. El reloj del hoyo arranca a la vez para todos (`startAt`); hay tiempo por hoyo (60, 90 o 120 s), cuando el primero emboca a los demás
+  les quedan 25 s, quien no termina suma 10 golpes y gana el que menos suma (desempata el tick en que embocó). Salas públicas (Partida rápida) o privadas con
+  código, link para compartir, revancha y reconexión (al volver se repiten los golpes y se pone al día).
+
+Pruebas en `tests/golfazo.test.mjs` (física, los 24 hoyos con su solución, reglas, partida online contra el servidor y una partida completa de 6 hoyos con reloj falso).
+
+### Terco (plataformas de trampas)
+
+Plataformas de trampas de un solo golpe (`public/games/terco/`), de una sola jugadora: una mulita sube el cerro, patea piedritas y
+vuelve al último fogón cada vez que algo filoso, un bicho o una trampa la agarra. Son **33 pantallas** de 32×16 baldosas en seis zonas —el
+Puesto (tutorial y apacheta), la Quebrada, la Mina (a oscuras, solo se ve cerca de la mula, de los fogones y de los faroles), el Salar,
+el Volcán (con una subida de lava) y la Cumbre—, un **jefe por zona** (el Cóndor, el Topo, el Flamenco, la Culebra y la Tormenta, cada uno
+con tres fases y un aviso antes de cada ataque), **zanahorias secretas** (algunas detrás de bloques escondidos o paredes de mentira) y
+las trampas del género: pinchos que aparecen o caen del techo, pisos de mentira y flojos, bloques que se dejan ver con un cabezazo,
+plataformas que llevan, caen o aplastan, sierras en riel o en órbita, cerbatanas, rocas que ruedan, géiseres, ráfagas, bloques que
+parpadean, cintas y lava que sube. Las piedritas (X, Z o K) rompen ladrillos, tocan cencerros que abren portones, prenden fogones y
+bajan bichos. Se corre a velocidad fija, el salto se corta al soltar el botón y se tiene un salto más en el aire; con `R` se vuelve al
+fogón. Hay tres dificultades (normal, bravo y terco: cada una le saca fogones a la anterior), se guarda sola en `localStorage`
+(`gameit:terco:save`) en cada fogón, zanahoria y piedra, hay mejor tiempo por dificultad, música y efectos sintetizados y controles de
+teclado (flechas o WASD según las preferencias del portal), toque y mando.
+
+La simulación (`shared/sim.js`) es pura y determinista a 60 pasos por segundo: ningún azar, todo sale del reloj de la pantalla. Las
+pantallas (`shared/rooms.js`) las genera `tools/terco-niveles.py` (`python3 tools/terco-niveles.py`: mapas ASCII más objetos, con la
+leyenda en el encabezado del script), `shared/world.js` junta pantallas, fogones, piedras y zanahorias y `shared/bosses.js` tiene los
+cinco jefes. **Se puede terminar, y se prueba:** `tools/terco/solver.mjs` es un buscador de soluciones sobre la simulación real (un A*
+voraz con margen en los peligros, para que nada dependa de un píxel) y `tools/terco/boss-bot.mjs` un piloto que prueba jugadas por
+adelantado y vence a cada jefe; `node tools/terco/walk.mjs` los junta en un recorrido sin morir por todo el juego, con todas las
+zanahorias, que se guarda en `tests/fixtures/terco-walk.json` y que `npm test` reproduce paso a paso (`node tools/terco/check-rooms.mjs`
+revisa además que las salidas de cada pantalla coincidan con las de la de al lado). Si se cambia una pantalla o un jefe hay que volver
+a armar el recorrido.
+
 
 ## Juegos diarios
 

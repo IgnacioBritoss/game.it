@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <title>Brinco · game.it</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet" />
+    <script src="/sdk/gameit.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="cv"></canvas>
+
+    <!-- HUD del nivel -->
+    <div class="hud" id="hud" hidden>
+      <div class="h-left">
+        <div class="hearts" id="h-hearts"></div>
+        <div class="stat"><i class="ico coin"></i><b id="h-coins">0</b></div>
+        <div class="gems" id="h-gems"></div>
+      </div>
+      <div class="h-mid"><b id="h-name"></b><span id="h-time">0:00</span></div>
+      <button class="pause-btn" id="b-pause" aria-label="pause"><i></i><i></i></button>
+      <div class="boss" id="h-boss" hidden><span id="h-boss-name"></span><div class="bar"><i id="h-boss-bar"></i></div></div>
+      <div class="hint" id="h-hint"></div>
+    </div>
+    <div class="ready" id="ready"></div>
+    <div class="fade" id="fade"></div>
+
+    <!-- controles táctiles -->
+    <div class="touch" id="touch" hidden>
+      <div class="tc-l">
+        <button class="tb" data-k="l" aria-label="left"><svg viewBox="0 0 24 24"><path d="M15 5l-8 7 8 7z"/></svg></button>
+        <button class="tb" data-k="r" aria-label="right"><svg viewBox="0 0 24 24"><path d="M9 5l8 7-8 7z"/></svg></button>
+      </div>
+      <div class="tc-r">
+        <button class="tb small" data-k="d" aria-label="down"><svg viewBox="0 0 24 24"><path d="M5 9l7 8 7-8z"/></svg></button>
+        <button class="tb act" data-k="a" aria-label="action"><span data-t="tAct"></span></button>
+        <button class="tb jump" data-k="u" aria-label="jump"><span data-t="tJump"></span></button>
+      </div>
+    </div>
+
+    <!-- inicio -->
+    <section class="screen on" id="s-title">
+      <div class="title">
+        <div class="logo"><h1><span>B</span><span>R</span><span>I</span><span>N</span><span>C</span><span>O</span></h1></div>
+        <p class="tag" data-t="tagline"></p>
+        <div class="menu">
+          <button class="btn sun" id="m-play"><span data-t="play"></span><small id="m-play-sub"></small></button>
+          <div class="row2">
+            <button class="btn ice" id="m-chars"><span data-t="chars"></span><small id="m-chars-sub"></small></button>
+            <button class="btn grape" id="m-help"><span data-t="help"></span><small data-t="helpSub"></small></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- personajes -->
+    <section class="screen" id="s-chars">
+      <div class="panel wide">
+        <h2 data-t="pickChar"></h2>
+        <div class="chars" id="chars"></div>
+        <div class="char-info" id="char-info"></div>
+        <button class="btn sun" id="chars-ok"><span data-t="done"></span></button>
+      </div>
+    </section>
+
+    <!-- mapa de mundos -->
+    <section class="screen" id="s-map">
+      <div class="panel wide map">
+        <h2 data-t="worlds"></h2>
+        <div class="worlds" id="worlds"></div>
+        <button class="link" id="map-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- cómo se juega -->
+    <section class="screen" id="s-help">
+      <div class="panel wide help">
+        <h2 data-t="help"></h2>
+        <div class="help-grid" id="help-body"></div>
+        <button class="btn sun" id="help-ok"><span data-t="gotIt"></span></button>
+      </div>
+    </section>
+
+    <!-- pausa -->
+    <section class="screen dim" id="s-pause">
+      <div class="panel">
+        <h2 data-t="paused"></h2>
+        <button class="btn sun" id="p-resume"><span data-t="resume"></span></button>
+        <button class="btn ice" id="p-restart"><span data-t="restart"></span></button>
+        <button class="btn ghost" id="p-help"><span data-t="help"></span></button>
+        <button class="link" id="p-map" data-t="toMap"></button>
+      </div>
+    </section>
+
+    <!-- resultados -->
+    <section class="screen" id="s-results">
+      <div class="panel">
+        <p class="kicker" id="res-kicker"></p>
+        <h2 id="res-title"></h2>
+        <div class="res-gems" id="res-gems"></div>
+        <ul class="res-list" id="res-list"></ul>
+        <div class="btns" id="res-btns"></div>
+      </div>
+    </section>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "id": "terco",
+  "title": { "es": "Terco", "en": "Terco" },
+  "description": {
+    "es": "Plataformas de trampas donde cualquier cosa filosa te manda de vuelta al último fogón. Una mulita sube el cerro por cinco zonas —el Puesto, la Quebrada, la Mina, el Salar, el Volcán y la Cumbre—, patea piedritas, vence a cinco jefes y busca zanahorias secretas. Tres dificultades: cuanto más terco, menos fogones.",
+    "en": "A trap platformer where anything sharp sends you back to the last campfire. A little mule climbs the mountain through five zones —the Outpost, the Gorge, the Mine, the Salt Flats, the Volcano and the Summit—, kicks pebbles, beats five bosses and hunts secret carrots. Three difficulties: the more stubborn, the fewer campfires."
+  },
+  "categories": ["accion", "aventura", "arcade"],
+  "tags": ["plataformas", "platformer", "trampas", "traps", "precision", "precisión", "dificil", "difícil", "hard", "jefes", "bosses", "mula", "mule", "fogones", "checkpoints", "secretos", "secrets", "saltar", "jump", "retro"],
+  "thumbnail": "thumb.svg",
+  "entry": "index.html",
+  "tech": "canvas2d",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "landscape",
+  "input": ["keyboard", "touch", "gamepad"],
+  "features": { "online": false, "multiplayer": false, "maxPlayers": 1, "story": false },
+  "order": 72
+}

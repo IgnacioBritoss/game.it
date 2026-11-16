@@ -1,0 +1,20 @@
+{
+  "id": "bengala",
+  "title": { "es": "Bengala", "en": "Skyburst" },
+  "description": {
+    "es": "Fuegos artificiales contra el reloj: en cada función lanzás cohetes, encadenás estallidos y levantás la ovación; después mejorás tus morteros en el taller. Llená la plaza para viajar de un pueblito a la Luna. Con show del día, contrarreloj con medallas y duelo online.",
+    "en": "Fireworks against the clock: every show you launch rockets, chain bursts and work the crowd, then upgrade your mortars in the workshop. Fill the square to travel from a tiny village to the Moon. With a daily show, medal time trials and online duels."
+  },
+  "categories": ["idle", "arcade", "casual", "online", "multijugador", "diarios"],
+  "tags": ["incremental", "clicker", "idle", "fuegos artificiales", "fireworks", "cohetes", "rockets", "cadenas", "chain", "prestigio", "prestige", "contrarreloj", "time trial", "duelo", "duel", "diario", "daily"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "canvas2d + dom + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["mouse", "touch", "keyboard"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 8, "daily": true, "save": true, "story": false },
+  "daily": { "epoch": "2026-11-12" },
+  "order": 75
+}

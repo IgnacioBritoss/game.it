@@ -33,7 +33,7 @@ Hay una plantilla lista en [`templates/juego-base/`](templates/juego-base/) y `n
 
 **Publicado en Render** (cada push a `main` se despliega solo):
 - Web: https://game-it-63r9.onrender.com (sitio estático: `npm ci && npm run build` → `dist/`)
-- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral, Cruce, Micelio, Bolos, Vuelo, Golfazo y Disimulá): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
+- Servidor online (salas de Minigolf, Tateti, 4 en línea, Drift, Sky Hop, Clashball, Ajedrez, Ameba, Serpentina, Billar, Chispa, Mecha Corta, Garabato, Teléfono Loco, La Cabra · Pádel, Batalla Naval, Voleyball, Trotamundos, Espiral, Cruce, Micelio, Bolos, Vuelo, Golfazo, Bengala y Disimulá): https://gameit-server-fy2t.onrender.com — `node server/index.js`.
   Variables: `ALLOWED_ORIGINS` (orígenes permitidos, separados por coma). La IP de cada cliente (para los límites por IP) se detecta sola cuando hay un proxy delante (solo se confía en los encabezados si quien se conecta por TCP es una dirección interna); se puede fijar con `CLIENT_IP_HEADER` (p. ej. `cf-connecting-ip`) o `TRUST_PROXY_HOPS` (cuántos proxies agregan una entrada a `X-Forwarded-For`, contando desde la derecha). `MAX_RT_ROOMS` (4 por defecto) es el tope de salas en tiempo real a la vez (Ameba, Serpentina, Clashball, Pádel, Disimulá y las arenas nuevas): el servidor gratis de Render tiene 0,1 CPU; al llegar al tope, crear otra devuelve `server_full_rt`. `/health` informa `rt: { rooms, max, avgTickMs }`. Límites ajustables en `server/index.js` (`CFG`).
 - En desarrollo: `npm run server` levanta el servidor local en `ws://localhost:8787`, que los juegos online usan automáticamente.
 
@@ -1052,6 +1052,35 @@ zanahorias, que se guarda en `tests/fixtures/terco-walk.json` y que `npm test` r
 revisa además que las salidas de cada pantalla coincidan con las de la de al lado). Si se cambia una pantalla o un jefe hay que volver
 a armar el recorrido.
 
+### Bengala (incremental de fuegos artificiales)
+
+Incremental por funciones (`public/games/bengala/`): cada **función** dura unos segundos (40 al empezar) con el cielo a pantalla
+completa y, entre una y otra, el **taller** donde se gasta lo juntado. Se toca el cielo para lanzar cohetes (con mechas que se
+recargan) y ocho morteros disparan solos, cada uno a su manera y con su dibujo: el Chasquibum chasquea bajito, la Cañita sube
+culebreando, el Volcán es un surtidor sobre el mortero, el Tres tiros tira una columna, la Batería un abanico, la Torta un barrido, la
+Bombarda un estallido grande con aro y el Trueno uno enorme con chasquidos. Cada estallido deja una onda que prende los cohetes en
+vuelo, los farolitos y el cartel de la avioneta que toque, y cada eslabón de esa **cadena** paga más hasta un tope. La **ovación** sube
+con las cadenas en las que hubo un toque, multiplica todo y, llena, se queda llena hasta que se usa en el **Gran Final** (la barra de
+ovación es el botón). Hay mejoras de tienda, un **catálogo** de 80 recetas (8 colores por 10 formas, con Pólvora que dan los pedidos
+del público, el avión y los finales), viento y 60 logros. El prestigio es la **gira**: juntar la meta de la sede en una sola función
+llena la plaza y habilita viajar a la siguiente (Pueblo, Puerto, Sierra, Salar, Metrópolis, Isla, Ciudad flotante y Luna, cada una con
+su cielo, su silueta y su regla); el viaje reinicia chispas, morteros y tienda, deja una postal que multiplica y da estrellas para
+encender las 60 de seis **constelaciones** (cada figura completa da un poder). Pasada la Luna la gira vuelve a empezar con metas más
+altas. Un **tutorial por pasos** enseña de a una cosa (tocar, reventar un farolito, encadenar, comprar, el Gran Final, recetas, viajar,
+constelaciones) y deja jugar entre paso y paso; las pestañas del taller aparecen cuando hacen falta. La simulación (`shared/sim.js`) es
+pura y determinista a 20 pasos por segundo: solo usa + − × ÷ √ y redondeos, así da exactamente lo mismo en cualquier navegador y en
+Node; el dibujo (`render.js`, `art.js`, canvas 2D) solo anima lo ya decidido, con un pozo fijo de chispas en mezcla aditiva, cantidad y
+resolución que se ajustan solas al tiempo de cuadro y flores quietas si se pidió reducir movimiento. Los números (`shared/data.js`) se
+calibraron con un bot (`shared/bot.js`, cinco niveles) que las pruebas usan para comprobar el ritmo: la primera plaza se llena en unas
+10 funciones y la gira entera en unas 120; cada función en una sede suma un poco de fama, así nadie se queda trabado. La gira se guarda
+sola (`shared/save.js`, con versión) y se puede exportar e importar como texto. Modos contra otros, todos de cero y con el mismo ir y
+venir entre función y taller por horario (`RACE` en `data.js`): **Show del día** (tres funciones con la sede, los tres colores y los
+farolitos de la fecha), **Contrarreloj** de 3, 5 o 10 minutos con cinco medallas sacadas de los niveles del bot y **reto por link**
+(`?reto=semilla-minutos-puntaje`: la misma semilla, sin servidor), y **duelo online** de hasta 8 (`server/games/bengala.js`, sobre
+`_race.js`): el cliente manda su registro de acciones en tandas y el servidor lleva una sim por jugador con ese registro; el puntaje que
+vale, también para quien no termina, es el de esa sim, se descartan las acciones del futuro, las que retroceden y las que llegan con
+más de 10 s de atraso, y si se recarga la página el duelo sigue donde estaba. El sabotaje opcional (humo al que va primero con cada
+Gran Final) es solo visual: nunca cambia un número.
 
 ## Juegos diarios
 
@@ -1100,6 +1129,7 @@ cada carpeta de datos tiene su `LEEME.txt` con las fuentes y licencias. Para sum
 | Dominó | Una ronda de dominó de a dos contra Don Mate (nivel difícil) con las mismas fichas para todos (el reparto sale de la fecha); cuenta si ganaste y por cuánto. | El reparto de la ronda y la suerte de la compu salen de la semilla del día (`daily.js`) en `domino/game.js`; la mesa es la misma que la de las partidas normales. |
 | Chorrito | Un nivel de 10 colores con los mismos tubos para todos; cuenta los trasvases (estrellas contra lo que encuentra el resolvedor). | La semilla es la fecha (`chorrito-daily-AAAA-MM-DD`) y `chorrito/shared/engine.js` arma siempre el mismo nivel y comprueba que tiene solución; el resultado y la racha se guardan con `daily.js`, y la partida en curso queda guardada si se recarga. |
 | Gemas | 25 jugadas con las mismas gemas para todos (las que caen salen de la fecha y de las jugadas); cuenta el puntaje y las estrellas según lo que consigue la compu con ese mismo tablero. | La semilla es la fecha (`gemas-daily-AAAA-MM-DD`) y `gemas/shared/engine.js` rehace la partida guardada si se recarga; el resultado y la racha se guardan con `daily.js`. |
+| Bengala | Tres funciones de fuegos artificiales, de cero, con taller entre una y otra: la sede (con su regla), los tres colores permitidos, el viento y los farolitos son los mismos para todos; cuenta las chispas y la mejor cadena. | La fecha siembra `dailySetup` en `bengala/shared/sim.js`; el resultado y la racha se guardan con `daily.js`. |
 
 El texto para compartir de cada uno es `game.it · <Juego> #N …` con cuadraditos de colores y el link; en modo práctica no se
 suma nada a las estadísticas. Las listas de respuestas y de puzzles se pueden ampliar sin tocar el código (los desafíos

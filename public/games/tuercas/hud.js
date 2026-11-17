@@ -52,6 +52,7 @@ export class Hud {
     this.path = null;
     this.mini = { w: 0 };
     this.lastRank = '';
+    this.boardN = 8; // cuántos puestos muestra el tablero (online: hasta 12)
   }
 
   /** Arma un bloque por jugador. */
@@ -236,8 +237,8 @@ export class Hud {
         this.lastRank = sig;
         const me = views[0].kart;
         this.blocks[0].board.innerHTML = R.order
-          .slice(0, 8)
-          .map((k, p) => `<li class="${k === me ? 'me' : ''}"><b>${p + 1}</b><i style="background:${PAINTS[k.cfg.paint] || '#fff'}"></i><span>${esc(k.name)}</span></li>`)
+          .slice(0, this.boardN)
+          .map((k, p) => `<li class="${k === me ? 'me' : ''}${R.online && k.human < 0 ? ' bot' : ''}"><b>${p + 1}</b><i style="background:${PAINTS[k.cfg.paint] || '#fff'}"></i><span>${esc(k.name)}</span></li>`)
           .join('');
       }
     }

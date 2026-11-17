@@ -963,6 +963,7 @@ espectador hasta la siguiente. Los **bots** (escondidos que se pintan por proyec
 niveles) corren con el mismo `shared/` en el servidor y sin conexión. Modos: online con amigos, partidas públicas, contra bots y práctica
 (pintar y explorar sin tiempo, con el puntaje de camuflaje en vivo). Sonido con `/shared/sfx.js` (silbido 3D posicional) y música
 sintetizada que mete tensión en los últimos 30 segundos.
+
 ### Tuercas (karts y motos en 3D)
 
 Carreras de karts y motos en 3D de dibujito (`public/games/tuercas/`, three.js, todo procedural: sin modelos ni imágenes). Los modelos se
@@ -973,7 +974,7 @@ en instancias) y sombras de mancha; el decorado de cada pista usa mallas instanc
 agarre y turbo) con ventajas y costos (`shared/parts.js`: `statsOf` y `params` pasan de las piezas a los números de la física). Hay **seis
 pistas** con tema propio (pradera, costa, ciudad, glaciar, caldera y taller) agrupadas en dos copas, tres clases de dificultad (los bots
 corren más rápido y mejor), **carrera libre**, **contrarreloj** (en solitario, con tres sifones, y la mejor vuelta de cada pista se
-guarda) y **2 jugadores en pantalla dividida**. En la carrera hay **cajas de ítems** (sifón, sifón triple, aceite, rulemán, tero, nube,
+guarda), **2 jugadores en pantalla dividida** y **carreras online de hasta 12**. En la carrera hay **cajas de ítems** (sifón, sifón triple, aceite, rulemán, tero, nube,
 burbuja, bocina, imán, ají y cañita, que salen de una ruleta que reparte mejor lo que ayuda más al que va atrás), **tuercas** que suman
 velocidad, **derrapes** con saltito y tres niveles de miniturbo (dos en las motos), estelas de aire, plataformas de impulso y **rampas**
 con piruetas. La física (`shared/kart.js`, paso fijo de 1/120 s) separa hacia dónde mira el vehículo de hacia dónde se mueve, y toda la
@@ -981,7 +982,63 @@ carrera (`shared/race.js`) es determinista: con la misma semilla pasa siempre ig
 arcos; dos rectas se resuelven para cerrar el circuito), se suavizan, se muestrean cada ~2 m y se validan (cierre, espacio libre,
 curvatura y largada en recta); los bots (`shared/ai.js`) siguen una línea de carrera con margen a los bordes, esquivan estorbos y manchas,
 usan los ítems con algo de criterio y se acomodan al ritmo (elástico). La resolución se adapta a la velocidad de cuadros, los íconos del
-taller se renderizan con un contexto WebGL aparte y la música y los efectos se sintetizan. Se juega con teclado, mando o pantalla táctil.
+taller se renderizan en un `WebGLRenderTarget` del mismo renderer (un solo contexto WebGL en toda la página) y la música y los efectos se
+sintetizan. Se juega con teclado, mando o pantalla táctil.
+
+**Online de 1 a 12 personas** (`server/games/tuercas.js`, `realtime: true`; cliente en `online.js`, `shared/net.js` y `shared/client.js`). Salas
+públicas (Partida rápida) o privadas con código y link; cada quien arma su vehículo en el taller dentro de la sala y el anfitrión elige pista,
+vueltas (1, 2, 3 o 5), cilindrada, tamaño de la grilla (6, 8, 10 o 12) y si se completa con bots. Al terminar hay tabla de resultados y revancha
+(solo el anfitrión) sin salir de la sala. Cómo funciona:
+
+- **El servidor es el árbitro.** Corre la misma carrera que el modo sin conexión (`stepRace`, determinista) a 60 ticks por segundo (2 pasos de
+  física de 1/120 s cada uno) y manda snapshots a 20 Hz. Los clientes solo mandan entradas `{ t: 'i', e: [[seq, tick, volante, botones], …] }`
+  (con redundancia ×3 y latido cada 250 ms); el servidor las valida y las acota (como mucho 200 ms tarde y 600 ms por adelantado, una por tick, bandeja
+  de 24) y suelta todo si una persona deja de dar noticias (así no sigue acelerando contra una pared).
+- **Respuesta inmediata con 150 ms de ping.** El vehículo propio se predice con la misma física que el servidor (`stepOwn`) un poco adelantado
+  (medio ping más un margen por el jitter) y se reconcilia con el estado autoritativo (`/shared/net/predict.js`: el error se disuelve en 120 ms y solo
+  se salta directo si la diferencia pasa de 10 m); lo que el cliente no puede saber (choques, cajas, ítems, aceleradores) llega del servidor. Los demás vehículos y los
+  ítems sueltos se interpolan con el retardo adaptativo de `/shared/net/interp.js`, y los eventos de los demás (sonido, chispas, carteles) se muestran a
+  la hora que les toca en esa interpolación. Con las entradas grabadas de un piloto, la predicción y el servidor difieren 8 mm como máximo en una vuelta de 320 m (la prueba exige menos de 5 cm).
+- **Snapshots chicos.** El estado propio va completo en una fila de enteros (con el número de la última entrada aplicada) y el de los demás en
+  forma compacta (posición al centímetro, rumbo, banderas); lo común a todos se serializa una sola vez por tick, las cajas, tuercas y estorbos viajan en
+  máscaras de bits y los eventos en un formato por tabla. Un snapshot de 12 vehículos pesa ~1,1 KB (≈ 23 KB/s por cliente).
+- **Carrera y desconexiones.** Después de `start` se manda `init` y cada cliente arma la pista y responde `ready` (el servidor sigue a los 20 s aunque
+  falte alguien); después viene la cuenta regresiva. Quien se desconecta sigue en la carrera manejado por un bot y, si vuelve con su token dentro de
+  la gracia del núcleo (45 s), retoma el volante y recibe de nuevo el `init`; quien se va para siempre queda como bot. Cuando llega el primero los demás
+  tienen 45 s; después se cierra con los puestos por distancia (`estimated` en los resultados). Nadie puede entrar con la carrera en curso (`lateJoin: false`).
+- **Cuidar el servidor.** Un gobernador mide el costo medio de un tick y, si pasa de la mitad del intervalo (8,3 ms), hace que los bots decidan cada 2
+  y luego cada 4 pasos (vuelve atrás por debajo del 15 %), sin tocar la física de las personas; un snapshot se saltea si el socket de alguien tiene más de
+  64 KB sin enviar (el siguiente trae todo el estado); un mensaje inválido no cambia nada en la carrera y suma una falta (el núcleo ya limita a 30 mensajes
+  por segundo por conexión y corta al que insiste), y `cfg` (cambios del taller) tiene un enfriamiento de 150 ms. `MAX_RT_ROOMS` limita las salas en
+  tiempo real simultáneas (por defecto 4). Medido con 12 personas en una sala, en la máquina de desarrollo: 0,23 ms por tick en promedio (máx 0,6 de los
+  16,7 que dura) y ~4 % de un núcleo, sockets incluidos. En un servidor de muy poco CPU (planes gratuitos de 0,1 núcleo) una sala llena ya pesa:
+  conviene bajar `MAX_RT_ROOMS`.
+
+**Que no se cierre.** Además del modo online, el juego se protege de lo que suele tumbar a un juego de WebGL en el celular:
+
+- Si el navegador pierde el contexto (`webglcontextlost`, se cancela el evento para que lo pueda restaurar) se avisa en pantalla y no se dibuja hasta que
+  vuelve (`webglcontextrestored`: three.js vuelve a subir lo que falta y se pide un 15 % menos de resolución por si fue falta de memoria). Los íconos
+  del taller usan un `WebGLRenderTarget` del renderer principal en vez de un segundo contexto (en el celular el segundo es lo primero que se pierde).
+- Un error en un cuadro se registra y la carrera sigue; si se repite 30 veces seguidas se frena todo y aparece la pantalla "Ups, algo falló" con
+  **Volver al menú** y **Recargar**, en vez de una página congelada o en blanco. Al volver al menú de una carrera online se sale limpio de la sala.
+- En celulares (`quality` 0,6) no hay suavizado de bordes, la densidad de píxeles tope es 1,25 (2 en computadora), hay menos partículas y el decorado
+  arranca al 70 %. Sobre eso la resolución baja sola (hasta 0,7) si el cuadro promedia más de 21,5 ms durante 1,2 s y, si aun así no alcanza, se aflojan
+  de a 0,2 hasta el 40 % las instancias del decorado y el clima (`Stage.applyDetail`). Cada tipo de decorado se parte en celdas de 120 m (se descartan solas
+  fuera de cámara) y sus lugares se mezclan con semilla, así que quitar instancias adelgaza parejo toda la pista, sin huecos.
+- El sonido tiene un tope de 12 efectos por cada 0,25 s (en una carrera de 12 los eventos de los demás no se acumulan) y al cambiar de pista o
+  salir se liberan geometrías, materiales y texturas (se comprobó con un contador de recursos que no quedan objetos de GPU).
+
+Herramientas y pruebas: `tools/tuercas-bots.mjs` simula N personas sin interfaz (usan el mismo `shared/client.js` del navegador, con los bots de
+la compu al volante) y mide el costo del servidor y el ancho de banda por cliente:
+
+```bash
+PORT=18800 node server/index.js &
+node --import ./tests/register.mjs tools/tuercas-bots.mjs --url ws://localhost:18800 --clients 12 --laps 1 --bots off --size 12 [--pid <PID del servidor>]
+```
+
+Con `tools/netsim/delay-proxy.mjs` entre el navegador y el servidor se prueba con ~160 ms de RTT y paradas. `tests/tuercas-online.test.mjs`
+cubre los códecs (estado propio, ajeno, ítems y eventos de la carrera), el límite de 12, la validación de entradas, la paridad entre predicción y
+servidor y, contra el servidor real con WebSockets, carreras de 12 personas, con bots y con quien se va, reconexión, entradas mal formadas y revancha.
 
 ### Brinco (plataformas 2D)
 

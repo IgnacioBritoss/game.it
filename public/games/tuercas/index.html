@@ -17,6 +17,8 @@
     <div id="flash" class="flash"></div>
     <div id="vign" class="vign"></div>
     <button id="b-pause" class="pause-btn" aria-label="pausa" hidden><i></i><i></i></button>
+    <div id="net-chip" class="net-chip" role="status" aria-live="polite" hidden><i></i><span></span></div>
+    <div id="gfx-note" class="gfx-note" role="status" aria-live="polite" hidden></div>
 
     <!-- inicio -->
     <section class="screen on" id="s-home">
@@ -28,6 +30,7 @@
         <p class="tag" data-t="tagline"></p>
         <div class="menu">
           <button class="btn sun" id="m-cup"><span data-t="mCup"></span><small data-t="mCupSub"></small></button>
+          <button class="btn teal" id="m-online"><span data-t="mOnline"></span><small data-t="mOnlineSub"></small></button>
           <div class="row2">
             <button class="btn ice" id="m-free"><span data-t="mFree"></span><small data-t="mFreeSub"></small></button>
             <button class="btn lime" id="m-trial"><span data-t="mTrial"></span><small data-t="mTrialSub"></small></button>
@@ -54,6 +57,62 @@
         </div>
         <button class="btn sun go" id="sel-go"><span data-t="go"></span></button>
         <button class="link" id="sel-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- online: entrar -->
+    <section class="screen" id="s-online">
+      <div class="panel">
+        <h2 data-t="onTitle"></h2>
+        <label class="field"><span class="lbl" data-t="onName"></span><input id="on-name" maxlength="16" autocomplete="off" spellcheck="false" /></label>
+        <button class="btn sun" id="on-quick"><span data-t="onQuick"></span><small data-t="onQuickSub"></small></button>
+        <button class="btn ice" id="on-create"><span data-t="onCreate"></span><small data-t="onCreateSub"></small></button>
+        <div class="join-row"><input id="on-code" maxlength="5" autocomplete="off" spellcheck="false" autocapitalize="characters" data-ph="onCodePh" /><button class="btn lime small" id="on-join"><span data-t="onJoin"></span></button></div>
+        <p class="note" id="on-status" aria-live="polite"></p>
+        <button class="link" id="on-back" data-t="back"></button>
+      </div>
+    </section>
+
+    <!-- online: sala de espera -->
+    <section class="screen" id="s-lobby">
+      <div class="panel wide lobby">
+        <div class="lb-head">
+          <h2 data-t="lobbyTitle"></h2>
+          <button class="code" id="lobby-code" data-title="lobbyCodeTip"></button>
+        </div>
+        <div class="lb-grid">
+          <div class="lb-col">
+            <span class="lbl" data-t="lobbyPlayers"></span>
+            <ul class="lb-players" id="lobby-players"></ul>
+            <button class="mine" id="lobby-garage"><i class="mine-sw" id="mine-sw"></i><span><small data-t="lobbyGarage"></small><b id="mine-name"></b><em id="mine-sub"></em></span></button>
+          </div>
+          <div class="lb-col lb-opts">
+            <div class="opt-group"><span class="lbl" data-t="lobbyTrack"></span><div class="seg wrap" id="seg-track"></div></div>
+            <div class="opt-row">
+              <div class="opt-group"><span class="lbl" data-t="laps"></span><div class="seg" id="seg-laps"></div></div>
+              <div class="opt-group"><span class="lbl" data-t="lobbySize"></span><div class="seg" id="seg-size"></div></div>
+            </div>
+            <div class="opt-row">
+              <div class="opt-group"><span class="lbl" data-t="cls"></span><div class="seg" id="seg-cls"></div></div>
+              <div class="opt-group"><span class="lbl" data-t="lobbyBots"></span><div class="seg" id="seg-bots"></div></div>
+            </div>
+          </div>
+        </div>
+        <p class="note" id="lobby-status" aria-live="polite"></p>
+        <div class="btns two">
+          <button class="btn sun go" id="lobby-start"><span data-t="lobbyStart"></span></button>
+          <button class="btn ghost" id="lobby-leave"><span data-t="lobbyLeave"></span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- online: preparando la carrera -->
+    <section class="screen dim" id="s-loading">
+      <div class="panel">
+        <h2 data-t="prepTitle"></h2>
+        <div class="spin" aria-hidden="true"></div>
+        <p class="note" id="prep-note"></p>
+        <button class="link" id="prep-leave" data-t="leaveRace"></button>
       </div>
     </section>
 
@@ -91,6 +150,7 @@
     <section class="screen dim" id="s-pause">
       <div class="panel">
         <h2 data-t="paused"></h2>
+        <p class="note" id="pause-note" data-t="onPauseNote" hidden></p>
         <button class="btn sun" id="p-resume"><span data-t="resume"></span></button>
         <button class="btn ice" id="p-restart"><span data-t="restart"></span></button>
         <button class="btn ghost" id="p-help"><span data-t="help"></span></button>
@@ -107,6 +167,16 @@
         <ol class="table" id="res-table"></ol>
         <p class="note" id="res-note"></p>
         <div class="btns" id="res-btns"></div>
+      </div>
+    </section>
+
+    <!-- algo se rompió -->
+    <section class="screen" id="s-crash">
+      <div class="panel">
+        <h2 data-t="crashTitle"></h2>
+        <p class="note" data-t="crashText"></p>
+        <button class="btn sun" id="crash-menu"><span data-t="crashMenu"></span></button>
+        <button class="btn ghost" id="crash-reload"><span data-t="crashReload"></span></button>
       </div>
     </section>
 

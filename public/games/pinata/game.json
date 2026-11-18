@@ -1,0 +1,20 @@
+{
+  "id": "pinata",
+  "title": { "es": "Piñata", "en": "Piñata Bash" },
+  "description": {
+    "es": "Un cumpleaños en el patio: pegale a las piñatas cuando pasan por el medio, llegá a la cuota de cada tanda y elegí cartas para seguir la fiesta. Invitados que pegan solos, mantel, álbum de figuritas y una torta de velitas que te lleva por ocho fiestas distintas. Con piñata del día, contrarreloj con medallas y duelo online.",
+    "en": "A backyard birthday: whack the piñatas as they swing through the middle, hit each round's quota and pick cards to keep the party going. Guests who hit on their own, a tablecloth, a sticker album and a candle cake that takes you through eight different parties. With a daily piñata, medal time trials and online duels."
+  },
+  "categories": ["idle", "accion", "casual", "online", "multijugador", "diarios"],
+  "tags": ["incremental", "roguelite", "cartas", "cards", "ritmo", "rhythm", "piñata", "cumpleaños", "birthday", "fiesta", "party", "prestigio", "prestige", "contrarreloj", "time trial", "duelo", "duel", "diario", "daily"],
+  "thumbnail": "thumb.webp",
+  "entry": "index.html",
+  "tech": "canvas2d + dom + websocket",
+  "sdk": true,
+  "platforms": ["desktop", "mobile"],
+  "orientation": "any",
+  "input": ["mouse", "touch", "keyboard"],
+  "features": { "online": true, "multiplayer": true, "maxPlayers": 8, "daily": true, "save": true, "story": false },
+  "daily": { "epoch": "2026-11-15" },
+  "order": 76
+}

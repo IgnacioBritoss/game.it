@@ -1139,6 +1139,36 @@ vale, también para quien no termina, es el de esa sim, se descartan las accione
 más de 10 s de atraso, y si se recarga la página el duelo sigue donde estaba. El sabotaje opcional (humo al que va primero con cada
 Gran Final) es solo visual: nunca cambia un número.
 
+### Piñata (incremental de fiestas con cartas)
+
+Roguelite de cartas con golpes a ritmo (`public/games/pinata/`). Una **fiesta** son hasta 8 **tandas** de 30 segundos con el patio a
+pantalla completa: de la soga cuelgan tres piñatas que se hamacan y tocarlas es un golpe, que gasta **Fuerza** (se recarga sola). Si
+el golpe cae cuando la piñata pasa por el tramo rosa del medio del vaivén (un tercio de cada lado, con margen de un tick) es **de lleno**
+(y en el centro amarillo, **perfecto**, que pega un poco más): pega el doble, suma a la
+**racha** (que multiplica los caramelos hasta x3) y llena la **Euforia**, que llena se queda llena hasta que se toca **¡DALE!** (8 s de
+golpes gratis, todos de lleno y con caramelos x3). La sim decide si un golpe fue de lleno mirando la fase (una tabla de 256 enteros
+escrita a mano en `data.js`); el cliente solo dice a qué punto de la soga pegó. Al terminar una tanda, si los caramelos llegaron a la
+**cuota** se eligen una de tres **cartas** (36, en seis etiquetas: tres de la misma activan un premio) y sigue la fiesta; si no, se
+termina y lo juntado queda. Pasada la octava viene la **gigante** de siete picos, con tres puntos débiles que se turnan. Diez piñatas
+con su comportamiento (la Estrella gira, el Pez recorre la soga, el Cactus pincha, la Nube se parte, el Robot está blindado, el Tambor
+marca el compás, el Globo se escapa, el Unicornio deja un Chocolatín y el Regalo devuelve Fuerza) y ocho **invitados** que pegan solos,
+cada uno a su manera y con su dibujo. Entre fiestas, la **mesa**: invitados, **mantel** (48 nodos en cuatro ramas), **álbum** (48
+figuritas con Chocolatines; cada página completa cambia el calado de los banderines) y **torta** (24 velitas permanentes). Vencer a la
+gigante habilita **soplar las velitas**: se reinician caramelos, invitados y mantel, se ganan Velitas y se pasa a la edad siguiente
+(Patio, Plaza, Salón, Playa, Kermesse, Terraza, Circo y Carnaval, cada una con su fondo y su regla: viento, luces, olas, dos sogas,
+noche, rueda y todo junto); pasada la octava se vuelve a empezar con cuotas más altas. Cada fiesta en una edad suma un poco de daño y
+de caramelos, así nadie se queda trabado. Un **tutorial por pasos** (un globo por vez) enseña a pegar, a pegar de lleno, la cuota, las
+cartas, la mesa, ¡DALE!, el álbum y las velitas; las pestañas de la mesa aparecen cuando hacen falta. La simulación (`shared/sim.js`) es
+pura y determinista a 20 pasos por segundo (solo + − × ÷ √ y redondeos); el dibujo (`render.js`, `art.js`, canvas 2D de papel
+recortado: flecos por capas que dejan ver la de abajo al romperse, hasta el cartón) solo anima lo ya decidido. Los números se calibraron
+con un bot (`shared/bot.js`, cinco niveles): la primera fiesta termina en la tanda 2 o 3, la primera gigante cae entre las fiestas 8 y
+14 y las ocho edades llevan unas 120 fiestas. Se guarda al empezar y al terminar cada fiesta (recargar a mitad vuelve a la mesa de
+antes) y se puede exportar e importar como texto. Modos contra otros, sin cuota, de cero y con caramelos x6 (`RACE` en `data.js`):
+**Piñata del día** (3 minutos con la edad y las cartas de la fecha), **Contrarreloj** de 3, 5 o 10 minutos con cinco medallas sacadas
+de los niveles del bot y **reto por link** (`?reto=semilla-minutos-puntaje`), y **duelo online** de hasta 8 (`server/games/pinata.js`,
+sobre `_race.js`): todos ven las mismas cartas, el servidor rehace el registro de acciones de cada jugador y su puntaje es el que vale;
+reventar un Unicornio le tira confeti unos segundos al que va primero (solo visual).
+
 ## Juegos diarios
 
 Un desafío nuevo por día, igual para todos y a la misma hora: **cambia a las 00:00 de Argentina** (UTC−3 fijo). Cada juego
@@ -1187,6 +1217,7 @@ cada carpeta de datos tiene su `LEEME.txt` con las fuentes y licencias. Para sum
 | Chorrito | Un nivel de 10 colores con los mismos tubos para todos; cuenta los trasvases (estrellas contra lo que encuentra el resolvedor). | La semilla es la fecha (`chorrito-daily-AAAA-MM-DD`) y `chorrito/shared/engine.js` arma siempre el mismo nivel y comprueba que tiene solución; el resultado y la racha se guardan con `daily.js`, y la partida en curso queda guardada si se recarga. |
 | Gemas | 25 jugadas con las mismas gemas para todos (las que caen salen de la fecha y de las jugadas); cuenta el puntaje y las estrellas según lo que consigue la compu con ese mismo tablero. | La semilla es la fecha (`gemas-daily-AAAA-MM-DD`) y `gemas/shared/engine.js` rehace la partida guardada si se recarga; el resultado y la racha se guardan con `daily.js`. |
 | Bengala | Tres funciones de fuegos artificiales, de cero, con taller entre una y otra: la sede (con su regla), los tres colores permitidos, el viento y los farolitos son los mismos para todos; cuenta las chispas y la mejor cadena. | La fecha siembra `dailySetup` en `bengala/shared/sim.js`; el resultado y la racha se guardan con `daily.js`. |
+| Piñata | Una fiesta de 3 minutos, de cero y sin cuota: la edad (con su regla), las piñatas y las cartas que se ofrecen son las mismas para todos; cuenta los caramelos y la mejor racha. | La fecha siembra `dailySetup` en `pinata/shared/sim.js`; el resultado y la racha se guardan con `daily.js`. |
 
 El texto para compartir de cada uno es `game.it · <Juego> #N …` con cuadraditos de colores y el link; en modo práctica no se
 suma nada a las estadísticas. Las listas de respuestas y de puzzles se pueden ampliar sin tocar el código (los desafíos

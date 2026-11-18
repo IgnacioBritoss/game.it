@@ -621,8 +621,9 @@ El truco argentino con el mazo español de 40 cartas dibujado en SVG (`public/sh
 y bastos con las pintas del marco, los anchos grandes y la sota, el caballo y el rey vestidos por palo) sobre una mesa de
 paño, con los porotos anotados con fósforos. Está todo: tres bazas con parda, truco, retruco y vale cuatro (solo sube el
 que quiso el último canto), envido, real envido y falta envido que se encadenan (y "el envido está primero" cuando te
-cantan truco antes de tirar), mazo, flor opcional (se canta sola, anula el envido y se cobra al terminar la primera baza)
-y partidas a 15 o a 30. Las reglas (`shared/rules.js`) son puras; la mesa (`shared/table.js`: turnos, cantos, puntos,
+cantan truco antes de tirar; en parejas lo cantan y lo contestan solo los pies, que ven el envido de su compañero como si
+fuera la seña), mazo (en la primera, con el envido sin jugar, le da además 1 al rival: 2 si no se cantó nada), flor
+opcional (se canta sola, anula el envido y se cobra al terminar la primera baza) y partidas a 15 o a 30. Las reglas (`shared/rules.js`) son puras; la mesa (`shared/table.js`: turnos, cantos, puntos,
 tiempo por jugada, ausentes) corre igual en el navegador y en el servidor y a cada jugador le manda solo sus cartas. La
 compu (`shared/bot.js`) decide con lo mismo que ve una persona: reparte muchas veces las cartas que no vio (respetando lo
 que se dijo en el envido y quién cantó flor), juega cada mano hasta el final para estimar la chance de ganarla, le da peso

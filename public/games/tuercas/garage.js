@@ -30,20 +30,25 @@ export function saveConfig(i, cfg) {
 
 // ---------------------------------------------------------------- miniaturas de las piezas
 let thumbs = null;
-function makeThumbs(cfg) {
+/**
+ * Renderiza una vez la miniatura de cada pieza. Usa el MISMO contexto WebGL del juego (con un destino de render fuera de
+ * pantalla): crear un segundo contexto, aunque sea por un momento, en algunos celulares hace que el navegador pierda el
+ * principal (la pantalla se queda en negro). Devuelve las miniaturas, o vacío si no se pudo.
+ */
+function makeThumbs(cfg, r) {
   const out = { driver: {}, body: {}, wheels: {}, extra: {} };
-  let r;
+  if (!r || r.getContext().isContextLost?.()) return out;
+  const S = 132;
+  let rt;
   try {
-    const c = document.createElement('canvas');
-    r = new THREE.WebGLRenderer({ canvas: c, alpha: true, antialias: true, preserveDrawingBuffer: true });
+    rt = new THREE.WebGLRenderTarget(S, S, { samples: 4, depthBuffer: true });
+    rt.texture.colorSpace = THREE.SRGBColorSpace;
   } catch {
     return out;
   }
-  const S = 132;
-  r.setPixelRatio(1);
-  r.setSize(S, S, false);
-  r.outputColorSpace = THREE.SRGBColorSpace;
-  r.setClearColor(0x000000, 0);
+  const prevColor = new THREE.Color();
+  r.getClearColor(prevColor);
+  const prevAlpha = r.getClearAlpha();
   const scene = new THREE.Scene();
   scene.add(new THREE.HemisphereLight('#ffffff', '#9a8fb8', 1.8));
   const sun = new THREE.DirectionalLight('#fff4d6', 2.4);
@@ -51,6 +56,28 @@ function makeThumbs(cfg) {
   scene.add(sun);
   const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 60);
   const base = { ...cfg, paint: cfg.paint };
+  const buf = new Uint8Array(S * S * 4);
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = S;
+  const g2 = cv.getContext('2d');
+  const img = g2.createImageData(S, S);
+  /** Los píxeles vienen de abajo hacia arriba y multiplicados por el alfa: se acomodan para un canvas común. */
+  const toUrl = () => {
+    for (let y = 0; y < S; y++) {
+      let s = (S - 1 - y) * S * 4;
+      let d = y * S * 4;
+      for (let x = 0; x < S; x++, s += 4, d += 4) {
+        const a = buf[s + 3];
+        const k = a > 0 && a < 255 ? 255 / a : 1;
+        img.data[d] = Math.min(255, buf[s] * k);
+        img.data[d + 1] = Math.min(255, buf[s + 1] * k);
+        img.data[d + 2] = Math.min(255, buf[s + 2] * k);
+        img.data[d + 3] = a;
+      }
+    }
+    g2.putImageData(img, 0, 0);
+    return cv.toDataURL('image/png');
+  };
   const shot = (c, kind) => {
     const v = makeVehicle(c, { thick: 0.035 });
     scene.add(v.root);
@@ -78,8 +105,13 @@ function makeThumbs(cfg) {
       cam.position.set(-2.4, 2.2, -4.2);
     }
     cam.lookAt(at);
+    r.setRenderTarget(rt);
+    r.setClearColor(0x000000, 0);
+    r.clear(true, true, true);
     r.render(scene, cam);
-    const url = r.domElement.toDataURL('image/png');
+    r.readRenderTargetPixels(rt, 0, 0, S, S, buf);
+    r.setRenderTarget(null);
+    const url = toUrl();
     scene.remove(v.root);
     v.root.traverse((o) => o.geometry?.dispose());
     return url;
@@ -89,9 +121,12 @@ function makeThumbs(cfg) {
     for (const b of BODIES) out.body[b.id] = shot({ ...base, body: b.id }, 'body');
     for (const w of WHEELS) out.wheels[w.id] = shot({ ...base, wheels: w.id }, 'wheels');
     for (const e of EXTRAS) out.extra[e.id] = shot({ ...base, extra: e.id }, 'extra');
-  } catch {}
-  r.dispose();
-  r.forceContextLoss?.();
+  } catch (e) {
+    console.error(e);
+  }
+  r.setRenderTarget(null);
+  r.setClearColor(prevColor, prevAlpha);
+  rt.dispose();
   return out;
 }
 
@@ -312,7 +347,8 @@ export class Garage {
     if (!thumbs) {
       // las miniaturas se generan en el siguiente cuadro para no trabar la apertura
       requestAnimationFrame(() => {
-        thumbs = makeThumbs(this.cfg);
+        const t = makeThumbs(this.cfg, this.stage?.r);
+        if (t.driver && Object.keys(t.driver).length) thumbs = t; // si no se pudo, se reintenta la próxima vez que se abra el taller
         this.renderTab();
       });
     }

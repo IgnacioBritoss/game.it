@@ -470,34 +470,66 @@ export function obstacleModel(kind, th) {
   };
 }
 
-/** Pone una geometría en N lugares como una malla instanciada con contorno. Devuelve el grupo. */
-export function instanced(geo, places, { outline = true, thick = 0.045, mat = null, matOutline = null } = {}) {
+/** Lado (m) de las celdas en que se parte el decorado: cada una es una malla propia que la cámara puede descartar entera. */
+export const CELL = 120;
+
+/** Parte los lugares en celdas del mapa. Dentro de cada celda el orden se mezcla (con semilla), así quedarse con los primeros n deja un decorado parejo. */
+function cellsOf(places) {
+  const cells = new Map();
+  for (const pl of places) {
+    const key = `${Math.floor(pl.x / CELL)},${Math.floor(pl.z / CELL)}`;
+    (cells.get(key) || cells.set(key, []).get(key)).push(pl);
+  }
+  let seed = 1;
+  return [...cells.values()].map((list) => {
+    const R = rng(seed++ * 7919);
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(R() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
+  });
+}
+
+/**
+ * Pone una geometría en N lugares como mallas instanciadas con contorno. Devuelve el grupo. Con muchos lugares se parte en
+ * celdas del mapa (CELL): cada una se descarta sola cuando la cámara no la ve (una malla única de toda la pista siempre
+ * "se ve" y la placa de video procesa todos los árboles de la vuelta en cada cuadro). Cada malla guarda en `userData.full`
+ * cuántos lugares tiene: el escenario baja `count` para aflojar el decorado en dispositivos lentos (Stage.setDetail).
+ * `bob` anima las matrices una por una y necesita una sola malla: no se parte.
+ */
+export function instanced(geo, places, { outline = true, thick = 0.045, mat = null, matOutline = null, bob = false, chunk = true } = {}) {
   const g = new THREE.Group();
   if (!places.length) return g;
-  const mesh = new THREE.InstancedMesh(geo, mat || paintMaterial(), places.length);
+  const cells = chunk && !bob && places.length >= 40 ? cellsOf(places) : [places];
   const M = new THREE.Matrix4();
   const q = new THREE.Quaternion();
   const e = new THREE.Euler(0, 0, 0, 'YXZ');
   const s = new THREE.Vector3();
   const p = new THREE.Vector3();
-  places.forEach((pl, i) => {
-    e.set(pl.rx || 0, pl.ry ?? pl.rot ?? 0, pl.rz || 0);
-    q.setFromEuler(e);
-    if (Array.isArray(pl.s)) s.set(pl.s[0], pl.s[1], pl.s[2]);
-    else s.setScalar(pl.s ?? 1);
-    p.set(pl.x, pl.y, pl.z);
-    M.compose(p, q, s);
-    mesh.setMatrixAt(i, M);
-  });
-  mesh.instanceMatrix.needsUpdate = true;
-  mesh.computeBoundingSphere();
-  g.add(mesh);
-  if (outline && geo.attributes.onormal) {
-    const line = new THREE.InstancedMesh(geo, matOutline || outlineMaterial(thick), places.length);
-    line.instanceMatrix = mesh.instanceMatrix;
-    line.computeBoundingSphere();
-    line.userData.outline = true;
-    g.add(line);
+  for (const list of cells) {
+    const mesh = new THREE.InstancedMesh(geo, mat || paintMaterial(), list.length);
+    list.forEach((pl, i) => {
+      e.set(pl.rx || 0, pl.ry ?? pl.rot ?? 0, pl.rz || 0);
+      q.setFromEuler(e);
+      if (Array.isArray(pl.s)) s.set(pl.s[0], pl.s[1], pl.s[2]);
+      else s.setScalar(pl.s ?? 1);
+      p.set(pl.x, pl.y, pl.z);
+      M.compose(p, q, s);
+      mesh.setMatrixAt(i, M);
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
+    mesh.userData.full = list.length;
+    g.add(mesh);
+    if (outline && geo.attributes.onormal) {
+      const line = new THREE.InstancedMesh(geo, matOutline || outlineMaterial(thick), list.length);
+      line.instanceMatrix = mesh.instanceMatrix;
+      line.computeBoundingSphere();
+      line.userData.outline = true;
+      line.userData.full = list.length;
+      g.add(line);
+    }
   }
   return g;
 }

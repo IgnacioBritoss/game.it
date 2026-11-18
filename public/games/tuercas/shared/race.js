@@ -136,6 +136,17 @@ function close(R) {
   R.ev('over', null);
 }
 
+/** Dónde están los estorbos que van y vienen a lo ancho de la pista, a la hora de la carrera `R.t` (el modo online lo repite en el cliente). */
+export function placeObstacles(R) {
+  const T = R.T;
+  for (const o of R.obstacles) {
+    o.now = o.d + o.amp * Math.sin((R.t / o.per) * Math.PI * 2 + o.ph);
+    o.x = T.x[o.i] + T.nx[o.i] * o.now;
+    o.z = T.z[o.i] + T.nz[o.i] * o.now;
+    o.y = T.y[o.i];
+  }
+}
+
 /** Un paso de la carrera. `inputs[h]` son las entradas del jugador h. */
 export function stepRace(R, inputs = []) {
   if (R.over) return;
@@ -143,6 +154,7 @@ export function stepRace(R, inputs = []) {
   const dt = DT;
   const ev = R.ev;
   R.t += dt;
+  R.stepN = (R.stepN | 0) + 1;
 
   // ---------- cuenta regresiva: nadie se mueve; se mide cuánto hace que cada uno acelera
   if (R.t < 0) {
@@ -187,7 +199,12 @@ export function stepRace(R, inputs = []) {
     let inp;
     if (k.autoT > 0) inp = follow(k, T, k.out);
     else if (k.human >= 0 && !k.finished) inp = inputs[k.human] || IDLE;
-    else inp = think(k, T, R, k.out);
+    else if (R.aiSkip > 1 && (R.stepN + k.index) % R.aiSkip !== 0) inp = k.out; // (online, con el servidor apretado: los bots deciden menos veces)
+    else if (R.aiSkip > 1) {
+      R.dt = dt * R.aiSkip; // lo que cuentan sus relojes internos es el tiempo que pasó desde la última decisión
+      inp = think(k, T, R, k.out);
+      R.dt = dt;
+    } else inp = think(k, T, R, k.out);
     const press = !!inp.item && !k.itemPrev;
     k.itemPrev = !!inp.item;
     if (k.rollT > 0) {
@@ -273,13 +290,8 @@ export function stepRace(R, inputs = []) {
   }
 
   // ---------- lo que hay sobre la pista
-  for (const o of R.obstacles) {
-    o.now = o.d + o.amp * Math.sin((R.t / o.per) * Math.PI * 2 + o.ph);
-    o.x = T.x[o.i] + T.nx[o.i] * o.now;
-    o.z = T.z[o.i] + T.nz[o.i] * o.now;
-    o.y = T.y[o.i];
-    if (o.downT > 0) o.downT -= dt;
-  }
+  placeObstacles(R);
+  for (const o of R.obstacles) if (o.downT > 0) o.downT -= dt;
   for (const k of ks) {
     if (k.fallT > 0) continue;
     if (!k.air && k.padT <= 0) {

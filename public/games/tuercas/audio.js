@@ -189,6 +189,8 @@ class Music {
 
 // ---------------------------------------------------------------- general
 const engines = [];
+let budget = 12;
+let budgetT = 0;
 const music = new Music();
 let rollT = 0;
 let nutStreak = 0;
@@ -236,6 +238,15 @@ export const audio = {
   event(ev, view) {
     if (!ac) return;
     const k = ev.k;
+    // con 12 vehículos juntos los eventos se amontonan: lo de los demás (no el propio) tiene un tope por cuarto de segundo
+    if (k && !view.includes(k)) {
+      const t = ac.currentTime;
+      if (t - budgetT > 0.25) {
+        budgetT = t;
+        budget = 12;
+      }
+      if (budget-- <= 0) return;
+    }
     let f = 1;
     if (k && view.length && !view.includes(k)) {
       let best = 1e9;

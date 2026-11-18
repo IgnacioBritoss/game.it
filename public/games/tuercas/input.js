@@ -33,6 +33,7 @@ export class Input {
     this.ptr = new Map();
     this.padsSeen = false;
     this._down = (e) => {
+      if (e.target?.closest?.('input, textarea')) return; // escribiendo (nombre y código de la sala online)
       if (e.repeat) {
         if (BLOCK.has(e.code)) e.preventDefault();
         return;

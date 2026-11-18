@@ -14,6 +14,7 @@ import { TRACK_DEFS, CUPS, getTrack } from './shared/tracks.js';
 import { CLASSES, DRIVERS, PAINTS, byId, randomConfig } from './shared/parts.js';
 import { ITEMS, ITEM_IDS } from './shared/items.js';
 import { THEMES } from './themes.js';
+import { OnlineMode } from './online.js';
 import { makeT } from './text.js';
 import { rng, clamp } from './shared/util.js';
 
@@ -63,12 +64,13 @@ let stage = null;
 let input = null;
 let hud = null;
 let garage = null;
+let online = null;
 let clock = 0;
 let last = performance.now();
 let unlocked = false;
 
 // ---------------------------------------------------------------- pantallas
-const SCREENS = ['s-home', 's-select', 's-garage', 's-help', 's-pause', 's-results', 's-nogl'];
+const SCREENS = ['s-home', 's-select', 's-garage', 's-help', 's-pause', 's-results', 's-nogl', 's-online', 's-lobby', 's-loading', 's-crash'];
 function show(id) {
   for (const s of SCREENS) $(s).classList.toggle('on', s === id);
 }
@@ -80,6 +82,8 @@ function applyLang() {
     // la garage los reescribe ella misma; el resto se traduce acá
     if (!el.closest('#g-tabs')) el.textContent = tr(el.dataset.t);
   }
+  for (const el of document.querySelectorAll('[data-ph]')) el.placeholder = tr(el.dataset.ph);
+  for (const el of document.querySelectorAll('[data-title]')) el.title = tr(el.dataset.title);
 }
 
 // ---------------------------------------------------------------- ayuda
@@ -94,7 +98,8 @@ function renderHelp() {
     <section><h3>${esc(tr('hDriftT'))}</h3><p>${esc(tr('hDriftText'))}</p>
       <h3>${esc(tr('hBoxT'))}</h3><p>${esc(tr('hBoxText'))}</p></section>
     <section><h3>${esc(tr('hTricksT'))}</h3><p>${esc(tr('hTricksText'))}</p>
-      <h3>${esc(tr('hGarageT'))}</h3><p>${esc(tr('hGarageText'))}</p></section>
+      <h3>${esc(tr('hGarageT'))}</h3><p>${esc(tr('hGarageText'))}</p>
+      <h3>${esc(tr('hOnlineT'))}</h3><p>${esc(tr('hOnlineText'))}</p></section>
     <div class="help-items"><h3 style="grid-column:1/-1;color:var(--sun)">${esc(tr('hItems'))}</h3>${ITEM_IDS.map((id) => `<div>${ICONS[id]}<p><b>${esc(ITEMS[id].name[lang])}</b><span>${esc(ITEMS[id].tip[lang])}</span></p></div>`).join('')}</div>`;
 }
 
@@ -375,22 +380,52 @@ function stepSim(R, dt, inputs) {
   if (n >= 10) S.acc = 0;
 }
 
+let errStreak = 0;
+let crashed = false;
 function frame(now) {
   requestAnimationFrame(frame);
   const dt = clamp((now - last) / 1000, 0, 0.1);
   last = now;
   clock += dt;
-  if (!stage) return;
+  if (!stage || crashed) return;
   navPad();
   try {
     if (S.view === 'garage') {
       garage.frame(dt, clock);
       audio.update(null, [], dt);
-    } else if (S.view === 'race' || S.view === 'results') tickRace(dt);
+    } else if ((S.view === 'race' || S.view === 'results') && S.mode === 'online') online.frame(dt, clock);
+    else if (S.view === 'race' || S.view === 'results') tickRace(dt);
     else tickAttract(dt);
+    errStreak = Math.max(0, errStreak - 0.05);
+  } catch (e) {
+    // un error en un cuadro no debe congelar el juego: se registra y se sigue; si se repite sin parar, se avisa y se ofrece salir
+    if (errStreak < 1) console.error(e);
+    if (++errStreak >= 30) crash(e);
+  }
+}
+
+/** Algo se repite fallando: se frena la carrera y se deja salir al menú o recargar. */
+function crash(err) {
+  if (crashed) return;
+  crashed = true;
+  console.error('Tuercas: el bucle falló sin parar', err);
+  try {
+    audio.stopAll();
+    G.gameplay(false);
+  } catch {}
+  show('s-crash');
+}
+function recover() {
+  crashed = false;
+  errStreak = 0;
+  try {
+    if (S.mode === 'online' && online?.active) online.leaveRace();
+    else quitToMenu();
   } catch (e) {
     console.error(e);
+    location.reload();
   }
+  show('s-home');
 }
 
 function tickRace(dt) {
@@ -439,8 +474,13 @@ function tickAttract(dt) {
 
 /** Eventos del paso: efectos, sonido y mensajes del HUD. */
 function drain(R, views) {
+  drainEvents(R, R.events, views);
+  R.events.length = 0;
+}
+
+function drainEvents(R, events, views) {
   const karts = views.map((v) => v.kart).filter(Boolean);
-  for (const ev of R.events) {
+  for (const ev of events) {
     stage.fx(ev, karts);
     audio.event(ev, karts);
     const vi = ev.k ? views.findIndex((v) => v.kart === ev.k) : -1;
@@ -482,7 +522,6 @@ function drain(R, views) {
         break;
     }
   }
-  R.events.length = 0;
 }
 
 function countdown(text, go) {
@@ -503,13 +542,18 @@ function flash() {
 function pauseGame() {
   if (S.view !== 'race' || S.paused) return;
   S.paused = true;
-  audio.muteEngines();
+  const on = S.mode === 'online';
+  $('p-restart').hidden = on; // online no se reinicia ni se detiene: el menú avisa y deja salir
+  $('pause-note').hidden = !on;
+  if (on) online.pause(true);
+  else audio.muteEngines();
   overlay('s-pause', true);
   G.gameplay(false);
 }
 function resumeGame() {
   if (!S.paused) return;
   S.paused = false;
+  if (S.mode === 'online') online.pause(false);
   overlay('s-pause', false);
   G.gameplay(true);
   last = performance.now();
@@ -706,6 +750,11 @@ function back() {
   if (S.view === 'select') return goHome();
   if (S.view === 'help') return closeHelp();
   if (S.view === 'garage') return garage.finish();
+  if (S.view === 'online') return online.exit();
+  if (S.view === 'lobby') {
+    online.lobby.leave();
+    return online.screen('online');
+  }
 }
 function goHome() {
   S.view = 'home';
@@ -725,6 +774,7 @@ addEventListener('keydown', (e) => {
   if (S.view === 'race' && !S.paused) return;
   const t = document.activeElement;
   if (t && t.type === 'range' && (e.code === 'ArrowLeft' || e.code === 'ArrowRight')) return;
+  if (t && t.tagName === 'INPUT' && t.type !== 'range' && e.code !== 'Escape') return; // escribiendo el nombre o el código
   const m = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 };
   if (e.code in m && S.view !== 'garage') {
     moveFocus(m[e.code]);
@@ -761,7 +811,9 @@ function wire() {
   click('m-free', () => openSelect('free'));
   click('m-trial', () => openSelect('trial'));
   click('m-two', () => openSelect('two'));
+  click('m-online', () => online.open());
   click('m-garage', () => {
+    S.garageFrom = 'home';
     S.view = 'garage';
     show('s-garage');
     garage.open(0, 1);
@@ -777,7 +829,7 @@ function wire() {
   click('sel-go', startFromSelect);
   click('p-resume', resumeGame);
   click('p-restart', () => startRace());
-  click('p-quit', quitToMenu);
+  click('p-quit', () => (S.mode === 'online' ? online.leaveRace() : quitToMenu()));
   click('p-help', () => {
     S.helpFrom = 'race';
     S.view = 'help';
@@ -786,6 +838,8 @@ function wire() {
     show('s-help');
   });
   click('nogl-exit', () => G.exit());
+  click('crash-menu', recover);
+  click('crash-reload', () => location.reload());
   $('b-pause').addEventListener('click', pauseGame);
   $('sel-cards').addEventListener('click', (e) => {
     const c = e.target.closest('.card');
@@ -825,6 +879,8 @@ function wire() {
   input.onPause(() => (S.paused ? resumeGame() : pauseGame()));
   G.onPrefs(() => {
     applyLang();
+    online?.buildOptions();
+    online?.refreshMine();
     if (S.view === 'help') renderHelp();
     if (S.view === 'select') openSelect(S.mode);
     if (S.view === 'garage') garage.i18n(), garage.renderTab(), garage.renderStats(true);
@@ -848,16 +904,23 @@ function boot() {
     return;
   }
   G.progress(0.3);
+  stage.onContext = (lost) => {
+    const n = $('gfx-note');
+    n.hidden = !lost;
+    if (lost) n.textContent = tr('gfxLost');
+  };
   input = new Input(document.body);
   hud = new Hud($('hud'), getTrack('pradera'), tr);
   garage = new Garage($('s-garage'), tr, {
     stage,
     audio,
     onDone: () => {
+      if (S.garageFrom === 'lobby') return online.afterGarage();
       S.view = 'home';
       show('s-home');
     },
   });
+  online = makeOnline();
   wire();
   // "2 jugadores" necesita teclado o mandos
   const two = () => ($('m-two').hidden = G.prefs.platform === 'mobile' && !input.pads.length);
@@ -867,11 +930,68 @@ function boot() {
   const first = load('track', 'pradera');
   startAttract(first);
   G.progress(0.9);
-  S.view = 'home';
-  show('s-home');
+  // un link de sala o una partida online en curso que se recargó: directo a la pantalla online
+  if (online.pending) {
+    online.active = true;
+    S.view = 'online';
+    show('s-online');
+  } else {
+    S.view = 'home';
+    show('s-home');
+  }
   G.gameplay(false);
   requestAnimationFrame(frame);
   G.ready();
+}
+
+/** El modo online: game.js le presta lo que necesita de la pantalla, la carrera y los menús. */
+function makeOnline() {
+  return new OnlineMode({
+    G,
+    tr,
+    $,
+    lang: LANG,
+    show,
+    overlay,
+    audio,
+    input,
+    stage: () => stage,
+    hud: () => hud,
+    newHud: (R) => (hud = new Hud($('hud'), R.T, tr)),
+    views: () => S.views,
+    layout: () => layoutViews(),
+    setView: (v) => {
+      S.view = v;
+    },
+    setRace: (R, init) => {
+      S.mode = 'online';
+      S.race = R;
+      S.players = 1;
+      S.bg = null;
+      S.cup = null;
+      S.paused = false;
+      S.trackId = init.track;
+      S.opts = { mode: 'online', cls: init.cls, laps: init.laps, track: init.track };
+    },
+    drain: (R, events) => drainEvents(R, events, S.views),
+    cfg: () => loadConfig(0),
+    openGarage: (from) => {
+      S.garageFrom = from;
+      S.view = 'garage';
+      show('s-garage');
+      garage.open(0, 1);
+    },
+    goHome: () => {
+      S.mode = null;
+      S.race = null;
+      S.paused = false;
+      stage.marks = false;
+      layoutViews();
+      S.view = 'home';
+      show('s-home');
+      startAttract(S.bgTrack || load('track', 'pradera'));
+    },
+  });
 }
 boot();
 

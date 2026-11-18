@@ -26,6 +26,35 @@ const SPARK = [
 ];
 const BOOST_COLOR = { mt: ['#9fe6ff', '#1f7bff'], pad: ['#9fe6ff', '#1f9dd6'], start: ['#ffe27a', '#ff7a1f'], sifon: ['#ffffff', '#7fd0ff'], tow: ['#f0b0ff', '#8a3dff'], trick: ['#ffb0e0', '#ff4b9a'], '': ['#fff3c4', '#ff7a1f'] };
 
+// ---------------------------------------------------------------- etiqueta con el nombre (online)
+/** Un cartelito con el nombre que mira siempre a la cámara. `human`: persona (cartel claro) o compu (cartel apagado). */
+function makeNameTag(text, human) {
+  const W = 256;
+  const H = 64;
+  const tex = canvasTex(W, H, (g) => {
+    g.font = '700 30px Fredoka, "Baloo 2", system-ui, sans-serif';
+    const name = String(text).slice(0, 14);
+    const w = Math.min(W - 8, g.measureText(name).width + 34);
+    const x = (W - w) / 2;
+    g.fillStyle = human ? 'rgba(255,247,230,.94)' : 'rgba(58,47,107,.82)';
+    g.strokeStyle = '#2b1b3d';
+    g.lineWidth = 5;
+    g.beginPath();
+    g.roundRect(x, 8, w, H - 16, 14);
+    g.fill();
+    g.stroke();
+    g.fillStyle = human ? '#2b1b3d' : '#fff7e6';
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.fillText(name, W / 2, H / 2 + 1);
+  });
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, fog: false });
+  const sp = new THREE.Sprite(mat);
+  sp.renderOrder = 9;
+  sp.scale.set(3.4, 0.85, 1);
+  return sp;
+}
+
 // ---------------------------------------------------------------- vehículo en pista
 class KartView {
   constructor(stage, kart) {
@@ -64,6 +93,12 @@ class KartView {
     this.rocket = this.makeRocket();
     this.rocket.visible = false;
     v.lean.add(this.rocket);
+    // nombre sobre el vehículo (online)
+    if (kart.tag) {
+      this.tag = makeNameTag(kart.name, kart.human >= 0);
+      this.tag.visible = false;
+      stage.scene.add(this.tag);
+    }
     // marca de jugador (solo en pantalla dividida)
     if (kart.human >= 0 && stage.marks) {
       const m = new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.6, 4), new THREE.MeshBasicMaterial({ color: kart.human === 0 ? '#ff4b4b' : '#3d8bff' }));
@@ -134,6 +169,19 @@ class KartView {
 
     this.root.position.set(x, y, z);
     this.root.rotation.set(0, yaw + spinY, 0);
+    if (this.tag) {
+      // el cartel se desvanece con la distancia y no se ve detrás de la cámara
+      const f = st.focus;
+      const dist = Math.hypot(x - f.x, z - f.z);
+      const a = clamp(1 - (dist - 20) / 40, 0, 1);
+      this.tag.visible = a > 0.03 && k.fallT <= 0;
+      if (this.tag.visible) {
+        const sc = clamp(dist / 16, 1, 2.6);
+        this.tag.position.set(x, y + v.top + 1.2 + sc * 0.15, z);
+        this.tag.scale.set(3.4 * sc, 0.85 * sc, 1);
+        this.tag.material.opacity = a;
+      }
+    }
     v.lean.rotation.set(-(this.pitch + this.wheelie * 0.34) - flip, 0, this.roll);
 
     // parpadeo mientras es inmune (después de un golpe)
@@ -270,6 +318,11 @@ class KartView {
       if (o.geometry) o.geometry.dispose();
     });
     this.mat.dispose();
+    if (this.tag) {
+      this.stage.scene.remove(this.tag);
+      this.tag.material.map.dispose();
+      this.tag.material.dispose();
+    }
     this.bubble.geometry.dispose();
     this.bubble.material.dispose();
     if (this.mark) {
@@ -428,10 +481,30 @@ export class Stage {
     this.quality = quality;
     this.marks = marks;
     this.outline = quality > 0.5;
-    const r = (this.r = new THREE.WebGLRenderer({ canvas, antialias: quality > 0.5, powerPreference: 'high-performance' }));
+    // (en celulares sin suavizado de bordes ni más de 1,25 de resolución: el contorno grueso disimula el escalonado y la memoria de video alcanza)
+    const r = (this.r = new THREE.WebGLRenderer({ canvas, antialias: quality > 0.8, powerPreference: 'high-performance' }));
     r.outputColorSpace = THREE.SRGBColorSpace;
     r.autoClear = false;
-    this.maxDpr = quality > 0.8 ? Math.min(2, devicePixelRatio || 1) : Math.min(1.5, devicePixelRatio || 1);
+    this.maxDpr = quality > 0.8 ? Math.min(2, devicePixelRatio || 1) : Math.min(1.25, devicePixelRatio || 1);
+    this.detail = quality > 0.8 ? 1 : 0.7; // cuánto decorado se dibuja (1 = todo): baja solo si el dispositivo no da abasto
+    this.lost = false; // el contexto WebGL se perdió (la placa se reinició o faltó memoria)
+    this.lostCount = 0;
+    this.onContext = null; // (perdido: boolean) => void: el juego avisa en pantalla
+    canvas.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault(); // sin esto el navegador no lo restaura
+      this.lost = true;
+      this.lostCount++;
+      this.onContext?.(true);
+    });
+    canvas.addEventListener('webglcontextrestored', () => {
+      // three.js vuelve a subir lo que haga falta; se vuelve a pedir menos resolución por si fue falta de memoria
+      this.lost = false;
+      this.maxDpr = Math.max(0.75, this.maxDpr * 0.85);
+      this.dpr = Math.min(this.dpr, this.maxDpr);
+      this.r.setPixelRatio(this.dpr);
+      this.resize();
+      this.onContext?.(false);
+    });
     this.dpr = this.maxDpr;
     this.ema = 1 / 60;
     this.slowT = 0;
@@ -485,6 +558,11 @@ export class Stage {
         this.r.setSize(this.W, this.H, false);
         this.slowT = 0;
         this.backoff = Math.min(40, this.backoff * 1.6);
+      } else if (this.slowT > 2.5 && this.dpr <= 0.7 && this.detail > 0.4) {
+        // ya no se puede bajar más la resolución: se afloja el decorado (árboles, edificios…)
+        this.detail = Math.max(0.4, this.detail - 0.2);
+        this.applyDetail();
+        this.slowT = 0;
       }
     } else {
       this.slowT = 0;
@@ -498,6 +576,15 @@ export class Stage {
         }
       }
     }
+  }
+
+  /** Dibuja solo una parte del decorado (las mallas instanciadas se mezclaron al armarse: es una parte pareja de cada zona). */
+  applyDetail() {
+    const f = this.detail;
+    this.world?.group.traverse((o) => {
+      if (o.isInstancedMesh && o.userData.full) o.count = Math.max(1, Math.ceil(o.userData.full * f));
+    });
+    if (this.weather) this.weather.points.geometry.setDrawRange(0, Math.ceil(this.weather.points.geometry.attributes.position.count * Math.max(0.4, f)));
   }
 
   loadTrack(id) {
@@ -530,6 +617,7 @@ export class Stage {
     }
     this.soft.clear();
     this.glow.clear();
+    this.applyDetail();
     for (const c of this.cams) c.snap();
     return w;
   }
@@ -795,6 +883,7 @@ export class Stage {
   // ------------------------------------------------------------ dibujo
   /** Dibuja otra escena (el taller) en un rectángulo de la pantalla; el resto se limpia con `clear`. */
   renderOther(scene, cam, rect, clear = '#000000') {
+    if (this.lost) return;
     const r = this.r;
     r.setScissorTest(false);
     r.setViewport(0, 0, this.W, this.H);
@@ -814,6 +903,7 @@ export class Stage {
    */
   render(R, alpha, dt, t, views) {
     this.t = t;
+    if (this.lost) return; // sin contexto no hay nada que dibujar (la simulación sigue)
     const r = this.r;
     if (R && this.kviews.length) {
       for (const kv of this.kviews) kv.update(R, alpha, dt, t);

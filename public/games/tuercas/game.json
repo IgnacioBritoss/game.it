@@ -2,11 +2,11 @@
   "id": "tuercas",
   "title": { "es": "Tuercas", "en": "Tuercas" },
   "description": {
-    "es": "Karts y motos en 3D de dibujito con ocho pilotos, siete vehículos, ruedas, accesorios, pintura y puesta a punto: cada pieza cambia las estadísticas. Seis pistas con tema propio, cajas con ítems, tuercas, derrapes con miniturbo y saltos con pirueta. Copa, carrera libre, contrarreloj y 2 jugadores en pantalla dividida.",
-    "en": "Cartoon 3D karts and bikes with eight drivers, seven vehicles, wheels, accessories, paint and tuning: every part changes the stats. Six themed tracks, item boxes, nuts, drifts with mini-turbos and jumps with tricks. Cup, free race, time trial and 2-player split screen."
+    "es": "Karts y motos en 3D de dibujito con ocho pilotos, siete vehículos, ruedas, accesorios, pintura y puesta a punto: cada pieza cambia las estadísticas. Seis pistas con tema propio, cajas con ítems, tuercas, derrapes con miniturbo y saltos con pirueta. Copa, carrera libre, contrarreloj, 2 jugadores en pantalla dividida y carreras online de hasta 12 con salas y revancha.",
+    "en": "Cartoon 3D karts and bikes with eight drivers, seven vehicles, wheels, accessories, paint and tuning: every part changes the stats. Six themed tracks, item boxes, nuts, drifts with mini-turbos and jumps with tricks. Cup, free race, time trial, 2-player split screen and online races for up to 12 with rooms and rematches."
   },
-  "categories": ["carreras", "arcade", "multijugador", "casual"],
-  "tags": ["kart", "karts", "moto", "motos", "bike", "autos", "cars", "racing", "carrera", "derrape", "drift", "items", "cajas", "boxes", "taller", "garage", "personalizar", "3d", "cartoon", "pantalla dividida", "split screen", "copa", "cup", "contrarreloj", "time trial"],
+  "categories": ["carreras", "online", "arcade", "multijugador", "casual"],
+  "tags": ["kart", "karts", "moto", "motos", "bike", "autos", "cars", "racing", "carrera", "derrape", "drift", "items", "cajas", "boxes", "taller", "garage", "personalizar", "3d", "cartoon", "pantalla dividida", "split screen", "copa", "cup", "contrarreloj", "time trial", "online", "salas", "rooms", "amigos", "friends"],
   "thumbnail": "thumb.webp",
   "entry": "index.html",
   "tech": "three.js",
@@ -14,6 +14,6 @@
   "platforms": ["desktop", "mobile"],
   "orientation": "any",
   "input": ["keyboard", "touch", "gamepad"],
-  "features": { "online": false, "multiplayer": true, "localPlayers": 2, "maxPlayers": 8, "cpu": true, "story": false },
+  "features": { "online": true, "multiplayer": true, "localPlayers": 2, "maxPlayers": 12, "cpu": true, "story": false },
   "order": 74
 }

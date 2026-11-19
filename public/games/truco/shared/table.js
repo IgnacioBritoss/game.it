@@ -255,10 +255,11 @@ export class Table {
     }
     const r = envidoResult(h.dealt, h.mano);
     const pts = envidoAccepted(p.chain, this.scores, target);
-    // lo que dice cada equipo: primero el más cercano a la mano; el otro dice sus puntos solo si son mejores
+    // lo que dice cada equipo: primero el más cercano a la mano y después el otro, que dice "son mejores" o "son
+    // buenas"; los puntos de los dos se muestran siempre, para que se vea cuánto tenía cada uno
     const order = [0, 1].sort((a, b) => ((r.seat[a] - h.mano + this.n) % this.n) - ((r.seat[b] - h.mano + this.n) % this.n));
     const said = [{ seat: r.seat[order[0]], pts: r.pts[order[0]] }];
-    said.push({ seat: r.seat[order[1]], pts: r.winner === order[1] ? r.pts[order[1]] : null });
+    said.push({ seat: r.seat[order[1]], pts: r.pts[order[1]], buenas: r.winner !== order[1] });
     h.env.result = { yes: true, winner: r.winner, pts, said, seat: r.seat[r.winner] };
     this.push({ k: 'envido', yes: true, winner: r.winner, pts, said });
     if (this.award(r.winner, pts)) return;

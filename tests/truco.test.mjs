@@ -386,7 +386,7 @@ test('envido: cadena con real, querido, no querido y falta', () => {
   const er = A.T.h.env.result;
   assert.equal(er.yes, true);
   assert.equal(er.winner, 0);
-  assert.deepEqual(er.said, [{ seat: 0, pts: 33 }, { seat: 1, pts: null }], 'el segundo dice "son buenas"');
+  assert.deepEqual(er.said, [{ seat: 0, pts: 33 }, { seat: 1, pts: 7, buenas: true }], 'el segundo dice "son buenas" y se ven sus puntos');
   assert.equal(A.T.legal(0).envido.length, 0, 'ya se jugó el envido');
   assert.ok(A.T.legal(0).play, 'y sigue la mano');
   // no querido: lo de antes del último canto (o 1 si fue el primero)
@@ -404,7 +404,7 @@ test('envido: cadena con real, querido, no querido y falta', () => {
   go(D, 0, { t: 'envido', kind: 'envido' });
   go(D, 1, { t: 'quiero' });
   assert.deepEqual(D.T.scores, [0, 2]);
-  assert.deepEqual(D.T.h.env.result.said, [{ seat: 0, pts: 7 }, { seat: 1, pts: 33 }], 'el mano dice 7 y el otro lo supera con 33');
+  assert.deepEqual(D.T.h.env.result.said, [{ seat: 0, pts: 7 }, { seat: 1, pts: 33, buenas: false }], 'el mano dice 7 y el otro lo supera con 33');
   // falta envido querida: todo lo que falta (acá, la partida)
   const E = scene(hands);
   go(E, 0, { t: 'envido', kind: 'falta' });
@@ -780,7 +780,10 @@ test('cartas: las 40 y el dorso se dibujan (SVG válido, distinto cada una)', ()
   assert.equal(new Set(svgs).size, 40);
   for (const s of svgs) assert.ok(s.startsWith('<svg') && s.endsWith('</svg>') && s.includes('viewBox'));
   assert.ok(backSVG().startsWith('<svg'));
-  assert.ok(cardSVG('1e').includes('url(#gs)'), 'el ancho de espadas lleva la espada grande');
+  // cada espada tiene una hoja: el ancho una sola (la grande) y del 2 al 7, tantas como el número
+  const blades = (c) => cardSVG(c).split('fill="#36aee4"').length - 1;
+  for (const n of [1, 2, 3, 4, 5, 6, 7]) assert.equal(blades(`${n}e`), n, `${n} de espadas`);
+  assert.equal(blades('1e'), 1);
 });
 
 test('servidor: valida los ajustes, pide dos personas, reparte sin mostrar las cartas ajenas y completa con la compu', async () => {

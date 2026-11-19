@@ -91,7 +91,7 @@ const TXT = {
   c_quiero: { es: '¡Quiero!', en: 'I accept!' },
   c_noquiero: { es: 'No quiero', en: 'I decline' },
   c_mazo: { es: 'Me voy al mazo', en: 'I fold' },
-  c_buenas: { es: 'Son buenas', en: 'You win' },
+  c_buenas: { es: '{p}, son buenas', en: '{p}, you win' },
   c_mejores: { es: '{p} son mejores', en: '{p} beats it' },
   c_tengo: { es: '{p}', en: '{p}' },
   n_truco: { es: 'el truco', en: 'truco' },
@@ -143,8 +143,7 @@ const TXT = {
   w_mazoName: { es: '{name} se fue al mazo', en: '{name} folded' },
   w_mazoEnv: { es: '1 es por el envido que no se jugó', en: '1 is for the envido nobody played' },
   e_line: { es: 'Envido: {who} +{p}', en: 'Envido: {who} +{p}' },
-  e_vs: { es: '{a} a {b}', en: '{a} to {b}' },
-  e_buenas: { es: '{a}, son buenas', en: '{a}, unbeaten' },
+  e_pts: { es: '{a} {p} · {b} {q}', en: '{a} {p} · {b} {q}' },
   e_no: { es: 'no quiso', en: 'declined' },
   f_line: { es: 'Flor: {who} +{p}', en: 'Flor: {who} +{p}' },
   pt1: { es: 'punto', en: 'point' },
@@ -545,7 +544,9 @@ function playEvent(e, v) {
       if (e.yes) {
         const [a, b] = e.said;
         later(650, () => bubble(v, a.seat, t('c_tengo', { p: a.pts }), 'pts', t('b_envido'), 2400));
-        later(1450, () => bubble(v, b.seat, b.pts === null ? t('c_buenas') : t('c_mejores', { p: b.pts }), b.pts === null ? 'no' : 'pts', '', 2200));
+        // el segundo dice si son mejores o son buenas, y siempre se ven sus puntos
+        const buenas = b.buenas ?? b.pts === null;
+        later(1450, () => bubble(v, b.seat, t(buenas ? 'c_buenas' : 'c_mejores', { p: b.pts ?? '?' }), buenas ? 'no' : 'pts', '', 2400));
         later(1500, () => {
           flashScore(e.winner);
           (e.winner === mineTeam(v) ? sfx.point : sfx.lose)();
@@ -891,7 +892,10 @@ function matchSVG(n, target, size) {
 }
 function renderScore(v) {
   const el = $('score');
-  const size = L.W > 700 ? 18 : 15;
+  // grande y claro cuando hay lugar; en pantallas bajas (celular acostado) queda chico, para no tapar a los de los costados
+  const big = L.W > 700 && L.H > 520;
+  const mid = !big && L.H > 420;
+  const size = big ? 25 : mid ? 20 : L.W > 700 ? 18 : 15;
   const me = mineTeam(v);
   const teams = [me, 1 - me];
   const html = teams
@@ -905,6 +909,8 @@ function renderScore(v) {
   el.dataset.sig = sig;
   el.innerHTML = html;
   el.style.gridTemplateColumns = 'auto auto';
+  el.classList.toggle('big', big);
+  el.classList.toggle('mid', mid);
 }
 function flashScore(team) {
   const el = $('score').querySelector(`[data-team="${team}"]`);
@@ -961,8 +967,14 @@ function showToast(v, e) {
   const lines = [`<p>${esc(why)} · <em>+${e.pts}</em>${e.env ? ` <small>(${esc(t('w_mazoEnv'))})</small>` : ''}</p>`];
   const en = S.handEnv;
   if (en) {
-    const detail = en.yes ? (en.said[1].pts === null ? t('e_buenas', { a: en.said[0].pts }) : t('e_vs', { a: en.said[1].pts, b: en.said[0].pts })) : t('e_no');
-    lines.push(`<p>${esc(t('e_line', { who: teamLabel(v, en.winner), p: en.pts }))} <small>(${esc(detail)})</small></p>`);
+    // cuánto tenía cada uno: primero lo mío (o lo de mi pareja) y después lo del rival
+    let detail = t('e_no');
+    if (en.yes) {
+      const me = mineTeam(v);
+      const ptsOf = (tm) => en.said.find((x) => teamOf(x.seat) === tm)?.pts ?? '?';
+      detail = t('e_pts', { a: teamLabel(v, me), p: ptsOf(me), b: teamLabel(v, 1 - me), q: ptsOf(1 - me) });
+    }
+    lines.push(`<p>${esc(t('e_line', { who: teamLabel(v, en.winner), p: en.pts }))} ${en.yes ? `<b class="env-pts">${esc(detail)}</b>` : `<small>(${esc(detail)})</small>`}</p>`);
   }
   if (S.handFlor) lines.push(`<p>${esc(t('f_line', { who: teamLabel(v, S.handFlor.winner), p: S.handFlor.pts }))}</p>`);
   // las cartas con las que se ganó el envido (o la flor), para que se vea que eran ciertos
